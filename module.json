@@ -1,0 +1,11 @@
+{
+    "name": "WebsiteBase",
+    "alias": "website-base",
+    "description": "",
+    "keywords": [],
+    "priority": 3000,
+    "providers": [
+        "Modules\\WebsiteBase\\app\\Providers\\WebsiteBaseServiceProvider"
+    ],
+    "files": []
+}

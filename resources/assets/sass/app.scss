@@ -1,0 +1,23 @@
+.console {
+  padding: 18px 32px;
+  white-space: pre-wrap;
+  background: #202040;
+  color: #ffc107;
+  border: 1px solid #000;
+  font-family: "Lucida Console", "Courier New", monospace;
+  height: 300px;
+  scroll-behavior: auto;
+
+  .timestamp {
+    color: #707070;
+  }
+
+  .message {
+    color: #ffc107;
+  }
+
+}
+
+.deployment-console {
+
+}
