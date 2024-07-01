@@ -30,5 +30,5 @@
 
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS, null, null, [null => '[Keine Auswahl]']),
+    'options' => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS, null, null, [null => __('No choice')]),
     ])

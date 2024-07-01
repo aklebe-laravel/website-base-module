@@ -35,5 +35,5 @@
 
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions($telegramGroups, ['display_name'], 'id', [-1 => '[Keine Auswahl]']),
+    'options' => app('system_base')->toHtmlSelectOptions($telegramGroups, ['display_name'], 'id', [-1 => __('No choice')]),
     ])

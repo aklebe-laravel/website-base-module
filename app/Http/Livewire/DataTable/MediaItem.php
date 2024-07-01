@@ -130,7 +130,9 @@ class MediaItem extends BaseDataTable
     {
         $builder = parent::getBaseBuilder($collectionName);
         if ($this->useCollectionUserFilter) {
-            $builder = $builder->whereUserId($this->getUserId());
+            $builder = $builder->where(function ($b) {
+                $b = $b->whereUserId($this->getUserId())->orWhereNull('user_id');
+            });
         }
         return $builder;
     }

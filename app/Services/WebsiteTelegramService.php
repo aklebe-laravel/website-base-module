@@ -177,7 +177,7 @@ class WebsiteTelegramService extends BaseService
             $user = $user->makeWithDefaults([
                 'name'     => $this->userService->getNextAvailableUserName($telegramEntity->display_name),
                 'email'    => 'fake_'.Str::orderedUuid().'@local.test',
-                'password' => Hash::make(Str::random(30)),
+                'password' => Str::random(30),
             ]);
 
             // add extra attribute: telegram_id

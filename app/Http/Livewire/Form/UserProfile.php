@@ -62,7 +62,6 @@ class UserProfile extends User
         if ($telegramIdentityFound = $this->websiteTelegramService->ensureTelegramIdentity($telegramIdentityModelData)) {
 
             // add extra attribute: telegram_id
-            // @todo: move this to event to prevent WebsiteBase stuff from this module
             $user->setExtraAttribute('telegram_id', $telegramIdentityFound->telegram_id);
             $user->setExtraAttribute('use_telegram', true);
             $user->setExtraAttribute('preferred_notification_channel', WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM);

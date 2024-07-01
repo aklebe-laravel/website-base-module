@@ -35,7 +35,7 @@ return new class () extends Migration {
                 $table->string('city', 100)->nullable();
                 $table->string('region', 100)->nullable();
                 $table->string('zip', 10)->nullable()->comment('ZIP/PLZ');
-                $table->unsignedBigInteger('auto_region_id')->nullable()->index()->comment('Always ue this if given');
+                $table->unsignedBigInteger('auto_region_id')->nullable()->index()->comment('Always use this if given');
                 $table->foreign('auto_region_id')->references('id')->on('regions'); // no cascade here!
                 $table->string('user_description', 255)->nullable();
                 $table->timestamps();

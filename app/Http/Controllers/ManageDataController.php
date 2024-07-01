@@ -72,11 +72,11 @@ class ManageDataController extends Controller
         }
 
         // form and restrictions
-        if ($livewireForm = $showOnly ? null : app('system_base')->findLivewire($modelName, 'livewire-forms', $forceModuleName)) {
+        if ($livewireForm = $showOnly ? null : app('system_base')->findLivewire($modelName, 'livewire-forms',
+            $forceModuleName)) {
             /** @var ModelBase $livewireFormClass */
             if ($livewireFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireForm)) {
-                if ($livewireFormClass::aclResources && !$currentUser->hasAclResource($currentUser,
-                        $livewireFormClass::aclResources)) {
+                if ($livewireFormClass::aclResources && !$currentUser->hasAclResource($livewireFormClass::aclResources)) {
                     return view('content-pages.access-denied');
                 }
             }
@@ -86,8 +86,7 @@ class ManageDataController extends Controller
         if ($livewireTable = app('system_base')->findLivewire($tableName, 'data-tables', $forceModuleName)) {
             /** @var BaseDataTable $livewireTableClass */
             if ($livewireTableClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireTable)) {
-                if ($livewireTableClass::aclResources && !$currentUser->hasAclResource($currentUser,
-                        $livewireTableClass::aclResources)) {
+                if ($livewireTableClass::aclResources && !$currentUser->hasAclResource($livewireTableClass::aclResources)) {
                     return view('content-pages.access-denied');
                 }
             }

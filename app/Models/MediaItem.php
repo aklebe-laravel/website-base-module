@@ -104,7 +104,7 @@ class MediaItem extends Model implements Attachable
     public static function getMediaTypesAsSelectOptions(): array
     {
         $result = [
-            '' => '[Keine Auswahl]',
+            '' => __('No choice'),
         ];
         foreach (self::MEDIA_TYPES as $k => $v) {
             $result[$k] = $v['description'];
@@ -116,7 +116,7 @@ class MediaItem extends Model implements Attachable
     public static function getObjectTypesAsSelectOptions(): array
     {
         $result = [
-            '' => '[Keine Auswahl]',
+            '' => __('No choice'),
         ];
         foreach (self::OBJECT_TYPES as $k => $v) {
             $result[$k] = $v['description'];

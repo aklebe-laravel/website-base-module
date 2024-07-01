@@ -15,11 +15,12 @@ class MediaItemImage extends MediaItem
      * @param  string  $collectionName
      *
      * @return Builder|null
+     * @throws \Exception
      */
     public function getBaseBuilder(string $collectionName): ?Builder
     {
         $builder = parent::getBaseBuilder($collectionName);
-        $builder->where('media_type', \Modules\WebsiteBase\app\Models\MediaItem::MEDIA_TYPE_IMAGE);
+        $builder = $builder->where('media_type', \Modules\WebsiteBase\app\Models\MediaItem::MEDIA_TYPE_IMAGE);
         return $builder;
     }
 

@@ -4,7 +4,7 @@ namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class MediaItemImageUserAvatar extends MediaItemImage
+class MediaItemImageProduct extends MediaItemImage
 {
     /**
      * The base builder before all filter manipulations.
@@ -18,7 +18,7 @@ class MediaItemImageUserAvatar extends MediaItemImage
     public function getBaseBuilder(string $collectionName): ?Builder
     {
         $builder = parent::getBaseBuilder($collectionName);
-        $builder = $builder->where('object_type', '=', \Modules\WebsiteBase\app\Models\MediaItem::OBJECT_TYPE_USER_AVATAR);
+        $builder = $builder->where('object_type', '=', \Modules\WebsiteBase\app\Models\MediaItem::OBJECT_TYPE_PRODUCT_IMAGE);
         return $builder;
     }
 }

@@ -102,7 +102,7 @@ class CmsContent extends ModelBase
                                             'ASC')->get(), [
                                             'id',
                                             'code'
-                                        ], 'id', [self::UNSELECT_RELATION_IDENT => '[Keine Auswahl]']),
+                                        ], 'id', [self::UNSELECT_RELATION_IDENT => __('No choice')]),
                                         'description'  => __('The Store assigned to this page'),
                                         'validator'    => [
                                             'nullable',
@@ -117,7 +117,7 @@ class CmsContent extends ModelBase
                                             'html',
                                             'plain',
                                             'markdown'
-                                        ], first: [self::UNSELECT_RELATION_IDENT => '[Keine Auswahl]']),
+                                        ], first: [self::UNSELECT_RELATION_IDENT => __('No choice')]),
                                         'description'  => __('Format and behaviour of content calculation.'),
                                         'validator'    => [
                                             'nullable',
