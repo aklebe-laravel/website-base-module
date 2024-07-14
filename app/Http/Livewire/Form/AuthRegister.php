@@ -70,7 +70,7 @@ class AuthRegister extends ModelBase
 
                 Auth::login($user);
 
-                return redirect(RouteServiceProvider::HOME);
+                return redirect()->intended();
 
             } else {
                 // fail
@@ -78,6 +78,8 @@ class AuthRegister extends ModelBase
 
         } else {
             $this->addErrorMessages($res->getErrors());
+            // Open this form again (with errors)!
+            $this->reopenFormIfNeeded();
         }
 
     }

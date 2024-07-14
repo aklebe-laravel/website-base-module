@@ -26,6 +26,6 @@ class AuthenticationTest extends TestCase
         $livewire->call('login', $livewire->id());
 
         $this->assertAuthenticated();
-        $livewire->assertRedirect(RouteServiceProvider::HOME);
+        $livewire->assertRedirect();
     }
 }

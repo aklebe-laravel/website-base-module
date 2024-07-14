@@ -74,7 +74,7 @@ class AuthenticatedSessionController extends Controller
             Log::error("Token not found or invalid");
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended();
     }
 
 }

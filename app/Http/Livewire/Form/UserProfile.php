@@ -12,6 +12,13 @@ use Modules\WebsiteBase\app\Services\WebsiteTelegramService;
 class UserProfile extends User
 {
     /**
+     * This form is opened by default.
+     *
+     * @var bool
+     */
+    public bool $isFormOpen = true;
+
+    /**
      * @var WebsiteTelegramService
      */
     protected WebsiteTelegramService $websiteTelegramService;

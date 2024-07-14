@@ -63,7 +63,9 @@ class AuthPasswordForget extends ModelBase
         }
 
         if (!($validatedData = $this->validateForm())) {
-            // Errors already set ...
+            // (Errors already set)
+            // Open this form again (with errors)!
+            $this->reopenFormIfNeeded();
             return;
         }
 
@@ -83,6 +85,8 @@ class AuthPasswordForget extends ModelBase
             $sendNotificationService = app(SendNotificationService::class);
             if (!$sendNotificationService->sendNotificationConcern('remember_user_login_data', $user)) {
                 $this->addErrorMessages($sendNotificationService->getErrors());
+                // Open this form again (with errors)!
+                $this->reopenFormIfNeeded();
                 return;
             }
 

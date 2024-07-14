@@ -81,7 +81,7 @@ class UserController extends Controller
     public function stopClaim()
     {
         if (!($id = session()->get('admin_user_id', 0))) {
-            return redirect()->intended(RouteServiceProvider::HOME);
+            return redirect()->intended();
         }
 
         $backRoute = session()->get('admin_user_redirect', '');
@@ -100,7 +100,7 @@ class UserController extends Controller
             return redirect()->to($backRoute);
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended();
     }
 
 }

@@ -17,7 +17,6 @@
 <div>
     {{--Form--}}
     <div>
-        {{--                            <div class="text-info">(before livewire form)</div>--}}
         @livewire($livewireForm, [
             'relatedLivewireDataTable' => $livewireTable,
             'formObjectId' => $formObjectId ?? null,

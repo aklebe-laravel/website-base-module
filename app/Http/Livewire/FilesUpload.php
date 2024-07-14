@@ -161,7 +161,7 @@ class FilesUpload extends BaseComponent
         $list = $this->runUploadedMediaItems($tmpFilenames);
 
         // // Need to open the form again
-        // $this->dispatch('open-form', $this->mediaItemId, false);
+        // $this->reopenFormIfNeeded();
 
         // Need to open the form again, maybe more code is needed in event 'upload-process-finished'
         $this->dispatch('upload-process-finished', 'mediaItems', $this->mediaItemId);

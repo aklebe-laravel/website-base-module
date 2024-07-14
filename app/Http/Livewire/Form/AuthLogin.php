@@ -38,7 +38,7 @@ class AuthLogin extends ModelBase
     ];
 
     /**
-     * Overwrite this to setup the default Call if Enter pressed in Form
+     * Overwrite this to set up the default Call if Enter pressed in Form
      *
      * @return string
      */
@@ -59,10 +59,11 @@ class AuthLogin extends ModelBase
         }
 
         if ($this->authenticate()) {
-
             session()->regenerate();
-
             return redirect()->intended();
+        } else {
+            // Open this form again (with errors)!
+            $this->reopenFormIfNeeded();
         }
     }
 

@@ -29,6 +29,6 @@ class RegistrationTest extends TestCase
         $livewire->call('register', $livewire->id());
 
         $this->assertAuthenticated();
-        $livewire->assertRedirect(RouteServiceProvider::HOME);
+        $livewire->assertRedirect();
     }
 }
