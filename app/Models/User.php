@@ -19,10 +19,8 @@ use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseMedia;
 use Modules\WebsiteBase\app\Models\Base\UserTrait;
 use Modules\WebsiteBase\app\Services\WebsiteService;
-use Modules\WebsiteBase\Models\IdeHelperUser;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-
 
 /**
  * @mixin IdeHelperUser

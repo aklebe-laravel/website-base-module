@@ -12,8 +12,6 @@ use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService as UserServiceAlias;
 use Modules\SystemBase\app\Services\SystemService;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
-use Modules\WebsiteBase\Models\IdeHelperNotificationEvent;
-
 
 /**
  * @mixin IdeHelperNotificationEvent

@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\View;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
-use Modules\WebsiteBase\Models\IdeHelperViewTemplate;
 use Shipu\Themevel\Facades\Theme;
-
 
 /**
  * @mixin IdeHelperViewTemplate

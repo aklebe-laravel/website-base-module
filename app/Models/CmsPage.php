@@ -3,8 +3,6 @@
 namespace Modules\WebsiteBase\app\Models;
 
 use Modules\WebsiteBase\app\Models\Base\CmsBase;
-use Modules\WebsiteBase\Models\IdeHelperCmsPage;
-
 
 /**
  * @mixin IdeHelperCmsPage

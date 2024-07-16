@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Mail\Attachment;
 use Illuminate\Support\Facades\Storage;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
-use Modules\WebsiteBase\Models\IdeHelperMediaItem;
-
 
 /**
  * @mixin IdeHelperMediaItem

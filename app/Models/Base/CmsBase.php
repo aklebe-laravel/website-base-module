@@ -4,8 +4,6 @@ namespace Modules\WebsiteBase\app\Models\Base;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Modules\WebsiteBase\Models\Base\IdeHelperCmsBase;
-
 
 /**
  * @mixin IdeHelperCmsBase

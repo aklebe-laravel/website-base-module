@@ -4,8 +4,6 @@ namespace Modules\WebsiteBase\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
-use Modules\WebsiteBase\Models\IdeHelperChangelog;
-
 
 /**
  * @mixin IdeHelperChangelog
