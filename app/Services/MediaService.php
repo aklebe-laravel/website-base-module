@@ -11,8 +11,47 @@ use Modules\WebsiteBase\app\Models\MediaItem;
 class MediaService extends BaseService
 {
     /**
+     * Defined thumbs (inclusive original) sorted from big to small
+     */
+    const availableThumbs = [
+        // '' original (no thumb)
+        ''              => [
+            'config' => [
+                'width'           => 'catalog.product.image.width',
+                'width_default'   => 1000,
+                'height'          => 'catalog.product.image.height',
+                'height_default'  => 1000,
+                'quality'         => 'catalog.product.image.quality',
+                'quality_default' => 90,
+            ],
+        ],
+        // medium thumb
+        'thumbs_medium' => [
+            'config' => [
+                'width'           => 'catalog.product.image_thumb_medium.width',
+                'width_default'   => 200,
+                'height'          => 'catalog.product.image_thumb_medium.height',
+                'height_default'  => 200,
+                'quality'         => 'catalog.product.image_thumb_medium.quality',
+                'quality_default' => 90,
+            ],
+        ],
+        // small thumb
+        'thumbs_small'  => [
+            'config' => [
+                'width'           => 'catalog.product.image_thumb_small.width',
+                'width_default'   => 50,
+                'height'          => 'catalog.product.image_thumb_small.height',
+                'height_default'  => 50,
+                'quality'         => 'catalog.product.image_thumb_small.quality',
+                'quality_default' => 90,
+            ],
+        ],
+    ];
+
+    /**
      * @param  MediaItem  $mediaModel
-     * @param  string  $tmpFile
+     * @param  string     $tmpFile
      * @return void
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
@@ -25,29 +64,32 @@ class MediaService extends BaseService
             $constraint->aspectRatio();
         };
 
-        // create the original
-        $width = (int) $config->get('catalog.product.image.width', 1000);
-        $height = (int) $config->get('catalog.product.image.height', 1000);
-        $quality = (int) $config->get('catalog.product.image.quality', 90);
-
         $img = ImageStatic::make($tmpFile);
-        $img->resize($width, $height, $aspectRatio) // resize with aspect ratio
-        ->resizeCanvas($width, $height, 'center', false, 'f8f8f8'); // fit to $width and $height using background color
-        $this->saveToMedia($img, $mediaModel, $quality, '', true);
+        $loopIndex = 0;
+        foreach (self::availableThumbs as $thumbName => $data) {
+            $configKeyWidth = data_get($data, 'config.width');
+            $configKeyWidthDefault = (int) data_get($data, 'config.width_default');
+            $configKeyHeight = data_get($data, 'config.height');
+            $configKeyHeightDefault = (int) data_get($data, 'config.height_default');
+            $configKeyQuality = data_get($data, 'config.quality');
+            $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
 
-        // create thumb medium
-        $width = (int) $config->get('catalog.product.image_thumb_medium.width', 200);
-        $height = (int) $config->get('catalog.product.image_thumb_medium.height', 200);
-        $quality = (int) $config->get('catalog.product.image_thumb_medium.quality', 80);
-        $img->resize($width, $height); // $aspectRatio not needed because the source did already
-        $this->saveToMedia($img, $mediaModel, $quality, 'thumbs_medium');
+            $width = (int) $config->get($configKeyWidth, $configKeyWidthDefault);
+            $height = (int) $config->get($configKeyHeight, $configKeyHeightDefault);
+            $quality = (int) $config->get($configKeyQuality, $configKeyQualityDefault);
 
-        // create thumb small
-        $width = (int) $config->get('catalog.product.image_thumb_small.width', 50);
-        $height = (int) $config->get('catalog.product.image_thumb_small.height', 50);
-        $quality = (int) $config->get('catalog.product.image_thumb_medium.quality', 80);
-        $img->resize($width, $height); // $aspectRatio not needed because the source did already
-        $this->saveToMedia($img, $mediaModel, $quality, 'thumbs_small');
+            // resize with aspect ratio
+            $img->resize($width, $height, $aspectRatio);
+
+            // canvas only once
+            if ($loopIndex === 0) {
+                $img->resizeCanvas($width, $height, 'center', false,
+                    'f8f8f8'); // fit to $width and $height using background color
+            }
+
+            $this->saveToMedia($img, $mediaModel, $quality, $thumbName, ($loopIndex === 0));
+            $loopIndex++;
+        }
     }
 
     /**
@@ -55,7 +97,7 @@ class MediaService extends BaseService
      * Only the files by $thumbPath will be deleted.
      *
      * @param  MediaItem  $mediaModel
-     * @param  string  $thumbPath
+     * @param  string     $thumbPath
      *
      * @return bool
      */
@@ -77,11 +119,32 @@ class MediaService extends BaseService
     }
 
     /**
-     * @param  Image  $img
      * @param  MediaItem  $mediaModel
-     * @param  int  $quality
-     * @param  string  $thumbPath
-     * @param  bool  $generate  if true generate a new filename and DB entry
+     * @return void
+     */
+    public function deleteAllMediaFiles(MediaItem $mediaModel): void
+    {
+        foreach (self::availableThumbs as $thumbName => $data) {
+            $this->deleteMediaFiles($mediaModel, $thumbName);
+        }
+    }
+
+    /**
+     * @param  MediaItem  $mediaModel
+     * @return void
+     */
+    public function deleteMediaItem(MediaItem $mediaModel): void
+    {
+        $this->deleteAllMediaFiles($mediaModel);
+        $mediaModel->delete();
+    }
+
+    /**
+     * @param  Image      $img
+     * @param  MediaItem  $mediaModel
+     * @param  int        $quality
+     * @param  string     $thumbPath
+     * @param  bool       $generate  if true generate a new filename and DB entry
      *
      * @return bool
      */
