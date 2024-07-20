@@ -94,7 +94,10 @@ class ViewTemplate extends ModelBase
                                     'view_file'         => [
                                         'html_element' => 'select_theme_files_in_folder',
                                         'options'      => [
-                                            'path' => 'views/notifications/emails',
+                                            'path'            => 'views/notifications/emails',
+                                            'directory_deep'  => 1,
+                                            'regex_blacklist' => ['views/notifications/emails/inc'],
+                                            'add_delimiters'  => '#',
                                         ],
                                         'label'        => __('View File'),
                                         'description'  => __("Force this content if set."),
