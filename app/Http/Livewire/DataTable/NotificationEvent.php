@@ -63,6 +63,7 @@ class NotificationEvent extends BaseDataTable
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void
@@ -135,12 +136,12 @@ class NotificationEvent extends BaseDataTable
 
     /**
      * @param $livewireId
-     * @param $notificationEventId
+     * @param $itemId
      *
      * @return bool
      */
     #[On('launch')]
-    public function launch(mixed $livewireId, mixed $notificationEventId): bool
+    public function launch(mixed $livewireId, mixed $itemId): bool
     {
         if (!$this->checkLivewireId($livewireId)) {
             return false;
@@ -152,14 +153,14 @@ class NotificationEvent extends BaseDataTable
         // check for validItems() before send it to $service->launch()
         if (!($event = \Modules\WebsiteBase\app\Models\NotificationEvent::with([])
             ->validItems()
-            ->whereId($notificationEventId)
+            ->whereId($itemId)
             ->count())) {
             $this->addErrorMessage(__('Event not found or disabled/invalid.'));
             return false;
         }
 
         //
-        if ($service->launch((int) $notificationEventId)) {
+        if ($service->launch((int) $itemId)) {
             $this->addSuccessMessage("Notification event was queued.");
         } else {
             $this->addErrorMessage("Something goes wrong.");
@@ -173,7 +174,7 @@ class NotificationEvent extends BaseDataTable
      * Overwrite this to add filters
      *
      * @param  Builder  $builder
-     * @param  string  $collectionName
+     * @param  string   $collectionName
      *
      * @return void
      */
