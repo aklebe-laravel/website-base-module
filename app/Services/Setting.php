@@ -2,13 +2,13 @@
 
 namespace Modules\WebsiteBase\app\Services;
 
-use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Modules\WebsiteBase\app\Events\InitNavigation;
 use Modules\WebsiteBase\app\Models\Navigation as NavigationModel;
 use Modules\WebsiteBase\app\Models\Store;
+use Modules\WebsiteBase\app\Models\User;
 use Spatie\Navigation\Navigation;
 use Spatie\Navigation\Section;
 
@@ -74,7 +74,7 @@ class Setting
     public function getSiteOwner(): ?User
     {
         /** @var User $user */
-        if (!($user = \Modules\WebsiteBase\app\Models\User::withAclResources(['site_owner'])->first())) {
+        if (!($user = User::withAclResources(['site_owner'])->first())) {
             throw new Exception('Site Owner not defined. Missing User with resource "site_owner"');
         }
 
@@ -196,6 +196,5 @@ class Setting
 
         $this->setNavigation($navigation);
     }
-
 
 }
