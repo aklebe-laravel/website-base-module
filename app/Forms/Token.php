@@ -128,7 +128,7 @@ class Token extends ModelBase
                                         'css_group'    => 'col-12 col-lg-8',
                                     ],
                                     'expires_at'  => [
-                                        'html_element' => 'date',
+                                        'html_element' => 'datetime-local',
                                         'label'        => __('Expires At'),
                                         'description'  => __('When token becomes invalid.'),
                                         'validator'    => ['nullable', 'date'],

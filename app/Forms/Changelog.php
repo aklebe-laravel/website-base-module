@@ -92,7 +92,7 @@ class Changelog extends ModelBase
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
                                     'commit_created_at' => [
-                                        'html_element' => 'date',
+                                        'html_element' => 'datetime-local',
                                         'label'        => __('Commit Date'),
                                         'description'  => __('Commit was created at.'),
                                         'validator'    => ['nullable', 'date'],
