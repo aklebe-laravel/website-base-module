@@ -5,7 +5,8 @@ namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Acl\app\Models\AclResource;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
-use Modules\WebsiteBase\app\Services\CreateChangeLogService;
+use Modules\SystemBase\app\Services\ModuleService;
+use Nwidart\Modules\Module;
 
 class Changelog extends BaseDataTable
 {
@@ -25,54 +26,51 @@ class Changelog extends BaseDataTable
     const FILTER_APP_ONLY = '[APP ONLY]';
 
     /**
-     * @var array|array[]
-     */
-    protected array $filterConfig = [
-        [
-            'css_group' => 'col-12 col-md-3 text-start',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.rows-per-page.default',
-        ],
-        [
-            'css_group' => 'col-12 col-md text-center',
-            'css_item'  => '',
-            'view'      => 'website-base::livewire.js-dt.commands.select-module',
-        ],
-        [
-            'css_group' => 'col-12 col-md text-end',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.search.default',
-        ],
-        [
-            'css_group' => 'col-12 col-md-1 text-end',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.settings.default',
-        ],
-    ];
-
-    /**
-     * Runs once, immediately after the component is instantiated, but before render() is called.
-     * This is only called once on initial page load and never called again, even on component refreshes
-     *
      * @return void
      */
-    protected function initMount(): void
+    protected function initFilters(): void
     {
-        // Important to call this before calling parent::initMount()!
-        foreach ($this->enabledCollectionNames as $collectionName => $enabled) {
-            data_set($this->filtersDefaults, $collectionName.'.changelog_method', self::FILTER_APP_ONLY);
-        }
+        parent::initFilters();
 
-        //
-        parent::initMount();
+        /** @var ModuleService $moduleService */
+        $moduleService = app(ModuleService::class);
 
-        // add changelog_method to reset page to 1 when updated
-        $this->filterSoftResetActivators[] = 'changelog_method';
+        $options = [
+            Changelog::FILTER_ALL      => Changelog::FILTER_ALL,
+            // app only has special builder
+            Changelog::FILTER_APP_ONLY => [
+                'label'   => Changelog::FILTER_APP_ONLY,
+                'builder' => function (Builder $builder, string $filterElementKey, string $filterValue) {
+                    $builder->where(function (Builder $b) { // important: condition in parentheses here!
+                        $b->where('path', '')->orWhereNull('path');
+                    });
+                    //Log::debug("Builder extended to filter '$filterElementKey' to '$filterValue'");
+                },
+            ],
 
-        // update git histories
-        /** @var CreateChangeLogService $changelog */
-        $changelog = app(CreateChangeLogService::class);
-        $changelog->updateGitHistories();
+        ];
+        $moduleService->runOrderedEnabledModules(function (Module $module) use (&$options) {
+            $options[$module->getStudlyName()] = $module->getName();
+
+            return true;
+        });
+
+        $this->addFilterElement('select-module', [
+            'label'      => 'Module',
+            'default'    => 10,
+            'position'   => 1700, // between elements rows and search
+            'soft_reset' => true,
+            'css_group'  => 'col-12 col-md-3 text-start',
+            'css_item'   => '',
+            'options'    => $options,
+            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
+                if ($filterValue !== Changelog::FILTER_ALL) {
+                    $builder->where('path', 'Modules/'.$filterValue);
+                    //Log::debug("Builder extended to filter '$filterElementKey' to '$filterValue'");
+                }
+            },
+            'view'       => 'data-table::livewire.js-dt.filters.default-elements.select',
+        ]);
     }
 
     /**
@@ -165,32 +163,6 @@ class Changelog extends BaseDataTable
                 'css_all'    => 'w-10',
             ],
         ];
-    }
-
-    /**
-     * Overwrite this to add filters
-     *
-     * @param  Builder  $builder
-     * @param  string  $collectionName
-     *
-     * @return void
-     */
-    protected function addCustomFilters(Builder $builder, string $collectionName)
-    {
-        switch ($clm = data_get($this->filters, $collectionName.'.changelog_method')) {
-
-            case '':
-            case self::FILTER_ALL:
-                break;
-
-            case self::FILTER_APP_ONLY:
-                $builder->where('path', '')->orWhereNull('path');
-                break;
-
-            default:
-                $builder->where('path', 'Modules/'.$clm);
-                break;
-        }
     }
 
 }

@@ -5,7 +5,7 @@
      */
 
     $relevantUserId = Auth::id();
-    $objectModelInstanceDefaultValues = [
+    $objectInstanceDefaultValues = [
         'user_id' => $relevantUserId,
     ];
     $livewireTableOptions = [

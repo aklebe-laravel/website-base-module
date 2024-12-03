@@ -10,6 +10,8 @@ use Modules\WebsiteBase\app\Models\Token;
  */
 class TokenFactory extends Factory
 {
+    protected $model = Token::class;
+
     /**
      * Define the model's default state.
      *

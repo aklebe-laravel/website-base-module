@@ -2,26 +2,27 @@
 
 namespace Modules\WebsiteBase\database\seeders;
 
-use App\Models\User;
-use Illuminate\Database\Seeder;
+use Modules\SystemBase\database\seeders\BaseModelSeeder;
 use Modules\WebsiteBase\app\Models\Store;
+use Modules\WebsiteBase\app\Models\User;
 
-class StoreSeeder extends Seeder
+class StoreSeeder extends BaseModelSeeder
 {
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
+        parent::run();
+
         $users = User::with(['aclGroups.aclResources'])->whereHas('aclGroups.aclResources', function ($query) {
             return $query->where('code', '=', 'admin');
         })->get();
         /** @var User $user */
         $user = $users->first();
-        Store::factory()
-             ->count(20)
-             ->create(['user_id' => $user->id ?? null]);
+
+        $this->TryCreateFactories(Store::class, 20, fn() => ['user_id' => $user->id ?? null]);
     }
 }

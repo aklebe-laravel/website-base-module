@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
 use Modules\WebsiteBase\app\Services\NotificationEventService;
+use Modules\WebsiteBase\app\Services\WebsiteService;
 
 class NotificationEvent extends BaseDataTable
 {
@@ -15,50 +16,33 @@ class NotificationEvent extends BaseDataTable
     const FILTER_NOTIFICATION_CHANNEL_ALL = '';
 
     /**
-     * @var array|array[]
-     */
-    protected array $filterConfig = [
-        [
-            'css_group' => 'col-12 col-md-3 text-start',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.rows-per-page.default',
-        ],
-        [
-            'css_group' => 'col-12 col-md text-center',
-            'css_item'  => '',
-            'view'      => 'website-base::livewire.js-dt.commands.select-notification-channel',
-        ],
-        [
-            'css_group' => 'col-12 col-md text-end',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.search.default',
-        ],
-        [
-            'css_group' => 'col-12 col-md-1 text-end',
-            'css_item'  => '',
-            'view'      => 'data-table::livewire.js-dt.filters.settings.default',
-        ],
-    ];
-
-    /**
-     * Runs once, immediately after the component is instantiated, but before render() is called.
-     * This is only called once on initial page load and never called again, even on component refreshes
-     *
      * @return void
      */
-    protected function initMount(): void
+    protected function initFilters(): void
     {
-        // Important to call this before calling parent::initMount()!
-        foreach ($this->enabledCollectionNames as $collectionName => $enabled) {
-            data_set($this->filtersDefaults, $collectionName.'.notification_channel',
-                self::FILTER_NOTIFICATION_CHANNEL_ALL);
-        }
+        parent::initFilters();
 
-        //
-        parent::initMount();
-
-        // add notification_channel to reset page to 1 when updated
-        $this->filterSoftResetActivators[] = 'notification_channel';
+        $this->addFilterElement('notification_channel', [
+            'label'     => 'Channel',
+            'default'   => 10,
+            'position'  => 1700, // between elements rows and search
+            'css_group' => 'col-12 col-md-3 text-start',
+            'css_item'  => '',
+            'options'   => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS,
+                first: [NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL => '['.__('All Channels').']']),
+            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
+                if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
+                    return;
+                }
+                $builder->where(function (Builder $b) use ($filterValue) {
+                    $b->where('force_channel', $filterValue);
+                    $b->orWhereHas('notificationConcerns.notificationTemplate', function (Builder $b2) use ($filterValue) {
+                        $b2->where('notification_channel', $filterValue);
+                    });
+                });
+            },
+            'view'      => 'data-table::livewire.js-dt.filters.default-elements.select',
+        ]);
     }
 
     /**
@@ -169,33 +153,5 @@ class NotificationEvent extends BaseDataTable
 
         return false;
     }
-
-    /**
-     * Overwrite this to add filters
-     *
-     * @param  Builder  $builder
-     * @param  string   $collectionName
-     *
-     * @return void
-     */
-    protected function addCustomFilters(Builder $builder, string $collectionName)
-    {
-        switch ($v = data_get($this->filters, $collectionName.'.notification_channel')) {
-
-            // no filter here
-            case self::FILTER_NOTIFICATION_CHANNEL_ALL:
-                break;
-
-            default:
-                $builder->where(function (Builder $b) use ($v) {
-                    $b->where('force_channel', $v);
-                    $b->orWhereHas('notificationConcerns.notificationTemplate', function (Builder $b2) use ($v) {
-                        $b2->where('notification_channel', $v);
-                    });
-                });
-                break;
-        }
-    }
-
 
 }

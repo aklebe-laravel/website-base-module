@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
+use Modules\WebsiteBase\database\factories\StoreFactory;
 
 /**
  * @mixin IdeHelperStore
@@ -29,5 +30,11 @@ class Store extends Model
      * @var array
      */
     protected $appends = ['extra_attributes'];
+
+    /**
+     * You can use this instead of newFactory()
+     * @var string
+     */
+    public static string $factory = StoreFactory::class;
 
 }

@@ -8,9 +8,11 @@ use Chelout\RelationshipEvents\Concerns\HasOneEvents;
 use Chelout\RelationshipEvents\Traits\HasDispatchableEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -27,7 +29,7 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class User extends AppUser
 {
-    use TraitAttributeAssignment, TraitBaseMedia, UserTrait, HasDispatchableEvents, HasOneEvents, HasBelongsToManyEvents;
+    use HasFactory, Notifiable, TraitAttributeAssignment, TraitBaseMedia, UserTrait, HasDispatchableEvents, HasOneEvents, HasBelongsToManyEvents;
 
     /**
      * Default media type. Should be overwritten by delivered class.
@@ -97,9 +99,9 @@ class User extends AppUser
      *
      * Important for \Modules\Acl\Models\Base\TraitBaseModel::bootTraitBaseModel
      */
-    public function __construct()
+    public function __construct(array $attributes = array())
     {
-        parent::__construct();
+        parent::__construct($attributes);
     }
 
     /**
@@ -117,15 +119,23 @@ class User extends AppUser
     /**
      * @return BelongsToMany
      */
-    public function avatars()
+    public function notificationEvents(): BelongsToMany
+    {
+        return $this->belongsToMany(NotificationEvent::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function avatars(): BelongsToMany
     {
         return $this->images()->where('object_type', MediaItem::OBJECT_TYPE_USER_AVATAR);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function tokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function tokens(): HasMany
     {
         return $this->hasMany(Token::class);
     }
@@ -314,7 +324,7 @@ class User extends AppUser
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function addresses()
     {

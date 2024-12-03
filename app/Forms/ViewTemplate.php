@@ -25,9 +25,9 @@ class ViewTemplate extends ModelBase
     /**
      * @return array
      */
-    public function makeObjectModelInstanceDefaultValues(): array
+    public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectModelInstanceDefaultValues(), [
+        return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled'        => true,
             'parameter_variant' => \Modules\WebsiteBase\app\Models\ViewTemplate::PARAMETER_VARIANT_DEFAULT,
         ]);

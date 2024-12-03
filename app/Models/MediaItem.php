@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Mail\Attachment;
 use Illuminate\Support\Facades\Storage;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseModel;
+use Modules\WebsiteBase\database\factories\MediaItemFactory;
 
 /**
  * @mixin IdeHelperMediaItem
@@ -21,11 +22,12 @@ class MediaItem extends Model implements Attachable
 
     const MEDIA_TYPE_IMAGE = 'IMAGE';
     const MEDIA_TYPE_ARCHIVE = 'ARCHIVE';
-
+    const MEDIA_TYPE_IMPORT = 'IMPORT';
     const OBJECT_TYPE_DOWNLOAD = 'DOWNLOAD';
     const OBJECT_TYPE_PRODUCT_IMAGE = 'PRODUCT_IMAGE';
     const OBJECT_TYPE_CATEGORY_IMAGE = 'CATEGORY_IMAGE';
     const OBJECT_TYPE_USER_AVATAR = 'USER_AVATAR';
+    const OBJECT_TYPE_IMPORT_PRODUCT = 'IMPORT_PRODUCT';
 
     public string $mediaPath = 'app/public/media';
 
@@ -67,6 +69,12 @@ class MediaItem extends Model implements Attachable
     ];
 
     /**
+     * You can use this instead of newFactory()
+     * @var string
+     */
+    public static string $factory = MediaItemFactory::class;
+
+    /**
      * Multiple bootable model traits is not working
      * https://github.com/laravel/framework/issues/40645
      *
@@ -75,9 +83,9 @@ class MediaItem extends Model implements Attachable
      *
      * Important for \Modules\Acl\Models\Base\TraitBaseModel::bootTraitBaseModel
      */
-    public function __construct()
+    public function __construct(array $attributes = array())
     {
-        parent::__construct();
+        parent::__construct($attributes);
     }
 
     /**

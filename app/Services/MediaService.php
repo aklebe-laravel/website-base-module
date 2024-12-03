@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Services;
 
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Constraint;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManagerStatic as ImageStatic;
@@ -51,12 +52,13 @@ class MediaService extends BaseService
 
     /**
      * @param  MediaItem  $mediaModel
-     * @param  string     $tmpFile
+     * @param  string     $originalMediaFile
+     *
      * @return void
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function createMediaFile(MediaItem $mediaModel, string $tmpFile): void
+    public function createMediaFile(MediaItem $mediaModel, string $originalMediaFile): void
     {
         $config = app('website_base_config');
 
@@ -64,7 +66,8 @@ class MediaService extends BaseService
             $constraint->aspectRatio();
         };
 
-        $img = ImageStatic::make($tmpFile);
+        // @todo: check for image ...
+        $img = ImageStatic::make($originalMediaFile);
         $loopIndex = 0;
         foreach (self::availableThumbs as $thumbName => $data) {
             $configKeyWidth = data_get($data, 'config.width');
@@ -135,6 +138,7 @@ class MediaService extends BaseService
      */
     public function deleteMediaItem(MediaItem $mediaModel): void
     {
+        Log::debug("Deleting media item {$mediaModel->getKey()} and related files ...");
         $this->deleteAllMediaFiles($mediaModel);
         $mediaModel->delete();
     }
