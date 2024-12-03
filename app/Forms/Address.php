@@ -31,9 +31,9 @@ class Address extends ModelBase
     /**
      * @return array
      */
-    public function makeObjectModelInstanceDefaultValues(): array
+    public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectModelInstanceDefaultValues(), [
+        return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'user_id'     => $this->getOwnerUserId(),
             'country_iso' => 'DE',
             'city'        => 'Berlin',

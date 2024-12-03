@@ -44,11 +44,11 @@ class ManageDataController extends Controller
      * @param  mixed|null  $modelId
      * @param  bool  $useCollectionUserFilter
      * @param  bool  $showOnly
+     *
      * @return View|Factory|Application
      * @throws Exception
      */
-    public function get(Request $request, ?string $modelName = null, mixed $modelId = null,
-        bool $useCollectionUserFilter = true, bool $showOnly = false): View|Factory|Application
+    public function get(Request $request, ?string $modelName = null, mixed $modelId = null, bool $useCollectionUserFilter = true, bool $showOnly = false): View|Factory|Application
     {
         if (!$modelName) {
             return view('content-pages.my-shop');
@@ -72,12 +72,30 @@ class ManageDataController extends Controller
         }
 
         // form and restrictions
-        if ($livewireForm = $showOnly ? null : app('system_base')->findLivewire($modelName, 'livewire-forms',
-            $forceModuleName)) {
+        $livewireImportFormKey = '';
+        if ($livewireFormKey = $showOnly ? null : app('system_base')->findLivewire($modelName, 'livewire-forms', $forceModuleName)) {
             /** @var ModelBase $livewireFormClass */
-            if ($livewireFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireForm)) {
-                if ($livewireFormClass::aclResources && !$currentUser->hasAclResource($livewireFormClass::aclResources)) {
-                    return view('content-pages.access-denied');
+            if ($livewireFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireFormKey)) {
+                if (class_exists($livewireFormClass)) {
+                    if ($livewireFormClass::aclResources && !$currentUser->hasAclResource($livewireFormClass::aclResources)) {
+                        return view('content-pages.access-denied');
+                    }
+
+                    // Check there is an import form declared ...
+                    if (preg_match('#(^.+\.)(.+?$)#', $livewireFormKey, $out1)) {
+                        $livewireImportFormKey = $out1[1].'import-'.$out1[2];
+                        try {
+                            if ($livewireImportFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireImportFormKey)) {
+                                if (class_exists($livewireImportFormClass)) {
+                                    if ($livewireImportFormClass::aclResources && !$currentUser->hasAclResource($livewireImportFormClass::aclResources)) {
+                                        $livewireImportFormKey = '';
+                                    }
+                                }
+                            }
+                        } catch (Exception $e) {
+                            $livewireImportFormKey = '';
+                        }
+                    }
                 }
             }
         }
@@ -109,19 +127,20 @@ class ManageDataController extends Controller
         }
 
         return view('website-base::page', [
-            'title'                            => __(($showOnly ? 'Show' : 'Manage')).' '.Str::plural($modelName),
-            'contentView'                      => $contentView,
+            'title'                       => __(($showOnly ? 'Show' : 'Manage')).' '.Str::plural($modelName),
+            'contentView'                 => $contentView,
             // modelName is needed for form js x-data="getNewForm('User') ... otherwise console error
-            'moduleName'                       => $forceModuleName,
-            'modelName'                        => $modelName,
-            'livewireForm'                     => $livewireForm,
-            'livewireTable'                    => $livewireTable,
-            'livewireTableOptions'             => [
+            'moduleName'                  => $forceModuleName,
+            'modelName'                   => $modelName,
+            'livewireForm'                => $livewireFormKey,
+            'livewireImportForm'          => $livewireImportFormKey,
+            'livewireTable'               => $livewireTable,
+            'livewireTableOptions'        => [
                 'useCollectionUserFilter' => $useCollectionUserFilter,
             ],
-            'formObjectId'                     => $showOnly ? null : $modelId,
-            'isFormOpen'                       => !$showOnly && ($modelId !== null),
-            'objectModelInstanceDefaultValues' => [
+            'formObjectId'                => $showOnly ? null : $modelId,
+            'isFormOpen'                  => !$showOnly && ($modelId !== null),
+            'objectInstanceDefaultValues' => [
                 'user_id' => $relevantUserId,
             ],
 
@@ -134,6 +153,7 @@ class ManageDataController extends Controller
      * @param  Request  $request
      * @param  string|null  $modelName
      * @param  mixed|null  $modelId
+     *
      * @return Application|Factory|View
      * @throws Exception
      */
@@ -146,11 +166,11 @@ class ManageDataController extends Controller
      * @param  Request  $request
      * @param  string|null  $modelName
      * @param  mixed|null  $modelId
+     *
      * @return View|Factory|Application
      * @throws Exception
      */
-    public function showOnly(Request $request, ?string $modelName = null,
-        mixed $modelId = null): View|Factory|Application
+    public function showOnly(Request $request, ?string $modelName = null, mixed $modelId = null): View|Factory|Application
     {
         return $this->get($request, $modelName, $modelId, true, true);
     }
@@ -158,6 +178,7 @@ class ManageDataController extends Controller
     /**
      * @param  Request  $request
      * @param  mixed  $id
+     *
      * @return View|Factory|Application
      * @throws Exception
      */
@@ -170,12 +191,12 @@ class ManageDataController extends Controller
         if ($user = app(User::class)->with([])->frontendItems()->loadByFrontend($id, 'shared_id')->first()) {
             if ($user->canLogin()) {
                 return view('website-base::page', [
-                    'title'                            => __('User Profile'),
-                    'contentView'                      => 'components.user-profile',
-                    'modelName'                        => 'User',
-                    'formObjectId'                     => $user->getKey(),
-                    'livewireForm'                     => 'website-base::form.user-profile',
-                    'objectModelInstanceDefaultValues' => [
+                    'title'                       => __('User Profile'),
+                    'contentView'                 => 'components.user-profile',
+                    'modelName'                   => 'User',
+                    'formObjectId'                => $user->getKey(),
+                    'livewireForm'                => 'website-base::form.user-profile',
+                    'objectInstanceDefaultValues' => [
                         'user_id' => $user->getKey(),
                     ],
                 ]);

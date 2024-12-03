@@ -7,5 +7,10 @@
     "providers": [
         "Modules\\WebsiteBase\\app\\Providers\\WebsiteBaseServiceProvider"
     ],
+    "migration": {
+        "seeds": [
+            "Modules\\WebsiteBase\\database\\seeders\\DatabaseSeeder"
+        ]
+    },
     "files": []
 }

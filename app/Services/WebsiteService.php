@@ -60,11 +60,12 @@ class WebsiteService extends BaseService
         //
         $forceAuthMiddleware = [
             'auth',
-            StoreUserValid::class
+            StoreUserValid::class,
         ];
 
         //$forceAuthMiddleware = ['auth', 'verified'];
         $defaultMiddleware = $publicPortal ? [] : $forceAuthMiddleware;
+
         return $defaultMiddleware;
     }
 
@@ -75,6 +76,7 @@ class WebsiteService extends BaseService
     {
         /** @var Config $websiteBaseConfig */
         $websiteBaseConfig = app('website_base_config');
+
         return !!$websiteBaseConfig->get('channels.email.enabled', false);
     }
 
@@ -85,6 +87,7 @@ class WebsiteService extends BaseService
     {
         /** @var Config $websiteBaseConfig */
         $websiteBaseConfig = app('website_base_config');
+
         return !!$websiteBaseConfig->get('channels.telegram.enabled', false);
     }
 
@@ -103,8 +106,7 @@ class WebsiteService extends BaseService
             $model = app($attributeAssignment->model);
             $tableName = $model->getAttributeTypeTableName($attributeAssignment->attribute_type);
 
-            if ($builder = DB::table($tableName)
-                ->where('model_attribute_assignment_id', '=', $attributeAssignment->id)) {
+            if ($builder = DB::table($tableName)->where('model_attribute_assignment_id', '=', $attributeAssignment->id)) {
                 $toDelete = [];
                 foreach ($builder->get() as $attributeAssignmentAsType) {
                     // try to find this model
@@ -125,7 +127,10 @@ class WebsiteService extends BaseService
                 }
             }
         }
-        $this->info(sprintf("%s unused attribute assignments deleted.", $deleted));
+
+        if ($deleted) {
+            $this->info(sprintf("%s unused attribute assignments deleted.", $deleted));
+        }
     }
 
 }

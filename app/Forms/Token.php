@@ -51,9 +51,9 @@ class Token extends ModelBase
     /**
      * @return array
      */
-    public function makeObjectModelInstanceDefaultValues(): array
+    public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectModelInstanceDefaultValues(), [
+        return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'purpose' => \Modules\WebsiteBase\app\Models\Token::PURPOSE_LOGIN,
             'token'   => uniqid('tkf-', true),
             'user_id' => $this->getOwnerUserId(),

@@ -28,7 +28,7 @@ trait UserTrait
     {
         static::belongsToManyAttached(function ($relation, $parent, $ids) {
             /** @var User|UserTrait $parent */
-            Log::info("Roles has been attached to user {$parent->name}.", [$relation, $ids]);
+            Log::info("{$relation} relations has been attached to user {$parent->name}.", [$ids]);
 
             /** @var NotificationEventService $notificationEventService */
             $notificationEventService = app(NotificationEventService::class);

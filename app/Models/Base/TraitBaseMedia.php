@@ -32,7 +32,7 @@ trait TraitBaseMedia
     /**
      * @return BelongsToMany
      */
-    public function mediaItems()
+    public function mediaItems(): BelongsToMany
     {
         // maybe overridden class MediaItem ...
         $mediaClassName = get_class(app('media'));
@@ -44,7 +44,7 @@ trait TraitBaseMedia
      *
      * @return BelongsToMany
      */
-    public function images()
+    public function images(): BelongsToMany
     {
         return $this->mediaItems()->withTimestamps()->where('media_type', MediaItem::MEDIA_TYPE_IMAGE);
     }

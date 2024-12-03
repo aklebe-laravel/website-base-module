@@ -2,21 +2,20 @@
 
 namespace Modules\WebsiteBase\database\seeders;
 
-use Illuminate\Database\Seeder;
+use Modules\SystemBase\database\seeders\BaseModelSeeder;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
-class CoreConfigSeeder extends Seeder
+class CoreConfigSeeder extends BaseModelSeeder
 {
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
-        CoreConfig::factory()
-                  ->count(20)
-                  ->create();
+        parent::run();
 
+        $this->TryCreateFactories(CoreConfig::class, config('seeders.core_config.count', 10));
     }
 }

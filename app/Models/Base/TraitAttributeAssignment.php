@@ -20,7 +20,7 @@ trait TraitAttributeAssignment
 {
     /**
      * It's just the bag for mutator extra_attributes!
-     * From outside we use the mutator extra_attributes.
+     * From outside, we use the mutator extra_attributes.
      *
      * Dynamic extra attributes by classes. Filled on load.
      * Usage like:

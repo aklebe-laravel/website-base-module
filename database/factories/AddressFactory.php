@@ -3,9 +3,12 @@
 namespace Modules\WebsiteBase\database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\WebsiteBase\app\Models\Address;
 
 class AddressFactory extends Factory
 {
+    protected $model = Address::class;
+
     /**
      * Define the model's default state.
      *

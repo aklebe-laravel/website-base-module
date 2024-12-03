@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Providers;
 
 use Modules\SystemBase\app\Providers\Base\ModuleBaseServiceProvider;
+use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Console\AttributeCleanups;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\User;
@@ -28,8 +29,12 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
+        // add aliases before parent::register() ...
+        $modelList = ModuleService::getAllClassesInPath($this->moduleName, 'model');
+        $this->modelAliases = array_merge($this->modelAliases, $modelList);
+
         parent::register();
 
         $this->app->singleton('website_base_settings', Setting::class);
