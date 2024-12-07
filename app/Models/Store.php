@@ -25,13 +25,6 @@ class Store extends Model
     protected $guarded = [];
 
     /**
-     * appends will be filled dynamically for this instance by ModelWithAttributesLoaded
-     *
-     * @var array
-     */
-    protected $appends = ['extra_attributes'];
-
-    /**
      * You can use this instead of newFactory()
      * @var string
      */

@@ -18,10 +18,10 @@ class ViewTemplate extends Model
     use HasFactory;
     use TraitBaseModel;
 
-    const PARAMETER_VARIANT_DEFAULT = 'default';
-    const PARAMETER_VARIANT_USER = 'user';
+    const string PARAMETER_VARIANT_DEFAULT = 'default';
+    const string PARAMETER_VARIANT_USER = 'user';
 
-    const VALID_PARAMETER_VARIANTS = [
+    const array VALID_PARAMETER_VARIANTS = [
         self::PARAMETER_VARIANT_DEFAULT,
         self::PARAMETER_VARIANT_USER,
     ];
@@ -37,18 +37,23 @@ class ViewTemplate extends Model
     protected $table = 'view_templates';
 
     /**
-     * @var array
+     * @param  array  $attributes
      */
-    protected $appends = [
-        'is_valid'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends += [
+            'is_valid',
+        ];
+    }
 
     /**
      * Get content from file ist exist, otherwise $this->content is used.
      *
-     * @return false|mixed|string
+     * @return string|false|null
      */
-    public function getContent()
+    public function getContent(): string|null|false
     {
         if ($this->view_file) {
             // Need to set active theme explicit here
@@ -57,6 +62,7 @@ class ViewTemplate extends Model
             // get plain / not rendered html
             if (View::exists($this->view_file)) {
                 $v = View::make($this->view_file);
+
                 return file_get_contents($v->getPath());
             }
 
@@ -70,6 +76,7 @@ class ViewTemplate extends Model
      * scope scopeValidItems()
      *
      * @param  Builder  $query
+     *
      * @return Builder
      */
     public function scopeValidItems(Builder $query): Builder

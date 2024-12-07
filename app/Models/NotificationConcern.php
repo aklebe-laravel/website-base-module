@@ -17,13 +17,13 @@ class NotificationConcern extends Model
     use HasFactory;
     use TraitBaseModel;
 
-    const REASON_CODE_CONTACT_REQUEST_MESSAGE = "contact_request_message";
-    const REASON_CODE_AUTH_USER_LOGIN_DATA = "remember_user_login_data";
-    const REASON_CODE_AUTH_FORGET_PASSWORD = "auth_forget_password";
-    const REASON_CODE_AUTH_REGISTER_SUCCESS = "auth_register_success";
-    const REASON_CODE_SYSTEM_INFO = "system_info";
-    const REASON_CODE_USER_ASSIGNED_TO_TRADER = "market_user_assigned_to_trader";
-    const REASON_CODE_USER_ASSIGNED_TO_ACL_GROUP = "market_user_assigned_to_acl_group";
+    const string REASON_CODE_CONTACT_REQUEST_MESSAGE = "contact_request_message";
+    const string REASON_CODE_AUTH_USER_LOGIN_DATA = "remember_user_login_data";
+    const string REASON_CODE_AUTH_FORGET_PASSWORD = "auth_forget_password";
+    const string REASON_CODE_AUTH_REGISTER_SUCCESS = "auth_register_success";
+    const string REASON_CODE_SYSTEM_INFO = "system_info";
+    const string REASON_CODE_USER_ASSIGNED_TO_TRADER = "market_user_assigned_to_trader";
+    const string REASON_CODE_USER_ASSIGNED_TO_ACL_GROUP = "market_user_assigned_to_acl_group";
 
     /**
      * @var array
@@ -46,16 +46,21 @@ class NotificationConcern extends Model
     ];
 
     /**
-     * @var array
+     * @param  array  $attributes
      */
-    protected $appends = [
-        'is_valid'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends += [
+            'is_valid',
+        ];
+    }
 
     /**
      * @return BelongsTo
      */
-    public function store()
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
@@ -63,7 +68,7 @@ class NotificationConcern extends Model
     /**
      * @return BelongsTo
      */
-    public function notificationTemplate()
+    public function notificationTemplate(): BelongsTo
     {
         return $this->belongsTo(NotificationTemplate::class);
     }
@@ -109,6 +114,7 @@ class NotificationConcern extends Model
      * scope scopeValidItems()
      *
      * @param  Builder  $query
+     *
      * @return Builder
      */
     public function scopeValidItems(Builder $query): Builder
@@ -120,9 +126,9 @@ class NotificationConcern extends Model
             });
             $q->where(function (Builder $b1) {
                 $b1->whereDoesntHave('notificationTemplate')
-                    ->orWhereHas('notificationTemplate', function (Builder $b2) {
-                        $b2->validItems();
-                    });
+                   ->orWhereHas('notificationTemplate', function (Builder $b2) {
+                       $b2->validItems();
+                   });
             });
 
         });
@@ -133,9 +139,8 @@ class NotificationConcern extends Model
      */
     protected function isValid(): Attribute
     {
-        $result = $this->is_enabled && ($this->store->id === app('website_base_settings')
-                    ->getStore()
-                    ->getKey()) && (!$this->notificationTemplate || $this->notificationTemplate->isValid);
+        $result = $this->is_enabled && ($this->store->id === app('website_base_settings')->getStore()->getKey()) && (!$this->notificationTemplate || $this->notificationTemplate->isValid);
+
         return Attribute::make(get: fn() => $result);
     }
 

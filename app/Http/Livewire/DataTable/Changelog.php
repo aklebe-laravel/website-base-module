@@ -13,17 +13,17 @@ class Changelog extends BaseDataTable
     /**
      * Minimum restrictions to allow this component.
      */
-    public const aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_MANAGE_CONTENT];
+    public const array aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_MANAGE_CONTENT];
 
     /**
      *
      */
-    const FILTER_ALL = '[ALL]';
+    const string FILTER_ALL = '[ALL]';
 
     /**
      *
      */
-    const FILTER_APP_ONLY = '[APP ONLY]';
+    const string FILTER_APP_ONLY = '[APP ONLY]';
 
     /**
      * @return void

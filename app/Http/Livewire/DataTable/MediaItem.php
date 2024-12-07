@@ -12,7 +12,7 @@ class MediaItem extends BaseDataTable
     /**
      * Restrictions to allow this component.
      */
-    public const aclResources = [AclResource::RES_TRADER];
+    public const array aclResources = [AclResource::RES_TRADER];
 
     /**
      * Overwrite to init your sort orders before session exists

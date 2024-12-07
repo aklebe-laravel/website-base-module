@@ -82,15 +82,6 @@ class User extends AppUser
     protected $guarded = [];
 
     /**
-     * appends will be filled dynamically for this instance by ModelWithAttributesLoaded
-     *
-     * @var array
-     */
-    protected $appends = [
-        'extra_attributes',
-    ];
-
-    /**
      * Multiple bootable model traits is not working
      * https://github.com/laravel/framework/issues/40645
      *
@@ -102,18 +93,6 @@ class User extends AppUser
     public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);
-    }
-
-    /**
-     * Override this instead of declare $appends with all parent declarations.
-     *
-     * @return array|string[]
-     */
-    protected function getArrayableAppends()
-    {
-        return parent::getArrayableAppends() + [
-                'image_maker',
-            ];
     }
 
     /**
@@ -154,7 +133,7 @@ class User extends AppUser
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeFrontendItems(Builder $query)
+    public function scopeFrontendItems(Builder $query): Builder
     {
         return $query->where(function ($q) {
             $q->where('is_enabled', true);
@@ -306,7 +285,7 @@ class User extends AppUser
      *
      * @return void
      */
-    public function afterReplicated(Model $fromItem)
+    public function afterReplicated(Model $fromItem): void
     {
         $this->name = __('New').' '.$this->name.' '.uniqid();
         $this->email = uniqid('email_').'@local.test';

@@ -28,6 +28,7 @@ class CoreConfig extends Model
 
     /**
      * You can use this instead of newFactory()
+     *
      * @var string
      */
     public static string $factory = CoreConfigFactory::class;
@@ -35,7 +36,7 @@ class CoreConfig extends Model
     /**
      * @return BelongsTo
      */
-    public function store()
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }

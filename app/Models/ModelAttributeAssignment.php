@@ -17,18 +17,18 @@ class ModelAttributeAssignment extends Model
 
     protected $table = 'model_attribute_assignments';
 
-    public const ATTRIBUTE_ASSIGNMENT_TYPE_TABLE_PREFIX = 'model_attribute_assignment_';
-    const ATTRIBUTE_TYPE_STRING = 'string';
-    const ATTRIBUTE_TYPE_TEXT = 'text';
-    const ATTRIBUTE_TYPE_INTEGER = 'integer';
-    const ATTRIBUTE_TYPE_DOUBLE = 'double';
+    public const string ATTRIBUTE_ASSIGNMENT_TYPE_TABLE_PREFIX = 'model_attribute_assignment_';
+    const string ATTRIBUTE_TYPE_STRING = 'string';
+    const string ATTRIBUTE_TYPE_TEXT = 'text';
+    const string ATTRIBUTE_TYPE_INTEGER = 'integer';
+    const string ATTRIBUTE_TYPE_DOUBLE = 'double';
 
     /**
      * Filled up in constructor
      *
      * @var array|array[]
      */
-    const ATTRIBUTE_TYPE_MAP = [
+    const array ATTRIBUTE_TYPE_MAP = [
         self::ATTRIBUTE_TYPE_STRING  => [
             'type'         => 'string',
             'table_suffix' => 'strings',
@@ -59,7 +59,7 @@ class ModelAttributeAssignment extends Model
     /**
      * @return BelongsTo
      */
-    public function modelAttribute()
+    public function modelAttribute(): BelongsTo
     {
         return $this->belongsTo(ModelAttribute::class);//, 'model_attribute_id', 'id');
     }

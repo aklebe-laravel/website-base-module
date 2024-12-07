@@ -21,10 +21,10 @@ class NotificationEvent extends Model
     use HasFactory;
     use TraitBaseModel;
 
-    const EVENT_TRIGGER_MANUALLY = 'manually';
-    const EVENT_TRIGGER_AUTO = 'auto';
+    const string EVENT_TRIGGER_MANUALLY = 'manually';
+    const string EVENT_TRIGGER_AUTO = 'auto';
 
-    const VALID_EVENT_TRIGGERS = [
+    const array VALID_EVENT_TRIGGERS = [
         self::EVENT_TRIGGER_MANUALLY,
         self::EVENT_TRIGGER_AUTO,
     ];
@@ -32,22 +32,22 @@ class NotificationEvent extends Model
     /**
      * Run through all event users and send the given notification concern or just the content
      */
-    const EVENT_CODE_NOTIFY_DEFAULT = 'notify_default';
+    const string EVENT_CODE_NOTIFY_DEFAULT = 'notify_default';
 
     /**
      * This works like default, but also creates a token
      */
-    const EVENT_CODE_NOTIFY_USERS = 'token_and_notify_default';
+    const string EVENT_CODE_NOTIFY_USERS = 'token_and_notify_default';
 
     /**
      *
      */
-    const EVENT_CODE_ACL_GROUP_ATTACHED_USERS = 'AclGroups_attached_to_User';
+    const string EVENT_CODE_ACL_GROUP_ATTACHED_USERS = 'AclGroups_attached_to_User';
 
     /**
      * Determine the method in NotificationEventProcess like 'launch_event_xxx'
      */
-    const VALID_EVENT_CODES = [
+    const array VALID_EVENT_CODES = [
         self::EVENT_CODE_NOTIFY_DEFAULT,
         self::EVENT_CODE_NOTIFY_USERS,
         self::EVENT_CODE_ACL_GROUP_ATTACHED_USERS,
@@ -67,19 +67,25 @@ class NotificationEvent extends Model
     ];
 
     /**
-     * @var array
+     * @param  array  $attributes
      */
-    protected $appends = [
-        'is_valid'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends += [
+            'is_valid',
+        ];
+    }
 
     /**
      * scope scopeValidItems()
      *
      * @param  Builder  $query
+     *
      * @return Builder
      */
-    public function scopeValidItems(Builder $query)
+    public function scopeValidItems(Builder $query): Builder
     {
         return $query->where(function (Builder $q) {
             $q->where('is_enabled', true);
@@ -89,9 +95,9 @@ class NotificationEvent extends Model
             });
             $q->where(function (Builder $b1) {
                 $b1->whereDoesntHave('notificationConcerns')
-                    ->orWhereHas('notificationConcerns', function (Builder $b2) {
-                        $b2->validItems();
-                    });
+                   ->orWhereHas('notificationConcerns', function (Builder $b2) {
+                       $b2->validItems();
+                   });
             });
 
         });
@@ -102,9 +108,12 @@ class NotificationEvent extends Model
      */
     protected function isValid(): Attribute
     {
-        $result = $this->is_enabled && (!$this->expires_at || $this->expires_at > date(SystemService::dateIsoFormat8601)) && ((!$this->notificationConcerns->count()) || $this->notificationConcerns()
-                    ->validItems()
-                    ->count());
+        $result = $this->is_enabled && (!$this->expires_at || $this->expires_at > date(SystemService::dateIsoFormat8601))
+                  && ((!$this->notificationConcerns->count())
+                      || $this->notificationConcerns()
+                              ->validItems()
+                              ->count());
+
         return Attribute::make(get: fn() => $result);
     }
 
@@ -134,6 +143,7 @@ class NotificationEvent extends Model
 
     /**
      * @param  string  $channel
+     *
      * @return NotificationConcern|null
      */
     public function getNotificationConcernByChannel(string $channel = ''): ?NotificationConcern
@@ -161,6 +171,7 @@ class NotificationEvent extends Model
      * Prefer content from notification concern. If not exists use content itself.
      *
      * @param  string  $channel
+     *
      * @return string|null
      */
     public function getContent(string $channel = ''): ?string
@@ -178,9 +189,10 @@ class NotificationEvent extends Model
      * Prefer subject from notification concern. If not exists use subject itself.
      *
      * @param  string  $channel
+     *
      * @return string|null
      */
-    public function getSubject(string $channel = ''): mixed
+    public function getSubject(string $channel = ''): ?string
     {
         if ($this->notificationConcerns && $this->notificationConcerns->count()) {
             if ($notificationConcern = $this->getNotificationConcernByChannel($channel)) {
@@ -201,7 +213,7 @@ class NotificationEvent extends Model
         $res = $this->aclResources->pluck('id')->toArray();
         $userIds = $this->users->pluck('id')->toArray();
         if ($res || $userIds) {
-            return UserServiceAlias::getUserBuilderByAclResourcesOrUserIds($res, $userIds, false);
+            return UserServiceAlias::getUserBuilderByAclResourcesOrUserIds($res, $userIds);
         }
 
         return null;

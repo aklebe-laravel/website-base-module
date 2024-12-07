@@ -10,23 +10,28 @@ trait TraitBaseMedia
 {
     use TraitBaseModel;
 
-    const IMAGE_MAKER = 'MAKER'; // First/Only Image to show in product lists and current user avatar
+    /**
+     *
+     */
+    const string IMAGE_MAKER = 'MAKER'; // First/Only Image to show in product lists and current user avatar
 
     /**
-     * Override this instead of declare $appends with all parent declarations.
+     * General boot...() info: Static Setup for this object like events
+     * General initialize...() info: executed for every new instance
      *
-     * @return array|string[]
+     * @return void
      */
-    protected function getArrayableAppends()
+    public function initializeTraitBaseMedia(): void
     {
-        return parent::getArrayableAppends() + [
-                'image_maker',
-            ];
+        $this->appends[] = 'image_maker';
     }
 
-    protected function imageMaker(): Attribute
+    /**
+     * @return Attribute
+     */
+    public function imageMaker(): Attribute
     {
-        return Attribute::make(get: fn($value, $attributes) => $this->getContentImage(self::IMAGE_MAKER),);
+        return Attribute::make(get: fn($value, $attributes) => $this->getContentImage(self::IMAGE_MAKER));
     }
 
     /**

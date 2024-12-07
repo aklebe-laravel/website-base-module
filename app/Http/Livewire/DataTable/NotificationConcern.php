@@ -14,7 +14,7 @@ class NotificationConcern extends BaseDataTable
     /**
      * Restrictions to allow this component.
      */
-    public const aclResources = [
+    public const array aclResources = [
         AclResource::RES_DEVELOPER,
         AclResource::RES_MANAGE_DESIGN,
         AclResource::RES_MANAGE_CONTENT,

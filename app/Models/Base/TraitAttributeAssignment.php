@@ -38,16 +38,15 @@ trait TraitAttributeAssignment
     protected bool $extraAttributesLoaded = false;
 
     /**
-     * General boot...() info: To use bootSomethingLikeThis() or bootUserTrait()
-     * there must be at least declared a __construct() in the implemented class
-     * which calls parent::__construct()
-     *
-     * Context: Adding relation events for attached user groups
+     * General boot...() info: Static Setup for this object like events
+     * General initialize...() info: executed for every new instance
      *
      * @return void
      */
-    public function initializeTraitAttributeAssignment()
+    public function initializeTraitAttributeAssignment(): void
     {
+        $this->appends[] = 'extra_attributes';
+
         // Load with cache all assignments and defaults.
         // ModelWithAttributesLoaded will not care about make(), so we have also to call it here.
         $this->fillDefaultExtraAttributes();
@@ -61,10 +60,20 @@ trait TraitAttributeAssignment
         ];
     }
 
+    ///**
+    // * General boot...() info: Static Setup for this object like events
+    // * General initialize...() info: executed for every new instance
+    // *
+    // * @return void
+    // */
+    //public static function bootTraitAttributeAssignment(): void
+    //{
+    //}
+
     /**
      * @return void
      */
-    public function fillDefaultExtraAttributes()
+    public function fillDefaultExtraAttributes(): void
     {
         if ($collection = $this->getModelAttributeAssigmentCollection()) {
             foreach ($collection as $item) {
