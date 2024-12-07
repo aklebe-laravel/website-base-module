@@ -20,29 +20,34 @@ class MediaItem extends Model implements Attachable
     use HasFactory;
     use TraitBaseModel;
 
-    const MEDIA_TYPE_IMAGE = 'IMAGE';
-    const MEDIA_TYPE_ARCHIVE = 'ARCHIVE';
-    const MEDIA_TYPE_IMPORT = 'IMPORT';
-    const OBJECT_TYPE_DOWNLOAD = 'DOWNLOAD';
-    const OBJECT_TYPE_PRODUCT_IMAGE = 'PRODUCT_IMAGE';
-    const OBJECT_TYPE_CATEGORY_IMAGE = 'CATEGORY_IMAGE';
-    const OBJECT_TYPE_USER_AVATAR = 'USER_AVATAR';
-    const OBJECT_TYPE_IMPORT_PRODUCT = 'IMPORT_PRODUCT';
+    const string MEDIA_TYPE_IMAGE = 'IMAGE';
+    const string MEDIA_TYPE_ARCHIVE = 'ARCHIVE';
+    const string MEDIA_TYPE_IMPORT = 'IMPORT';
+    const string OBJECT_TYPE_DOWNLOAD = 'DOWNLOAD';
+    const string OBJECT_TYPE_PRODUCT_IMAGE = 'PRODUCT_IMAGE';
+    const string OBJECT_TYPE_CATEGORY_IMAGE = 'CATEGORY_IMAGE';
+    const string OBJECT_TYPE_USER_AVATAR = 'USER_AVATAR';
+    const string OBJECT_TYPE_IMPORT_PRODUCT = 'IMPORT_PRODUCT';
 
+    /**
+     * @var string
+     */
     public string $mediaPath = 'app/public/media';
 
+    /**
+     * @var string
+     */
     public string $fileNamePrefixFormat = "%s-";
 
+    /**
+     * @var array
+     */
     protected $guarded = [];
 
-    protected $appends = [
-        'final_path',
-        'final_url',
-        'final_thumb_medium_url',
-        'final_thumb_small_url',
-    ];
-
-    const MEDIA_TYPES = [
+    /**
+     *
+     */
+    const array MEDIA_TYPES = [
         self::MEDIA_TYPE_IMAGE   => [
             'extensions'  => ['gif', 'jpg', 'jpeg', 'png'],
             'description' => 'Images',
@@ -53,7 +58,7 @@ class MediaItem extends Model implements Attachable
         ],
     ];
 
-    const OBJECT_TYPES = [
+    const array OBJECT_TYPES = [
         self::OBJECT_TYPE_DOWNLOAD       => [
             'description' => 'Download',
         ],
@@ -70,6 +75,7 @@ class MediaItem extends Model implements Attachable
 
     /**
      * You can use this instead of newFactory()
+     *
      * @var string
      */
     public static string $factory = MediaItemFactory::class;
@@ -83,15 +89,23 @@ class MediaItem extends Model implements Attachable
      *
      * Important for \Modules\Acl\Models\Base\TraitBaseModel::bootTraitBaseModel
      */
-    public function __construct(array $attributes = array())
+    public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+
+        $this->appends += [
+            'final_path',
+            'final_url',
+            'final_thumb_medium_url',
+            'final_thumb_small_url',
+        ];
+
     }
 
     /**
      * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo($this::$userClassName);
     }
@@ -99,7 +113,7 @@ class MediaItem extends Model implements Attachable
     /**
      * @return BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany($this::$userClassName)->withTimestamps();
     }
@@ -119,6 +133,9 @@ class MediaItem extends Model implements Attachable
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public static function getObjectTypesAsSelectOptions(): array
     {
         $result = [
@@ -146,6 +163,9 @@ class MediaItem extends Model implements Attachable
         return app('system_base_file')->getValidPath('media/'.$thumbsSubFolder.'/'.($this->relative_path ?? '').'/'.$this->file_name);
     }
 
+    /**
+     * @return string
+     */
     public function getFinalPathAttribute(): string
     {
         if (!$this->file_name) {
@@ -155,6 +175,9 @@ class MediaItem extends Model implements Attachable
         return Storage::disk('public')->path($this->getRelativeFilePath());
     }
 
+    /**
+     * @return string
+     */
     public function getFinalUrlAttribute(): string
     {
         if (!$this->file_name) {
@@ -164,6 +187,9 @@ class MediaItem extends Model implements Attachable
         return Storage::url($this->getRelativeFilePath());
     }
 
+    /**
+     * @return string
+     */
     public function getFinalThumbMediumUrlAttribute(): string
     {
         if (!$this->file_name) {
@@ -173,6 +199,9 @@ class MediaItem extends Model implements Attachable
         return Storage::url($this->getRelativeFilePath('thumbs_medium'));
     }
 
+    /**
+     * @return string
+     */
     public function getFinalThumbSmallUrlAttribute(): string
     {
         if (!$this->file_name) {
@@ -182,7 +211,10 @@ class MediaItem extends Model implements Attachable
         return Storage::url($this->getRelativeFilePath('thumbs_small'));
     }
 
-    public function toMailAttachment()
+    /**
+     * @return Attachment
+     */
+    public function toMailAttachment(): Attachment
     {
         return Attachment::fromPath($this->final_path);
     }

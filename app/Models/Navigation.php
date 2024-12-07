@@ -23,13 +23,6 @@ class Navigation extends Model
     protected $guarded = [];
 
     /**
-     * appends will be filled dynamically for this instance by static::retrieved()
-     *
-     * @var array
-     */
-    protected $appends = ['extra_attributes'];
-
-    /**
      * properties should always cast from json to an array and via versa
      *
      * @var string[]
@@ -44,7 +37,7 @@ class Navigation extends Model
     /**
      * @return BelongsTo
      */
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class);
     }

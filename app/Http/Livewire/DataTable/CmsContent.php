@@ -10,7 +10,7 @@ class CmsContent extends BaseDataTable
     /**
      * Minimum restrictions to allow this component.
      */
-    public const aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_MANAGE_CONTENT];
+    public const array aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_MANAGE_CONTENT];
 
     /**
      * Overwrite to init your sort orders before session exists

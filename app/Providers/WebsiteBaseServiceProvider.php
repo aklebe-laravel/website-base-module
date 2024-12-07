@@ -45,6 +45,8 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
 
         // Important to get Modules\WebsiteBase\Models\User when accessing app(\App\Models\User::class)
         $this->app->bind(\App\Models\User::class, User::class);
+        // user shorthand
+        $this->app->bind('user', User::class);
 
         // This is also important to overwrite the user successfully!
         \Illuminate\Support\Facades\Config::set('auth.providers.users.model', User::class);

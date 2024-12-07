@@ -15,10 +15,10 @@ class Token extends Model
     use HasFactory;
     use TraitBaseModel;
 
-    const PURPOSE_LOGIN = 'LOGIN';
-    const PURPOSE_MAKE_TRADER = 'MAKE_TRADER';
+    const string PURPOSE_LOGIN = 'LOGIN';
+    const string PURPOSE_MAKE_TRADER = 'MAKE_TRADER';
 
-    const PURPOSE_LIST = [
+    const array PURPOSE_LIST = [
         self::PURPOSE_LOGIN,
         self::PURPOSE_MAKE_TRADER,
     ];
@@ -45,7 +45,7 @@ class Token extends Model
     /**
      * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo($this::$userClassName);
     }

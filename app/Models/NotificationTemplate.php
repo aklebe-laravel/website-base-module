@@ -28,16 +28,21 @@ class NotificationTemplate extends Model
     protected $table = 'notification_templates';
 
     /**
-     * @var array
+     * @param  array  $attributes
      */
-    protected $appends = [
-        'is_valid'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends += [
+            'is_valid'
+        ];
+    }
 
     /**
      * @return BelongsTo
      */
-    public function viewTemplate()
+    public function viewTemplate(): BelongsTo
     {
         return $this->belongsTo(ViewTemplate::class);
     }

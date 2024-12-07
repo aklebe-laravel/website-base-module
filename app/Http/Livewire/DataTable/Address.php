@@ -11,7 +11,7 @@ class Address extends BaseDataTable
     /**
      * Minimum restrictions to allow this component.
      */
-    public const aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_TRADER];
+    public const array aclResources = [AclResource::RES_DEVELOPER, AclResource::RES_TRADER];
 
     /**
      * @return array[]

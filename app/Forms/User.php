@@ -10,7 +10,7 @@ class User extends ModelBaseExtraAttributes
     /**
      * Relation method if parent form exists.
      */
-    const PARENT_RELATION_METHOD_NAME = 'users';
+    const string PARENT_RELATION_METHOD_NAME = 'users';
 
     /**
      * Set for example 'web_uri' or 'shared_id' to try load from this if is not numeric in getJsonResource().
