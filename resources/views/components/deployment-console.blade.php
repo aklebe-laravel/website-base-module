@@ -4,8 +4,10 @@
     </div>
 </div>
 <script>
-    document.addEventListener('alpine:init', () => {
-        console.log('module website-base console init ...')
+    // document.addEventListener('alpine:init', () => {
+    // window.addEventListener('load', () => {
+    document.addEventListener('cli-console-ready', () => {
+        console.log('event "cli-console-ready" ready ...')
 
         let c = new CliConsole("deployment-console");
         c.start();

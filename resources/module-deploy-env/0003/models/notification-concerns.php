@@ -50,188 +50,188 @@ return [
                 ],
                 "notification_template" => [
                     ["auth_register_success", "email"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             "notificationTemplate.notification_channel" => "email",
-            "sender"                             => '',
-            "description"                        => "User forgot password.",
-            "tags"                               => [
+            "sender"                                    => '',
+            "description"                               => "User forgot password.",
+            "tags"                                      => [
                 "user",
                 "customer",
                 "password",
                 "forget",
             ],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["auth_forget_password", "email"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_AUTH_USER_LOGIN_DATA,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_AUTH_USER_LOGIN_DATA,
             "notificationTemplate.code"                 => "user_login_info",
             "notificationTemplate.notification_channel" => "email",
-            "sender"                             => '',
-            "description"                        => "Send user login data.",
-            "tags"                               => [
+            "sender"                                    => '',
+            "description"                               => "Send user login data.",
+            "tags"                                      => [
                 "user",
                 "customer",
                 "login",
                 "remember",
             ],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["user_login_info", "email"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_SYSTEM_INFO,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             "notificationTemplate.notification_channel" => "email",
-            "sender"                             => '',
-            "description"                        => "Send system info.",
-            "tags"                               => [
+            "sender"                                    => '',
+            "description"                               => "Send system info.",
+            "tags"                                      => [
                 "system",
                 "information",
             ],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["system_info", "email"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             "notificationTemplate.notification_channel" => "email",
-            "sender"                             => '',
-            "description"                        => "Contact request.",
-            "tags"                               => [
+            "sender"                                    => '',
+            "description"                               => "Contact request.",
+            "tags"                                      => [
                 "user",
                 "customer",
                 "contact",
                 "request",
             ],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["contact_request_message", "email"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_AUTH_REGISTER_SUCCESS,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_AUTH_REGISTER_SUCCESS,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_AUTH_REGISTER_SUCCESS,
             "notificationTemplate.notification_channel" => "telegram",
-            "sender"                             => '',
-            "description"                        => "User registered successfully.",
-            "tags"                               => [],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "sender"                                    => '',
+            "description"                               => "User registered successfully.",
+            "tags"                                      => [],
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["auth_register_success", "telegram"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             "notificationTemplate.notification_channel" => "telegram",
-            "sender"                             => '',
-            "description"                        => "User forgot password.",
-            "tags"                               => [],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "sender"                                    => '',
+            "description"                               => "User forgot password.",
+            "tags"                                      => [],
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["auth_forget_password", "telegram"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_AUTH_USER_LOGIN_DATA,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_AUTH_USER_LOGIN_DATA,
             "notificationTemplate.code"                 => "user_login_info",
             "notificationTemplate.notification_channel" => "telegram",
-            "sender"                             => '',
-            "description"                        => "Send user login data.",
-            "tags"                               => [],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "sender"                                    => '',
+            "description"                               => "Send user login data.",
+            "tags"                                      => [],
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["user_login_info", "telegram"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_SYSTEM_INFO,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             "notificationTemplate.notification_channel" => "telegram",
-            "sender"                             => '',
-            "description"                        => "Send system info.",
-            "tags"                               => [],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "sender"                                    => '',
+            "description"                               => "Send system info.",
+            "tags"                                      => [],
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["system_info", "telegram"],
-                ]
+                ],
             ],
         ],
         [
-            "is_enabled"                         => true,
-            "reason_code"                        => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
+            "is_enabled"                                => true,
+            "reason_code"                               => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             "notificationTemplate.code"                 => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             "notificationTemplate.notification_channel" => "telegram",
-            "sender"                             => '',
-            "description"                        => "Contact request.",
-            "tags"                               => [],
-            "meta_data"                          => [],
-            "#sync_relations"                    => [
+            "sender"                                    => '',
+            "description"                               => "Contact request.",
+            "tags"                                      => [],
+            "meta_data"                                 => [],
+            "#sync_relations"                           => [
                 "store"                 => [
                     "default",
                 ],
                 "notification_template" => [
                     ["contact_request_message", "telegram"],
-                ]
+                ],
             ],
         ],
-    ]
+    ],
 ];

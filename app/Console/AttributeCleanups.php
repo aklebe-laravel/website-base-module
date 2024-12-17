@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Console;
 
 use Illuminate\Console\Command;
 use Modules\WebsiteBase\app\Services\WebsiteService;
+use Symfony\Component\Console\Command\Command as CommandResult;
 
 class AttributeCleanups extends Command
 {
@@ -26,13 +27,13 @@ class AttributeCleanups extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         /** @var WebsiteService $websiteService */
         $websiteService = app(WebsiteService::class);
         $websiteService->cleanupExtraAttributes();
 
-        return Command::SUCCESS;
+        return CommandResult::SUCCESS;
     }
 
 }

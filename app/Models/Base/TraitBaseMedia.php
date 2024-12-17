@@ -51,7 +51,7 @@ trait TraitBaseMedia
      */
     public function images(): BelongsToMany
     {
-        return $this->mediaItems()->withTimestamps()->where('media_type', MediaItem::MEDIA_TYPE_IMAGE);
+        return $this->mediaItems()->images()->withTimestamps();
     }
 
     /**
@@ -59,7 +59,7 @@ trait TraitBaseMedia
      * Pivot tables can differ by class objects.
      *
      * @param  string  $contentCode
-     * @param  bool  $forceAny  If true: Also select nullable pivots but order by pivots exists
+     * @param  bool    $forceAny  If true: Also select nullable pivots but order by pivots exists
      *
      * @return BelongsToMany
      */
@@ -76,7 +76,7 @@ trait TraitBaseMedia
 
     /**
      * @param  string  $contentCode
-     * @param  bool  $forceAny  If true: Select the first available image if $contentCode does not exist.
+     * @param  bool    $forceAny  If true: Select the first available image if $contentCode does not exist.
      *
      * @return MediaItem|null
      */

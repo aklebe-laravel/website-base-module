@@ -37,12 +37,14 @@ class User extends ModelBaseExtraAttributes
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'User';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Users';
@@ -96,7 +98,7 @@ class User extends ModelBaseExtraAttributes
                                         'label'        => __('ID'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'name'                 => [
@@ -106,7 +108,7 @@ class User extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -117,7 +119,7 @@ class User extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'required',
                                             'email',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -127,7 +129,7 @@ class User extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -137,7 +139,7 @@ class User extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -148,7 +150,7 @@ class User extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -159,7 +161,7 @@ class User extends ModelBaseExtraAttributes
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'media_file_upload'    => [
-                                        'html_element' => 'website-base::file_upload',
+                                        'html_element' => 'website-base::media_item_file_upload_images',
                                         'label'        => __('Media Upload'),
                                         'description'  => __('Media Upload'),
                                         'css_group'    => 'col-12 col-md-6',
@@ -192,7 +194,7 @@ class User extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -222,7 +224,7 @@ class User extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -250,7 +252,7 @@ class User extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -273,7 +275,7 @@ class User extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -302,7 +304,7 @@ class User extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],

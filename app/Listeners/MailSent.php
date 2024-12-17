@@ -28,7 +28,7 @@ class MailSent
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function handle(MessageSent $event)
+    public function handle(MessageSent $event): void
     {
         // max attempts 0 = no limiter
         if ($maxAttempts = (int) app('website_base_config')->get('email.rate-limiter.max', 0)) {

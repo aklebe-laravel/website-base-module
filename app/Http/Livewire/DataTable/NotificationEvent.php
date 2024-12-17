@@ -5,15 +5,18 @@ namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
+use Modules\WebsiteBase\app\Models\NotificationEvent as NotificationEventModel;
 use Modules\WebsiteBase\app\Services\NotificationEventService;
 use Modules\WebsiteBase\app\Services\WebsiteService;
 
 class NotificationEvent extends BaseDataTable
 {
+    use BaseWebsiteBaseDataTable;
+
     /**
      *
      */
-    const FILTER_NOTIFICATION_CHANNEL_ALL = '';
+    const string FILTER_NOTIFICATION_CHANNEL_ALL = '';
 
     /**
      * @return void
@@ -30,7 +33,7 @@ class NotificationEvent extends BaseDataTable
             'css_item'  => '',
             'options'   => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS,
                 first: [NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL => '['.__('All Channels').']']),
-            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
+            'builder'   => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;
                 }
@@ -68,7 +71,7 @@ class NotificationEvent extends BaseDataTable
         $this->rowCommands = [
             'notification_event_preview' => 'website-base::livewire.js-dt.tables.columns.buttons.notification-event-preview',
             'notification_event_launch'  => 'website-base::livewire.js-dt.tables.columns.buttons.notification-event-launch',
-            ...$this->rowCommands
+            ...$this->rowCommands,
         ];
     }
 
@@ -119,13 +122,13 @@ class NotificationEvent extends BaseDataTable
     }
 
     /**
-     * @param $livewireId
-     * @param $itemId
+     * @param  string|int  $livewireId
+     * @param  string|int  $itemId
      *
      * @return bool
      */
     #[On('launch')]
-    public function launch(mixed $livewireId, mixed $itemId): bool
+    public function launch(string|int $livewireId, string|int $itemId): bool
     {
         if (!$this->checkLivewireId($livewireId)) {
             return false;
@@ -135,11 +138,13 @@ class NotificationEvent extends BaseDataTable
         $service = app(NotificationEventService::class);
 
         // check for validItems() before send it to $service->launch()
-        if (!($event = \Modules\WebsiteBase\app\Models\NotificationEvent::with([])
-            ->validItems()
-            ->whereId($itemId)
-            ->count())) {
+        if (!($event = NotificationEventModel::with([])
+                                             ->validItems()
+                                             ->whereId($itemId)
+                                             ->count())
+        ) {
             $this->addErrorMessage(__('Event not found or disabled/invalid.'));
+
             return false;
         }
 

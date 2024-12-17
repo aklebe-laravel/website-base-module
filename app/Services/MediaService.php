@@ -8,13 +8,20 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManagerStatic as ImageStatic;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\MediaItem;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class MediaService extends BaseService
 {
     /**
+     * @var string
+     */
+    public string $mediaFileRegexPattern = '#(\d+?)\-([0-9a-zA-Z]+)\.([0-9a-zA-Z]+)$#';
+
+    /**
      * Defined thumbs (inclusive original) sorted from big to small
      */
-    const availableThumbs = [
+    const array availableThumbs = [
         // '' original (no thumb)
         ''              => [
             'config' => [
@@ -55,43 +62,52 @@ class MediaService extends BaseService
      * @param  string     $originalMediaFile
      *
      * @return void
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function createMediaFile(MediaItem $mediaModel, string $originalMediaFile): void
     {
         $config = app('website_base_config');
 
-        $aspectRatio = function (Constraint $constraint) {
-            $constraint->aspectRatio();
-        };
+        switch ($mediaModel->media_type) {
+            case MediaItem::MEDIA_TYPE_IMAGE:
+                $aspectRatio = function (Constraint $constraint) {
+                    $constraint->aspectRatio();
+                };
 
-        // @todo: check for image ...
-        $img = ImageStatic::make($originalMediaFile);
-        $loopIndex = 0;
-        foreach (self::availableThumbs as $thumbName => $data) {
-            $configKeyWidth = data_get($data, 'config.width');
-            $configKeyWidthDefault = (int) data_get($data, 'config.width_default');
-            $configKeyHeight = data_get($data, 'config.height');
-            $configKeyHeightDefault = (int) data_get($data, 'config.height_default');
-            $configKeyQuality = data_get($data, 'config.quality');
-            $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
+                // @todo: check for image ...
+                $img = ImageStatic::make($originalMediaFile);
+                $loopIndex = 0;
+                foreach (self::availableThumbs as $thumbName => $data) {
+                    $configKeyWidth = data_get($data, 'config.width');
+                    $configKeyWidthDefault = (int) data_get($data, 'config.width_default');
+                    $configKeyHeight = data_get($data, 'config.height');
+                    $configKeyHeightDefault = (int) data_get($data, 'config.height_default');
+                    $configKeyQuality = data_get($data, 'config.quality');
+                    $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
 
-            $width = (int) $config->get($configKeyWidth, $configKeyWidthDefault);
-            $height = (int) $config->get($configKeyHeight, $configKeyHeightDefault);
-            $quality = (int) $config->get($configKeyQuality, $configKeyQualityDefault);
+                    $width = (int) $config->get($configKeyWidth, $configKeyWidthDefault);
+                    $height = (int) $config->get($configKeyHeight, $configKeyHeightDefault);
+                    $quality = (int) $config->get($configKeyQuality, $configKeyQualityDefault);
 
-            // resize with aspect ratio
-            $img->resize($width, $height, $aspectRatio);
+                    // resize with aspect ratio
+                    $img->resize($width, $height, $aspectRatio);
 
-            // canvas only once
-            if ($loopIndex === 0) {
-                $img->resizeCanvas($width, $height, 'center', false,
-                    'f8f8f8'); // fit to $width and $height using background color
-            }
+                    // canvas only once
+                    if ($loopIndex === 0) {
+                        $img->resizeCanvas($width, $height, 'center', false,
+                            'f8f8f8'); // fit to $width and $height using background color
+                    }
 
-            $this->saveToMedia($img, $mediaModel, $quality, $thumbName, ($loopIndex === 0));
-            $loopIndex++;
+                    $this->saveImageToMedia($img, $mediaModel, $quality, $thumbName, ($loopIndex === 0));
+                    $loopIndex++;
+                }
+                break;
+
+            //case MediaItem::MEDIA_TYPE_IMPORT:
+            default:
+                $this->saveImport($mediaModel, $originalMediaFile);
+                break;
         }
     }
 
@@ -106,14 +122,29 @@ class MediaService extends BaseService
      */
     public function deleteMediaFiles(MediaItem $mediaModel, string $thumbPath = ''): bool
     {
-        $fileNamePrefix = sprintf($mediaModel->fileNamePrefixFormat, $mediaModel->id);
-        $relativePath = $mediaModel->relative_path ?? '';
-        $path = storage_path(app('system_base_file')->getValidPath($mediaModel->mediaPath.'/'.$thumbPath.'/'.$relativePath));
-        $files = glob($path.'/'.$fileNamePrefix.'*');
-        foreach ($files as $file) {
-            if (is_file($file)) {
-                if (!@unlink($file)) {
-                    return false;
+        return $this->deleteMediaFilesById($mediaModel->getKey(), $mediaModel->relative_path, $thumbPath);
+    }
+
+    /**
+     * @param  string|int|null  $id
+     * @param  string|null      $relativePath
+     * @param  string|null      $thumbPath
+     *
+     * @return bool
+     */
+    public function deleteMediaFilesById(string|int|null $id = null, ?string $relativePath = null, ?string $thumbPath = null): bool
+    {
+        $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $id);
+        $relativePath = $relativePath ?? '';
+
+        foreach (MediaItem::MEDIA_TYPES as $mediaType => $data) {
+            $path = $this->getMediaItemPathRaw($mediaType, $relativePath, $thumbPath);
+            $files = glob($path.'/'.$fileNamePrefix.'*');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    if (!@unlink($file)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -123,9 +154,10 @@ class MediaService extends BaseService
 
     /**
      * @param  MediaItem  $mediaModel
+     *
      * @return void
      */
-    public function deleteAllMediaFiles(MediaItem $mediaModel): void
+    public function deleteAllMediaFilesByModel(MediaItem $mediaModel): void
     {
         foreach (self::availableThumbs as $thumbName => $data) {
             $this->deleteMediaFiles($mediaModel, $thumbName);
@@ -134,13 +166,62 @@ class MediaService extends BaseService
 
     /**
      * @param  MediaItem  $mediaModel
+     *
      * @return void
      */
     public function deleteMediaItem(MediaItem $mediaModel): void
     {
         Log::debug("Deleting media item {$mediaModel->getKey()} and related files ...");
-        $this->deleteAllMediaFiles($mediaModel);
+        $this->deleteAllMediaFilesByModel($mediaModel);
         $mediaModel->delete();
+    }
+
+    /**
+     * calculate media item directory based on type
+     *
+     * @param  MediaItem  $mediaModel
+     * @param  string     $thumbPath  useful for images only
+     * @param  bool       $inclusiveFilenameIfNotEmpty
+     *
+     * @return string
+     */
+    public function getMediaItemPath(MediaItem $mediaModel, string $thumbPath = '', bool $inclusiveFilenameIfNotEmpty = true): string
+    {
+        $path = $this->getMediaItemPathRaw($mediaModel->media_type, $mediaModel->relative_path, $thumbPath);
+
+        if ($inclusiveFilenameIfNotEmpty && $mediaModel->file_name) {
+            $path .= '/'.$mediaModel->file_name;
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param  string|null  $mediaType
+     * @param  string|null  $relativePath
+     * @param  string|null  $thumbPath
+     *
+     * @return string
+     */
+    public function getMediaItemPathRaw(?string $mediaType = null, ?string $relativePath = null, ?string $thumbPath = null): string
+    {
+        $mediaSubPath = MediaItem::MEDIA_TYPES[$mediaType]['media_path'];
+        $path = storage_path(app('system_base_file')->getValidPath($mediaSubPath));
+        switch ($mediaType) {
+            case MediaItem::MEDIA_TYPE_IMAGE:
+                if ($thumbPath) {
+                    $path .= '/'.$thumbPath;
+                }
+                break;
+            default:
+                break;
+        }
+
+        if ($relativePath) {
+            $path .= '/'.$relativePath;
+        }
+
+        return $path;
     }
 
     /**
@@ -148,15 +229,14 @@ class MediaService extends BaseService
      * @param  MediaItem  $mediaModel
      * @param  int        $quality
      * @param  string     $thumbPath
-     * @param  bool       $generate  if true generate a new filename and DB entry
+     * @param  bool       $generate  if true generate a new filename
      *
      * @return bool
      */
-    public function saveToMedia(Image $img, MediaItem $mediaModel, int $quality = 90, string $thumbPath = '',
-        bool $generate = false): bool
+    public function saveImageToMedia(Image $img, MediaItem $mediaModel, int $quality = 90, string $thumbPath = '', bool $generate = false): bool
     {
         $relativePath = $mediaModel->relative_path ?? '';
-        $fileNamePrefix = sprintf($mediaModel->fileNamePrefixFormat, $mediaModel->id);
+        $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $mediaModel->id);
 
         // delete previous file(s)
         if (!$this->deleteMediaFiles($mediaModel, $thumbPath)) {
@@ -166,7 +246,7 @@ class MediaService extends BaseService
         }
 
         // calculate destination directory
-        $path = storage_path(app('system_base_file')->getValidPath($mediaModel->mediaPath.'/'.$thumbPath.'/'.$relativePath));
+        $path = $this->getMediaItemPath($mediaModel, $thumbPath, false);
 
         // create directory if not exists
         if (!is_dir($path)) {
@@ -193,4 +273,107 @@ class MediaService extends BaseService
         return true;
     }
 
+    /**
+     * @param  MediaItem  $mediaModel
+     * @param  string     $originalMediaFile
+     *
+     * @return bool
+     */
+    public function saveImport(MediaItem $mediaModel, string $originalMediaFile): bool
+    {
+        $relativePath = $mediaModel->relative_path ?? '';
+        $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $mediaModel->id);
+
+        // delete previous file(s)
+        if (!$this->deleteMediaFiles($mediaModel)) {
+            $this->error('Unable to delete files', [$mediaModel->id, __METHOD__]);
+
+            return false;
+        }
+
+        // calculate destination directory
+        $path = $this->getMediaItemPath($mediaModel, inclusiveFilenameIfNotEmpty: false);
+
+        // create directory if not exists
+        if (!is_dir($path)) {
+            app('system_base_file')->createDir($path);
+        }
+
+        $ext = pathinfo($originalMediaFile, PATHINFO_EXTENSION);
+        //$fileName = $mediaModel->file_name;
+        $uniqueId = uniqid(); // or just random_bytes()
+        $fileName = $fileNamePrefix.$uniqueId.'.'.$ext;
+
+        $path = app('system_base_file')->getValidPath($path.'/'.$fileName);
+
+        if (copy($originalMediaFile, $path)) {
+            $mediaModel->update([
+                'file_name'     => $fileName,
+                'relative_path' => $relativePath,
+            ]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  string  $type
+     *
+     * @return bool
+     */
+    public function deleteUnusedMediaFiles(string $type): bool
+    {
+        $fileService = app('system_base_file');
+
+        $fileMatchList = [];
+        $infoList = [
+            'files_total'   => 0,
+            'files_matched' => 0,
+            'files_deleted' => 0,
+        ];
+
+        $path = $this->getMediaItemPathRaw($type);
+        if (!is_dir($path)) {
+            return false;
+        }
+        $this->info("Searching files for type \"$type\" in \"$path\" ...");
+
+        // find all files
+        $fileService->runDirectoryFiles($path, function (string $file, array $sourcePathInfo) use (&$infoList, &$fileMatchList) {
+            $infoList['files_total']++;
+            // we could set this to whitelist, but we need the result
+            if (preg_match($this->mediaFileRegexPattern, $sourcePathInfo['basename'], $matches)) {
+                $infoList['files_matched']++;
+                if ($id = (int) $matches[1]) {
+                    $fileMatchList[$id][] = $file;
+                }
+            }
+
+            //Log::debug($sourcePathInfo['basename']);
+            return true;
+        });
+
+        $this->debug("Matched regex pattern: ".count($fileMatchList));
+        //$this->debug(print_r($fileMatchList, true));
+
+        $matchedIds = array_keys($fileMatchList);
+        $mediaItemsExists = MediaItem::whereIn('id', $matchedIds)->pluck('id')->toArray();
+        $diff = array_diff($matchedIds, $mediaItemsExists);
+        $this->debug("Matched to delete: ".count($diff), $diff);
+
+        $deleted = 0;
+        foreach ($diff as $id) {
+            foreach ($fileMatchList[$id] as $file) {
+                //$this->debug("deleting file: \"$file\" ...");
+                if (unlink($file)) {
+                    $deleted++;
+                }
+            }
+        }
+        $this->info("Files deleted: ".$deleted);
+
+        return true;
+    }
 }

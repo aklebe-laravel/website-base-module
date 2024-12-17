@@ -54,6 +54,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
         $this->app->register(ScheduleServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
+        $this->app->register(BroadcastServiceProvider::class);
     }
 
     /**
@@ -66,7 +67,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
         parent::boot();
 
         $this->commands([
-            AttributeCleanups::class
+            AttributeCleanups::class,
         ]);
     }
 

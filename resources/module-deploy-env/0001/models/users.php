@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\User;
+
 return [
     // class of eloquent model
-    "model"     => \App\Models\User::class,
+    "model"     => User::class,
     // update data if exists and data differ (default false)
     "update"    => true,
     // columns to check if data already exists (AND WHERE)
@@ -11,11 +13,11 @@ return [
     "relations" => [
         "res" => [
             // relation method which have to exists
-            "method" => "aclGroups",
+            "method"  => "aclGroups",
             // column(s) to find specific #sync_relations items below
             "columns" => "name",
             // delete items if not listed here (default: false)
-            "delete" => false,
+            "delete"  => false,
         ],
     ],
     // data rows itself
@@ -28,8 +30,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Site Owners",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "name"            => "AdminTest1",
@@ -40,8 +42,8 @@ return [
                 "res" => [
                     "Admins",
                     "Site Owners",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "name"            => "AdminTest2",
@@ -51,9 +53,9 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admins",
-                    "Supporters"
-                ]
-            ]
+                    "Supporters",
+                ],
+            ],
         ],
         [
             "name"            => "AdminTest3",
@@ -65,9 +67,9 @@ return [
                     "Admins",
                     "Supporters",
                     "Developers",
-                    "Staff"
-                ]
-            ]
+                    "Staff",
+                ],
+            ],
         ],
         [
             "name"            => "StuffTest1",
@@ -77,9 +79,9 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Staff",
-                    "Testers"
-                ]
-            ]
+                    "Testers",
+                ],
+            ],
         ],
-    ]
+    ],
 ];

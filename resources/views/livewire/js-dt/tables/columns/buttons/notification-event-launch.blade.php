@@ -6,14 +6,15 @@
      * @var mixed $value
      **/
 
+    use Modules\Acl\app\Models\AclResource;
     use Modules\Acl\app\Services\UserService;
 
     /** @var UserService $userService */
     $userService = app(UserService::class);
-    if(!$userService->hasUserResource(\Illuminate\Support\Facades\Auth::user(), \Modules\Acl\app\Models\AclResource::RES_MANAGE_USERS)) {
+    if(!$userService->hasUserResource(\Illuminate\Support\Facades\Auth::user(), AclResource::RES_MANAGE_USERS)) {
         return;
     }
-    $jsMessageBoxLaunchPath = app('system_base_module')->getModelSnakeName($this->getModelName()) . '.data-table.launch';
+    $jsMessageBoxLaunchPath = app('system_base_module')->getModelSnakeName($this->getEloquentModelName()) . '.data-table.launch';
 @endphp
 <button class="btn btn-sm btn-outline-secondary mr-2 {{ data_get($this->mobileCssClasses, 'button', '') }}"
         x-on:click="messageBox.show('{{ $jsMessageBoxLaunchPath }}', {'launch': {livewire_id: '{{ $this->getId() }}', name: '{{ $this->getName() }}', item_id: '{{ data_get($item, 'id') }}' }})"

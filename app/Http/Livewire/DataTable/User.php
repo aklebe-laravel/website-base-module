@@ -11,16 +11,20 @@ use Livewire\Attributes\On;
 use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
+use Modules\WebsiteBase\app\Models\User as UserModel;
 
 class User extends BaseDataTable
 {
+    use BaseWebsiteBaseDataTable;
+
     /**
      * @var string
      */
-    public string $modelName = 'User';
+    public string $eloquentModelName = UserModel::class;
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void
@@ -40,7 +44,7 @@ class User extends BaseDataTable
         if ($this->canManage()) {
             $this->rowCommands = [
                 'claim_user' => 'website-base::livewire.js-dt.tables.columns.buttons.claim-user',
-                ...$this->rowCommands
+                ...$this->rowCommands,
             ];
         } else {
             $this->rowCommands = [];
@@ -147,9 +151,10 @@ class User extends BaseDataTable
     }
 
     /**
-     * @param  mixed  $livewireId
-     * @param  mixed  $itemId
+     * @param  mixed        $livewireId
+     * @param  mixed        $itemId
      * @param  string|null  $currentUrl
+     *
      * @return bool
      * @todo: duplicate code UserController::claim()
      */
@@ -219,6 +224,7 @@ class User extends BaseDataTable
         if ($this->useCollectionUserFilter) {
             $builder = $builder->frontendItems();
         }
+
         return $builder;
     }
 
@@ -227,7 +233,7 @@ class User extends BaseDataTable
      * @param  mixed  $itemId
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     #[On('delete-item')]
     public function deleteItem(mixed $livewireId, mixed $itemId): bool
@@ -236,7 +242,7 @@ class User extends BaseDataTable
             return false;
         }
 
-        /** @var \Modules\WebsiteBase\app\Models\User $user */
+        /** @var UserModel $user */
         if ($user = app(\App\Models\User::class)->with([])->find($itemId)) {
             $result = $user->deleteIn3Steps();
             if ($result['success']) {
@@ -252,21 +258,23 @@ class User extends BaseDataTable
 
     /**
      * @param $item
+     *
      * @return bool
      */
     protected function isItemValid($item): bool
     {
-        /** @var \Modules\WebsiteBase\app\Models\User $item */
+        /** @var UserModel $item */
         return ($item->is_enabled && !$item->is_deleted && ($item->order_to_delete_at === null));
     }
 
     /**
      * @param $item
+     *
      * @return bool
      */
     protected function isItemWarn($item): bool
     {
-        /** @var \Modules\WebsiteBase\app\Models\User $item */
+        /** @var UserModel $item */
         return ((!$item->email) || (!$item->name) || (!$item->shared_id) || $item->hasAclResource('puppet', []));
     }
 

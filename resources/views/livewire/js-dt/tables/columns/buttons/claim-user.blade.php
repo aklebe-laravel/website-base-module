@@ -9,7 +9,7 @@
     // path for messageBox.config
     use Modules\Acl\app\Services\UserService;
 
-    $jsMessageBoxClaimItemPath = app('system_base_module')->getModelSnakeName($this->getModelName()) . '.data-table.claim';
+    $jsMessageBoxClaimItemPath = app('system_base_module')->getModelSnakeName($this->getEloquentModelName()) . '.data-table.claim';
     // $fullJsVarName = 'messageBox.config.' . $jsMessageBoxDeleteItemPath;
     /** @var UserService $userService */
     $userService = app(UserService::class);

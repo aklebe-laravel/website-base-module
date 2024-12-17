@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Acl\app\Services\UserService;
@@ -14,12 +15,12 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class WebsiteService extends BaseService
 {
-    const NOTIFICATION_CHANNEL_NOTHING = 'nothing';
-    const NOTIFICATION_CHANNEL_EMAIL = 'email';
-    const NOTIFICATION_CHANNEL_SMS = 'sms';
-    const NOTIFICATION_CHANNEL_TELEGRAM = 'telegram';
-    const NOTIFICATION_CHANNEL_WHATSAPP = 'whatsapp';
-    const NOTIFICATION_CHANNELS = [
+    const string NOTIFICATION_CHANNEL_NOTHING = 'nothing';
+    const string NOTIFICATION_CHANNEL_EMAIL = 'email';
+    const string NOTIFICATION_CHANNEL_SMS = 'sms';
+    const string NOTIFICATION_CHANNEL_TELEGRAM = 'telegram';
+    const string NOTIFICATION_CHANNEL_WHATSAPP = 'whatsapp';
+    const array NOTIFICATION_CHANNELS = [
         self::NOTIFICATION_CHANNEL_EMAIL,
         // self::NOTIFICATION_CHANNEL_SMS,
         self::NOTIFICATION_CHANNEL_TELEGRAM,
@@ -64,9 +65,7 @@ class WebsiteService extends BaseService
         ];
 
         //$forceAuthMiddleware = ['auth', 'verified'];
-        $defaultMiddleware = $publicPortal ? [] : $forceAuthMiddleware;
-
-        return $defaultMiddleware;
+        return $publicPortal ? [] : $forceAuthMiddleware;
     }
 
     /**
@@ -99,37 +98,44 @@ class WebsiteService extends BaseService
      */
     public function cleanupExtraAttributes(): void
     {
-        $deleted = 0;
-        $attributeAssignments = ModelAttributeAssignment::with([]);
-        foreach ($attributeAssignments->get() as $attributeAssignment) {
-            /** @var TraitAttributeAssignment $model */
-            $model = app($attributeAssignment->model);
-            $tableName = $model->getAttributeTypeTableName($attributeAssignment->attribute_type);
+        try {
 
-            if ($builder = DB::table($tableName)->where('model_attribute_assignment_id', '=', $attributeAssignment->id)) {
-                $toDelete = [];
-                foreach ($builder->get() as $attributeAssignmentAsType) {
-                    // try to find this model
-                    if (!$model::with([])->whereId($attributeAssignmentAsType->model_id)->count()) {
-                        // not found, attr assignment can be deleted
-                        // $this->debug(sprintf("Remove attribute assignment class: '%s' type: '%s' id: '%s'",
-                        //     $attributeAssignment->model, $attributeAssignment->attribute_type,
-                        //     $attributeAssignmentAsType->model_id));
-                        $toDelete[] = $attributeAssignmentAsType->id;
+            $deleted = 0;
+            $attributeAssignments = ModelAttributeAssignment::with([]);
+            foreach ($attributeAssignments->get() as $attributeAssignment) {
+                /** @var TraitAttributeAssignment $model */
+                $model = app($attributeAssignment->model);
+                $tableName = $model->getAttributeTypeTableName($attributeAssignment->attribute_type);
+
+                if ($builder = DB::table($tableName)->where('model_attribute_assignment_id', '=', $attributeAssignment->id)) {
+                    $toDelete = [];
+                    foreach ($builder->get() as $attributeAssignmentAsType) {
+                        // try to find this model
+                        if (!$model::with([])->whereId($attributeAssignmentAsType->model_id)->count()) {
+                            // not found, attr assignment can be deleted
+                            // $this->debug(sprintf("Remove attribute assignment class: '%s' type: '%s' id: '%s'",
+                            //     $attributeAssignment->model, $attributeAssignment->attribute_type,
+                            //     $attributeAssignmentAsType->model_id));
+                            $toDelete[] = $attributeAssignmentAsType->id;
+                        }
                     }
-                }
-                // $this->debug(sprintf("To delete '%s': ", $attributeAssignment->description), $toDelete);
-                foreach ($toDelete as $id) {
-                    // do not move the builder in a var
-                    if (DB::table($tableName)->delete($id)) {
-                        $deleted++;
+                    // $this->debug(sprintf("To delete '%s': ", $attributeAssignment->description), $toDelete);
+                    foreach ($toDelete as $id) {
+                        // do not move the builder in a var
+                        if (DB::table($tableName)->delete($id)) {
+                            $deleted++;
+                        }
                     }
                 }
             }
-        }
 
-        if ($deleted) {
-            $this->info(sprintf("%s unused attribute assignments deleted.", $deleted));
+            if ($deleted) {
+                $this->info(sprintf("%s unused attribute assignments deleted.", $deleted));
+            }
+
+        } catch (Exception $e) {
+            $this->error("Failed to cleanup extra attributes!");
+            $this->error($e->getMessage(), [__METHOD__]);
         }
     }
 
