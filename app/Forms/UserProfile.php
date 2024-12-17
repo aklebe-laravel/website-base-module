@@ -16,6 +16,7 @@ class UserProfile extends ModelBaseExtraAttributes
 
     /**
      * Needed in Userprofile because the Classname differ
+     *
      * @var string|null
      */
     protected ?string $objectEloquentModelName = \Modules\WebsiteBase\app\Models\User::class;
@@ -38,12 +39,14 @@ class UserProfile extends ModelBaseExtraAttributes
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'User';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Users';
@@ -121,7 +124,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'label'        => __('ID'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'shared_id'            => [
@@ -129,7 +132,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                     ],
                                     'name'                 => [
@@ -139,7 +142,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -150,7 +153,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'validator'    => [
                                             'required',
                                             'email',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -163,7 +166,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'validator'     => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'     => 'col-12 col-md-6',
                                     ],
@@ -176,7 +179,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'validator'     => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'     => 'col-12 col-md-6',
                                     ],
@@ -188,7 +191,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                     ],
                                     'media_file_upload'    => [
                                         'visible'      => $defaultSettings['can_edit'],
-                                        'html_element' => 'website-base::file_upload',
+                                        'html_element' => 'website-base::media_item_file_upload_images',
                                         'label'        => __('Media Upload'),
                                         'description'  => __('Media Upload'),
                                         'css_group'    => 'col-12 col-md-6',
@@ -219,7 +222,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -249,7 +252,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -279,7 +282,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -305,7 +308,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -331,7 +334,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -356,7 +359,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],

@@ -1,8 +1,10 @@
 <?php
 
+use Modules\WebsiteBase\app\Models\Store;
+
 return [
     // class of eloquent model
-    "model"   => \Modules\WebsiteBase\app\Models\Store::class,
+    "model"   => Store::class,
     // update data if exists and data differ (default false)
     "update"  => false,
     // columns to check if data already exists (AND WHERE)
@@ -19,6 +21,6 @@ return [
         [
             "code" => "default_03",
         ],
-    ]
+    ],
 ];
 

@@ -8,7 +8,7 @@ use Modules\WebsiteBase\app\Models\CoreConfig;
 
 class Config
 {
-    const CURRENT_STORE_MARKER = -2;
+    const int CURRENT_STORE_MARKER = -2;
 
     /**
      * If true, all $storeId parameters assigned to null will become the default store id.
@@ -51,8 +51,8 @@ class Config
     }
 
     /**
-     * @param  string  $path
-     * @param  mixed  $default
+     * @param  string    $path
+     * @param  mixed     $default
      * @param  int|null  $storeId
      *
      * @return mixed
@@ -82,19 +82,19 @@ class Config
 
         // use store value ...
         $value = Arr::get($this->configByStore[$storeId], $path, $default);
+
         return $value;
     }
 
     /**
-     * @param  string  $path
-     * @param  mixed  $value
+     * @param  string    $path
+     * @param  mixed     $value
      * @param  int|null  $storeId
-     * @param  bool  $persist
+     * @param  bool      $persist
      *
      * @return void
      */
-    public function set(string $path, mixed $value, ?int $storeId = self::CURRENT_STORE_MARKER,
-        bool $persist = false): void
+    public function set(string $path, mixed $value, ?int $storeId = self::CURRENT_STORE_MARKER, bool $persist = false): void
     {
         if ($storeId === self::CURRENT_STORE_MARKER) {
             $storeId = app('website_base_settings')->getStore()->id;

@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Models\Base;
 
+use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
@@ -172,7 +173,7 @@ trait TraitAttributeAssignment
      * @alias setExtraAttribute()
      *
      * @param  string  $attributeCode
-     * @param  mixed  $value
+     * @param  mixed   $value
      *
      * @return void
      */
@@ -183,7 +184,7 @@ trait TraitAttributeAssignment
 
     /**
      * @param  string  $attributeCode
-     * @param  mixed  $value
+     * @param  mixed   $value
      *
      * @return void
      */
@@ -194,6 +195,7 @@ trait TraitAttributeAssignment
 
     /**
      * @param  array  $values
+     *
      * @return void
      */
     public function setExtraAttributes(array $values): void
@@ -212,7 +214,7 @@ trait TraitAttributeAssignment
     }
 
     /**
-     * @param  string  $attributeCode
+     * @param  string      $attributeCode
      * @param  mixed|null  $default
      *
      * @return mixed
@@ -233,6 +235,7 @@ trait TraitAttributeAssignment
         // defined is slow ?!?
         $ttlDefault = config('system-base.cache.default_ttl', 1);
         $ttl = config('system-base.cache.db.signature.ttl', $ttlDefault);
+
         return Cache::remember(static::class.'-CONST-DEFINED-ATTRIBUTE_MODEL_IDENT', $ttl, function () {
             return defined(static::class.'::ATTRIBUTE_MODEL_IDENT') ? static::ATTRIBUTE_MODEL_IDENT : static::class;
         });
@@ -253,10 +256,10 @@ trait TraitAttributeAssignment
             try {
                 $attrModelIdent = $this->getAttributeModelIdent();
                 $collection = ModelAttributeAssignment::with(['modelAttribute'])
-                    ->where('model', '=', $attrModelIdent)
-                    ->orderBy('form_position')
-                    ->get();
-            } catch (\Exception $ex) {
+                                                      ->where('model', '=', $attrModelIdent)
+                                                      ->orderBy('form_position')
+                                                      ->get();
+            } catch (Exception $ex) {
                 Log::error("Error by getting model attributes!", [static::class]);
                 Log::error($ex->getMessage());
                 $collection = Collection::make();
@@ -279,8 +282,9 @@ trait TraitAttributeAssignment
         /** @var ModelAttributeAssignment $attribute */
         if ($attribute = $collection->first()) {
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                ->where('model_id', '=', $this->id)
-                ->where('model_attribute_assignment_id', '=', $attribute->id)) {
+                             ->where('model_id', '=', $this->id)
+                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+            ) {
                 return $builder;
             }
         }
@@ -292,7 +296,7 @@ trait TraitAttributeAssignment
      * Get the value of an attribute assigned to this instance id.
      *
      * @param  string  $attributeCode
-     * @param $default
+     * @param          $default
      *
      * @return mixed|null
      */
@@ -309,6 +313,7 @@ trait TraitAttributeAssignment
 
     /**
      * @param  string  $attributeType
+     *
      * @return string
      */
     public static function getAttributeTypeTableName(string $attributeType): string
@@ -319,7 +324,7 @@ trait TraitAttributeAssignment
 
     /**
      * @param  string  $attributeCode
-     * @param  mixed  $value
+     * @param  mixed   $value
      *
      * @return bool
      */
@@ -330,8 +335,9 @@ trait TraitAttributeAssignment
         if ($attribute = $collection->first()) {
 
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                ->where('model_id', '=', $this->id)
-                ->where('model_attribute_assignment_id', '=', $attribute->id)) {
+                             ->where('model_id', '=', $this->id)
+                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+            ) {
                 if ($item = $builder->first()) {
                     $item->value = $value;
 
@@ -377,6 +383,7 @@ trait TraitAttributeAssignment
 
     /**
      * @param  string|null  $attributeCode
+     *
      * @return bool
      */
     public function deleteModelAttributeTypeValue(?string $attributeCode = null): bool
@@ -386,10 +393,12 @@ trait TraitAttributeAssignment
         if ($attribute = $collection->first()) {
 
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                ->where('model_id', '=', $this->id)
-                ->where('model_attribute_assignment_id', '=', $attribute->id)) {
+                             ->where('model_id', '=', $this->id)
+                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+            ) {
                 if ($item = $builder->first()) {
                     $builder->delete($item->id);
+
                     return true;
                 }
             }
@@ -417,6 +426,7 @@ trait TraitAttributeAssignment
      * Save without fire extra attribute events.
      *
      * @param  array  $options
+     *
      * @return bool
      */
     public function saveWithoutEvents(array $options = []): bool
@@ -431,6 +441,7 @@ trait TraitAttributeAssignment
      *
      * @param  array  $data
      * @param  array  $options
+     *
      * @return bool
      */
     public function updateWithoutEvents(array $data = [], array $options = []): bool

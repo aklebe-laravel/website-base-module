@@ -18,13 +18,17 @@
      * @var array $x_data
      * @var int $element_index
      * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var Modules\Form\app\Forms\Base\ModelBase $form_instance
      */
+
+    use Modules\SystemBase\app\Services\LivewireService;
+    use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
+    use Modules\WebsiteBase\app\Forms\MediaItem as MediaItemForm;
 
     $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');
     $objectModelId = (int)($object->id ?? 0);
     $mediaItemId = 0;
-    if ($form_instance instanceof \Modules\WebsiteBase\app\Forms\MediaItem) {
+    if ($form_instance instanceof MediaItemForm) {
         $mediaItemId = $objectModelId;
     }
     if ($object->imageMaker ?? null) {
@@ -33,7 +37,7 @@
     if ($userId = $form_instance->getOwnerUserId()) {
 
     }
-    $livewireKey = \Modules\SystemBase\app\Services\LivewireService::getKey('upload');
+    $livewireKey = LivewireService::getKey('upload');
 @endphp
 <div class="form-group form-label-group {{ $css_group }}">
     @unless(empty($label))
@@ -42,13 +46,14 @@
 
     <div>
         @if($objectModelId)
-            @livewire('website-base::files-upload', [
+            @livewire('website-base::media-item-file-upload', [
             'objectModelId' => $objectModelId,
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
             'parentFormClass' => $form_instance::class,
             'parentFormLivewireId' => $form_instance->livewireId,
             'parentModelClass' => $form_instance->getObjectEloquentModelName(),
+            'forceMediaType' => MediaItemModel::MEDIA_TYPE_IMPORT,
             ], key($livewireKey))
         @else
             <div class="bg-light text-danger p-4">

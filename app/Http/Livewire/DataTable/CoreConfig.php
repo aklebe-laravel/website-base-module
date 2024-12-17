@@ -3,16 +3,18 @@
 namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
+use Modules\WebsiteBase\app\Models\CoreConfig as CoreConfigModel;
 
 class CoreConfig extends BaseDataTable
 {
     /**
      * @var string
      */
-    public string $modelName = 'CoreConfig';
+    public string $eloquentModelName = CoreConfigModel::class;
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void

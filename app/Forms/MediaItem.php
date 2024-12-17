@@ -3,9 +3,17 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\WebsiteBase\app\Models\MediaItem as WebsiteMediaItemModel;
 
 class MediaItem extends ModelBase
 {
+    /**
+     * Prepared for inheritances
+     *
+     * @var string|null
+     */
+    protected ?string $objectEloquentModelName = WebsiteMediaItemModel::class;
+
     /**
      * Relations commonly built in with(...)
      * * Also used for:
@@ -18,15 +26,37 @@ class MediaItem extends ModelBase
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'Media Item';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Media Items';
+
+    /**
+     * @var string
+     */
+    protected string $fixedMediaType = WebsiteMediaItemModel::MEDIA_TYPE_IMAGE;
+
+    /**
+     * @var string
+     */
+    protected string $defaultMediaType = '';
+
+    /**
+     * @var string
+     */
+    protected string $fixedObjectType = '';
+
+    /**
+     * @var string
+     */
+    protected string $defaultObjectType = WebsiteMediaItemModel::OBJECT_TYPE_PRODUCT_IMAGE;
 
     /**
      * @return array
@@ -38,8 +68,8 @@ class MediaItem extends ModelBase
             'is_public'   => false,
             'user_id'     => $this->getOwnerUserId(),
             'store_id'    => app('website_base_settings')->getStore()->getKey() ?? null,
-            'media_type'  => \Modules\WebsiteBase\app\Models\MediaItem::MEDIA_TYPE_IMAGE,
-            'object_type' => \Modules\WebsiteBase\app\Models\MediaItem::OBJECT_TYPE_PRODUCT_IMAGE,
+            'media_type'  => $this->fixedMediaType ?: $this->defaultMediaType,
+            'object_type' => $this->fixedObjectType ?: $this->defaultObjectType,
             'position'    => 100,
         ]);
     }
@@ -92,16 +122,24 @@ class MediaItem extends ModelBase
                                     ],
                                     'media_type'        => [
                                         'html_element' => 'select',
+                                        'disabled'     => (bool) $this->fixedMediaType, // disable if fixed value
                                         'label'        => __('Media Type'),
-                                        'options'      => \Modules\WebsiteBase\app\Models\MediaItem::getMediaTypesAsSelectOptions(),
+                                        'options'      => [
+                                            '' => __('No choice'),
+                                            ... WebsiteMediaItemModel::getMediaTypesAsSelectOptions(),
+                                        ],
                                         'description'  => __('Type of this media'),
                                         'validator'    => ['nullable', 'string', 'Max:255'],
                                         'css_group'    => 'col-6',
                                     ],
                                     'object_type'       => [
                                         'html_element' => 'select',
+                                        'disabled'     => (bool) $this->fixedObjectType, // disable if fixed value
                                         'label'        => __('Object Type'),
-                                        'options'      => \Modules\WebsiteBase\app\Models\MediaItem::getObjectTypesAsSelectOptions(),
+                                        'options'      => [
+                                            '' => __('No choice'),
+                                            ... WebsiteMediaItemModel::getObjectTypesAsSelectOptions(),
+                                        ],
                                         'description'  => __('What should this media used for'),
                                         'validator'    => ['nullable', 'string', 'Max:255'],
                                         'css_group'    => 'col-6',
@@ -113,7 +151,7 @@ class MediaItem extends ModelBase
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'media_file_upload' => [
-                                        'html_element' => 'website-base::file_upload',
+                                        'html_element' => 'website-base::media_item_file_upload',
                                         'label'        => __('Media Upload'),
                                         'description'  => __('Media Upload'),
                                         'css_group'    => 'col-12 col-md-6',

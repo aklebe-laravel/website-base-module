@@ -18,10 +18,8 @@
                 <div>Processing Files</div>
             </div>
 
-             {{--@todo: find event for button upload to refresh image like object.final_url = uploadedFilename.slice(-1); in form.js--}}
-            <input type="file" wire:model.live="files">
-
+            {{--@todo: find event for button upload to refresh image like object.final_url = uploadedFilename.slice(-1); in form.js--}}
+            <input type="file" wire:model.live="files" @if ($acceptExtensions) accept="{{ $acceptExtensions }}" @endif>
         </div>
-
     </div>
 </div>

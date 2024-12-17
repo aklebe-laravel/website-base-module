@@ -2,6 +2,9 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -12,7 +15,7 @@ use Modules\WebsiteBase\app\Models\MediaItem;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class FilesUpload extends BaseComponent
+class MediaItemFileUpload extends BaseComponent
 {
     use WithFileUploads;
 
@@ -20,7 +23,7 @@ class FilesUpload extends BaseComponent
      * @var TemporaryUploadedFile[]
      */
     // #[Modelable]
-    public $files = [];
+    public array $files = [];
 
     /**
      * If $userId is given, the MediaItem can be created if $mediaItemId is not present.
@@ -61,17 +64,25 @@ class FilesUpload extends BaseComponent
     public string $parentModelClass = '';
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @var string
      */
-    public function render()
+    public string $forceMediaType = ''; //MediaItem::MEDIA_TYPE_IMAGE;
+
+    /**
+     * @return Application|Factory|View
+     */
+    public function render(): Factory|View|Application
     {
-        return view('website-base::livewire.files-upload');
+        return view('website-base::livewire.media-item-file-upload', [
+            'acceptExtensions' => MediaItem::getMediaTypeExtensionsForHtml($this->forceMediaType),
+        ]);
     }
 
     /**
      * Create media files inclusive thumbs, create MediaItem and assign relation.
      *
-     * @param array $files
+     * @param  array  $files
+     *
      * @return array
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -90,7 +101,7 @@ class FilesUpload extends BaseComponent
                     'name'             => '123',
                     'description'      => '',
                     'meta_description' => '',
-                    'media_type'       => MediaItem::MEDIA_TYPE_IMAGE,
+                    'media_type'       => $this->forceMediaType ?: null,
                     'object_type'      => null,
                 ];
 
@@ -111,6 +122,7 @@ class FilesUpload extends BaseComponent
                 $this->mediaItemId = $mediaModel->getKey();
             } else {
                 Log::error('No user ID.', [__METHOD__]);
+
                 return $pathList;
             }
         }
@@ -134,7 +146,9 @@ class FilesUpload extends BaseComponent
                 continue;
             }
 
+            // create the media file using temp file ...
             app('website_base_media')->createMediaFile($mediaModel, $tmpFileFullPath);
+
             //            $pathList[] = $tmpFileFullPath;
             $pathList[] = $mediaModel->final_url;
         }
@@ -146,7 +160,8 @@ class FilesUpload extends BaseComponent
      * dispatch
      *
      * @param  string  $name
-     * @param  array  $tmpFilenames
+     * @param  array   $tmpFilenames
+     *
      * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -154,7 +169,7 @@ class FilesUpload extends BaseComponent
     #[On('upload:finished')]
     public function finishUpload(string $name, array $tmpFilenames): void
     {
-        // @todo: Better move to schedule?!
+        // cleanup temp uploads by framework
         $this->cleanupOldUploads();
 
         // Create media files inclusive thumbs, create MediaItem and assign relation.

@@ -6,9 +6,20 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Acl\app\Models\AclResource;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
+use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
 
 class MediaItem extends BaseDataTable
 {
+    use BaseWebsiteBaseDataTable;
+
+    /**
+     * Prepared for inheritances
+     * *
+     *
+     * @var string
+     */
+    public string $eloquentModelName = MediaItemModel::class;
+
     /**
      * Restrictions to allow this component.
      */
@@ -16,11 +27,62 @@ class MediaItem extends BaseDataTable
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void
     {
         $this->setSortAllCollections('updated_at', 'desc');
+    }
+
+    /**
+     * @return void
+     */
+    protected function initFilters(): void
+    {
+        parent::initFilters();
+
+        $this->addFilterElement('filter_media_type', [
+            'label'      => 'Filter',
+            'default'    => '',
+            'position'   => 1700, // between elements rows and search
+            'soft_reset' => true,
+            'css_group'  => 'col-12 col-md-3 text-start',
+            'css_item'   => '',
+            'options'    => [
+                '' => '[All Media Types]',
+                ... MediaItemModel::getMediaTypesAsSelectOptions(),
+            ],
+            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
+                if (!$filterValue) {
+                    return;
+                }
+
+                $builder->where('media_type', $filterValue);
+            },
+            'view'       => 'data-table::livewire.js-dt.filters.default-elements.select',
+        ]);
+
+        $this->addFilterElement('filter_object_type', [
+            'label'      => 'Filter',
+            'default'    => '',
+            'position'   => 1700, // between elements rows and search
+            'soft_reset' => true,
+            'css_group'  => 'col-12 col-md-3 text-start',
+            'css_item'   => '',
+            'options'    => [
+                '' => '[All Object Types]',
+                ... MediaItemModel::getObjectTypesAsSelectOptions(),
+            ],
+            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
+                if (!$filterValue) {
+                    return;
+                }
+
+                $builder->where('object_type', $filterValue);
+            },
+            'view'       => 'data-table::livewire.js-dt.filters.default-elements.select',
+        ]);
     }
 
     /**
@@ -134,6 +196,7 @@ class MediaItem extends BaseDataTable
                 $b = $b->whereUserId($this->getUserId())->orWhereNull('user_id');
             });
         }
+
         return $builder;
     }
 

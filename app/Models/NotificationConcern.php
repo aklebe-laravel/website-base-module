@@ -22,8 +22,6 @@ class NotificationConcern extends Model
     const string REASON_CODE_AUTH_FORGET_PASSWORD = "auth_forget_password";
     const string REASON_CODE_AUTH_REGISTER_SUCCESS = "auth_register_success";
     const string REASON_CODE_SYSTEM_INFO = "system_info";
-    const string REASON_CODE_USER_ASSIGNED_TO_TRADER = "market_user_assigned_to_trader";
-    const string REASON_CODE_USER_ASSIGNED_TO_ACL_GROUP = "market_user_assigned_to_acl_group";
 
     /**
      * @var array

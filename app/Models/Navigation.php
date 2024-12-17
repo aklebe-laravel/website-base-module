@@ -39,7 +39,7 @@ class Navigation extends Model
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(self::class);
+        return $this->belongsTo(static::class);
     }
 
     /**
@@ -47,7 +47,7 @@ class Navigation extends Model
      */
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id', 'id')->orderBy('position', 'asc');
+        return $this->hasMany(static::class, 'parent_id', 'id')->orderBy('position', 'asc');
     }
 
     /**
@@ -57,6 +57,7 @@ class Navigation extends Model
     {
         /** @var Builder $categories */
         $categories = self::with([])->where('parent_id', '=', 0)->orWhereNull('parent_id')->orderBy('position', 'asc');
+
         return $categories;
     }
 }

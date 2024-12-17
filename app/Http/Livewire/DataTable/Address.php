@@ -8,6 +8,8 @@ use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
 
 class Address extends BaseDataTable
 {
+    use BaseWebsiteBaseDataTable;
+
     /**
      * Minimum restrictions to allow this component.
      */

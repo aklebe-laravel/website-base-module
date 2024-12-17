@@ -1,10 +1,11 @@
 <?php
 
 use Modules\Acl\app\Models\AclResource;
+use Modules\WebsiteBase\app\Models\Navigation as NavigationModel;
 
 return [
     // class of eloquent model
-    "model"     => \Modules\WebsiteBase\app\Models\Navigation::class,
+    "model"     => NavigationModel::class,
     // update data if exists and data differ (default false)
     "update"    => true,
     // columns to check if data already exists (AND WHERE)
@@ -13,11 +14,11 @@ return [
     "relations" => [
         "res" => [
             // relation method which have to exists
-            "method" => "parent",
+            "method"  => "parent",
             // column(s) to find specific #sync_relations items below
             "columns" => "code",
             // delete items if not listed here (default: false)
-            "delete" => false,
+            "delete"  => false,
         ],
     ],
     // data rows itself
@@ -47,8 +48,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Admin Panel",
@@ -60,8 +61,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Panel-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Status",
@@ -73,8 +74,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Panel-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Settings",
@@ -86,8 +87,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Panel-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Users",
@@ -100,8 +101,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Users",
@@ -113,8 +114,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Users-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "User Groups",
@@ -126,8 +127,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Users-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Group Resources",
@@ -139,8 +140,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Users-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "CMS",
@@ -153,8 +154,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Cms Pages",
@@ -166,8 +167,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Cms-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Cms Contents",
@@ -179,8 +180,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Cms-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "View Templates",
@@ -192,8 +193,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Cms-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Notifications",
@@ -205,8 +206,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Notification Events",
@@ -219,8 +220,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Notifications-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Notification Concerns",
@@ -232,8 +233,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Notifications-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Notification Templates",
@@ -245,8 +246,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Notifications-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "View Templates",
@@ -258,8 +259,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Admin-Notifications-Menu-L2",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"         => "Content",
@@ -278,8 +279,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Content-Overview-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "House Rule",
@@ -291,8 +292,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Content-Overview-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "FAQ",
@@ -304,8 +305,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Content-Overview-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Help",
@@ -317,8 +318,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Content-Overview-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
         [
             "label"           => "Contact",
@@ -329,8 +330,8 @@ return [
             "#sync_relations" => [
                 "res" => [
                     "Content-Overview-Menu-L1",
-                ]
-            ]
+                ],
+            ],
         ],
-    ]
+    ],
 ];

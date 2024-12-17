@@ -33,9 +33,9 @@ return [
         [
             'model'              => 'App\Models\User',
             "model_attribute_id" => ModelAttribute::with([])
-                ->where('code', '=', 'user_register_hint')
-                ->first()
-                ->getKey(),
+                                                  ->where('code', '=', 'user_register_hint')
+                                                  ->first()
+                                                  ->getKey(),
             "attribute_type"     => "text",
             "attribute_input"    => "textarea",
             "description"        => "Register Info",
@@ -63,15 +63,15 @@ return [
         [
             'model'              => 'App\Models\User',
             "model_attribute_id" => ModelAttribute::with([])
-                ->where('code', '=', 'preferred_notification_channel')
-                ->first()
-                ->getKey(),
+                                                  ->where('code', '=', 'preferred_notification_channel')
+                                                  ->first()
+                                                  ->getKey(),
             "attribute_type"     => "string",
             "attribute_input"    => "website-base::select_notification_channel",
             "description"        => "Preferred Notification Channel",
             "form_position"      => "992",
             "form_css"           => "col-12 col-md-6",
         ],
-    ]
+    ],
 ];
 

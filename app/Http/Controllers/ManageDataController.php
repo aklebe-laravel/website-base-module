@@ -39,11 +39,11 @@ class ManageDataController extends Controller
      * [table].[model]
      * [table].[module].[model] - in this case all livewire classes have to be exists in module folder (untested in details)
      *
-     * @param  Request  $request
+     * @param  Request      $request
      * @param  string|null  $modelName
-     * @param  mixed|null  $modelId
-     * @param  bool  $useCollectionUserFilter
-     * @param  bool  $showOnly
+     * @param  mixed|null   $modelId
+     * @param  bool         $useCollectionUserFilter
+     * @param  bool         $showOnly
      *
      * @return View|Factory|Application
      * @throws Exception
@@ -72,29 +72,12 @@ class ManageDataController extends Controller
         }
 
         // form and restrictions
-        $livewireImportFormKey = '';
         if ($livewireFormKey = $showOnly ? null : app('system_base')->findLivewire($modelName, 'livewire-forms', $forceModuleName)) {
-            /** @var ModelBase $livewireFormClass */
+            /** @var string $livewireFormClass */
             if ($livewireFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireFormKey)) {
                 if (class_exists($livewireFormClass)) {
                     if ($livewireFormClass::aclResources && !$currentUser->hasAclResource($livewireFormClass::aclResources)) {
                         return view('content-pages.access-denied');
-                    }
-
-                    // Check there is an import form declared ...
-                    if (preg_match('#(^.+\.)(.+?$)#', $livewireFormKey, $out1)) {
-                        $livewireImportFormKey = $out1[1].'import-'.$out1[2];
-                        try {
-                            if ($livewireImportFormClass = app(Livewire\Mechanisms\ComponentRegistry::class)->getClass($livewireImportFormKey)) {
-                                if (class_exists($livewireImportFormClass)) {
-                                    if ($livewireImportFormClass::aclResources && !$currentUser->hasAclResource($livewireImportFormClass::aclResources)) {
-                                        $livewireImportFormKey = '';
-                                    }
-                                }
-                            }
-                        } catch (Exception $e) {
-                            $livewireImportFormKey = '';
-                        }
                     }
                 }
             }
@@ -126,14 +109,13 @@ class ManageDataController extends Controller
             $contentView[] = $this->viewAfterDataTable[$modelName];
         }
 
-        return view('website-base::page', [
+        $pageData = [
             'title'                       => __(($showOnly ? 'Show' : 'Manage')).' '.Str::plural($modelName),
             'contentView'                 => $contentView,
             // modelName is needed for form js x-data="getNewForm('User') ... otherwise console error
             'moduleName'                  => $forceModuleName,
             'modelName'                   => $modelName,
             'livewireForm'                => $livewireFormKey,
-            'livewireImportForm'          => $livewireImportFormKey,
             'livewireTable'               => $livewireTable,
             'livewireTableOptions'        => [
                 'useCollectionUserFilter' => $useCollectionUserFilter,
@@ -144,15 +126,17 @@ class ManageDataController extends Controller
                 'user_id' => $relevantUserId,
             ],
 
-        ]);
+        ];
+
+        return view('website-base::page', $pageData);
     }
 
     /**
      * Get data-table from all (users), butt still checking $mapModelAclResources inside of get()
      *
-     * @param  Request  $request
+     * @param  Request      $request
      * @param  string|null  $modelName
-     * @param  mixed|null  $modelId
+     * @param  mixed|null   $modelId
      *
      * @return Application|Factory|View
      * @throws Exception
@@ -163,9 +147,9 @@ class ManageDataController extends Controller
     }
 
     /**
-     * @param  Request  $request
+     * @param  Request      $request
      * @param  string|null  $modelName
-     * @param  mixed|null  $modelId
+     * @param  mixed|null   $modelId
      *
      * @return View|Factory|Application
      * @throws Exception
@@ -177,7 +161,7 @@ class ManageDataController extends Controller
 
     /**
      * @param  Request  $request
-     * @param  mixed  $id
+     * @param  mixed    $id
      *
      * @return View|Factory|Application
      * @throws Exception

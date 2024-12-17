@@ -14,7 +14,7 @@ class MediaItemFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'media_type'       => MediaItem::MEDIA_TYPE_IMAGE,

@@ -18,7 +18,6 @@ class MediaItemImageUserAvatar extends MediaItemImage
     public function getBaseBuilder(string $collectionName): ?Builder
     {
         $builder = parent::getBaseBuilder($collectionName);
-        $builder = $builder->where('object_type', '=', \Modules\WebsiteBase\app\Models\MediaItem::OBJECT_TYPE_USER_AVATAR);
-        return $builder;
+        return $builder->userAvatars();
     }
 }

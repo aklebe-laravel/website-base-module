@@ -49,6 +49,7 @@ class AuthLogin extends ModelBase
 
     /**
      * @param  mixed  $livewireId
+     *
      * @return RedirectResponse|void
      */
     #[On('login')]
@@ -60,6 +61,7 @@ class AuthLogin extends ModelBase
 
         if ($this->authenticate()) {
             session()->regenerate();
+
             return redirect()->intended();
         } else {
             // Open this form again (with errors)!
@@ -69,6 +71,7 @@ class AuthLogin extends ModelBase
 
     /**
      * Attempt to authenticate the request's credentials.
+     *
      * @return bool
      */
     public function authenticate(): bool
@@ -76,6 +79,7 @@ class AuthLogin extends ModelBase
         if (!$this->ensureIsNotRateLimited()) {
             $this->addErrorMessage(__('auth.failed2'));
             Log::error(sprintf("User Login failed. Rate Limiter."), [__METHOD__]);
+
             return false;
         }
 
@@ -104,15 +108,18 @@ class AuthLogin extends ModelBase
 
             Log::error(sprintf("User Login failed. Attempted to authenticate '%s'. Name: %s. Can login: %s.",
                 $credentials['email'], $u->name ?? '-', $u && $u->canLogin()), [__METHOD__]);
+
             return false;
         }
 
         RateLimiter::clear($this->throttleKey());
+
         return true;
     }
 
     /**
      * Ensure the login request is not rate limited.
+     *
      * @return bool
      */
     public function ensureIsNotRateLimited(): bool
@@ -137,7 +144,7 @@ class AuthLogin extends ModelBase
      *
      * @return string
      */
-    public function throttleKey()
+    public function throttleKey(): string
     {
         return Str::transliterate(Str::lower(data_get($this->formObjectAsArray, 'email',
                 '')).'|'.Request::getClientIp());

@@ -3,7 +3,7 @@ return [
     'user'               => [
         'data-table' => [
             // delete box
-            'delete'    => [
+            'delete'     => [
                 'title'   => 'Delete User',
                 'content' => 'ask_delete_user',
                 // constant names from defaultActions[] or closure
@@ -12,7 +12,7 @@ return [
                     'delete-item',
                 ],
             ],
-            'claim'     => [
+            'claim'      => [
                 'title'   => 'Claim User',
                 'content' => 'ask_claim_user',
                 // constant names from defaultActions[] or closure
@@ -31,7 +31,7 @@ return [
                 ],
             ],
         ],
-        'default'   => [
+        'default'    => [
             'rating' => [
                 'title'                => 'Submit User Rating',
                 'message-box-template' => 'forms.user-rating',//view('forms.user-rating')->render(),
@@ -65,6 +65,28 @@ return [
                 'actions' => [
                     'cancel',
                     'launch',
+                ],
+            ],
+        ],
+    ],
+    'media-item'         => [
+        'data-table' => [
+            //'upload' => [
+            //    'title'   => 'Upload',
+            //    'content' => 'launch_import_description',
+            //    // constant names from defaultActions[] or closure
+            //    'actions' => [
+            //        'cancel',
+            //        'upload',
+            //    ],
+            //],
+            'import' => [
+                'title'   => 'Import',
+                'content' => 'launch_import_description',
+                // constant names from defaultActions[] or closure
+                'actions' => [
+                    'cancel',
+                    'import',
                 ],
             ],
         ],

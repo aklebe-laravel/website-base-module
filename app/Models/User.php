@@ -7,7 +7,6 @@ use Chelout\RelationshipEvents\Concerns\HasBelongsToManyEvents;
 use Chelout\RelationshipEvents\Concerns\HasOneEvents;
 use Chelout\RelationshipEvents\Traits\HasDispatchableEvents;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -34,14 +33,14 @@ class User extends AppUser
     /**
      * Default media type. Should be overwritten by delivered class.
      */
-    const MEDIA_TYPE = MediaItem::MEDIA_TYPE_IMAGE;
+    const string MEDIA_TYPE = MediaItem::MEDIA_TYPE_IMAGE;
 
     /**
      * Default media object type. Should be overwritten by delivered class.
      */
-    const MEDIA_OBJECT_TYPE = MediaItem::OBJECT_TYPE_USER_AVATAR;
+    const string MEDIA_OBJECT_TYPE = MediaItem::OBJECT_TYPE_USER_AVATAR;
 
-    const ATTRIBUTE_MODEL_IDENT = AppUser::class;
+    const string ATTRIBUTE_MODEL_IDENT = AppUser::class;
 
     /**
      * guarded [] too slow in user ?!?!
@@ -90,7 +89,7 @@ class User extends AppUser
      *
      * Important for \Modules\Acl\Models\Base\TraitBaseModel::bootTraitBaseModel
      */
-    public function __construct(array $attributes = array())
+    public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
     }
@@ -108,7 +107,7 @@ class User extends AppUser
      */
     public function avatars(): BelongsToMany
     {
-        return $this->images()->where('object_type', MediaItem::OBJECT_TYPE_USER_AVATAR);
+        return $this->images()->userAvatars();
     }
 
     /**
@@ -131,6 +130,7 @@ class User extends AppUser
      * scope frontendItems()
      *
      * @param  Builder  $query
+     *
      * @return Builder
      */
     public function scopeFrontendItems(Builder $query): Builder
@@ -144,7 +144,7 @@ class User extends AppUser
             $q->whereNotNull('shared_id')->where('shared_id', '<>', '');
         })
             // no puppets/non-humans ...
-            ->with(['aclGroups.aclResources'])->whereDoesntHave('aclGroups.aclResources', function ($query) {
+                     ->with(['aclGroups.aclResources'])->whereDoesntHave('aclGroups.aclResources', function ($query) {
                 return $query->where('code', '=', 'puppet');
             });
     }
@@ -154,7 +154,7 @@ class User extends AppUser
      * Pivot tables can differ by class objects.
      *
      * @param  string  $contentCode
-     * @param  bool  $forceAny  If true: Also select nullable pivots but order by pivots exists
+     * @param  bool    $forceAny  If true: Also select nullable pivots but order by pivots exists
      *
      * @return BelongsToMany
      * @todo: caching?
@@ -162,7 +162,7 @@ class User extends AppUser
      */
     public function getContentImages(string $contentCode = '', bool $forceAny = true): BelongsToMany
     {
-        $images = $this->images()->where('object_type', MediaItem::OBJECT_TYPE_USER_AVATAR);
+        $images = $this->images()->userAvatars();
 
         if ($contentCode) {
             $images->where(function (Builder $b) use ($contentCode, $forceAny) {
@@ -184,14 +184,14 @@ class User extends AppUser
     }
 
     /**
-     * @param  string  $purpose
+     * @param  string       $purpose
      * @param  string|null  $minExpire
+     *
      * @return HasMany
      */
     public function getValidTokens(string $purpose = Token::PURPOSE_LOGIN, ?string $minExpire = null): HasMany
     {
-        return $this->tokens()->where('purpose', '=', $purpose)->whereNotNull('token')->where(function (Builder $b1) use
-        (
+        return $this->tokens()->where('purpose', '=', $purpose)->whereNotNull('token')->where(function (Builder $b1) use (
             $minExpire
         ) {
 
@@ -206,6 +206,7 @@ class User extends AppUser
 
     /**
      * @param  string|null  $minExpire  minimum expire dateTime you need to be valid
+     *
      * @return HasMany
      */
     public function getValidLoginTokens(?string $minExpire = null): HasMany
@@ -215,6 +216,7 @@ class User extends AppUser
 
     /**
      * @param  string|null  $minExpire  minimum expire dateTime you need to be valid
+     *
      * @return Token|null
      */
     public function getFirstValidLoginToken(?string $minExpire = null): ?Token
@@ -229,13 +231,13 @@ class User extends AppUser
     /**
      * Get an existing token or create a new one if none exist.
      *
-     * @param  string  $purpose
+     * @param  string       $purpose
      * @param  string|null  $minExpire  minimum expiration left
      * @param  string|null  $newExpire  if new token have to be created, use this expiration This value should always be higher than minExpire
+     *
      * @return Token|null
      */
-    public function getOrCreateWebsiteToken(string $purpose = Token::PURPOSE_LOGIN, ?string $minExpire = null,
-        ?string $newExpire = null,): ?Token
+    public function getOrCreateWebsiteToken(string $purpose = Token::PURPOSE_LOGIN, ?string $minExpire = null, ?string $newExpire = null): ?Token
     {
         /** @var Token $token */
         if ($token = $this->getValidTokens($purpose, $minExpire)->first()) {
@@ -255,33 +257,33 @@ class User extends AppUser
         //
         Log::info(sprintf("New token created for user: %s", $this->name), [
             $this->getKey(),
-            __METHOD__
+            __METHOD__,
         ]);
 
         return $token;
     }
 
     /**
-     * @param $purpose
+     * @param  string       $purpose
      * @param  string|null  $expire
-     * @return Collection|\Illuminate\Database\Eloquent\Model
+     *
+     * @return Token
      */
-    public function createWebsiteToken($purpose = Token::PURPOSE_LOGIN, ?string $expire = null)
+    public function createWebsiteToken(string $purpose = Token::PURPOSE_LOGIN, ?string $expire = null): Token
     {
-
-        $token = Token::create([
+        return Token::create([
             'user_id'    => $this->getKey(),
-            'purpose'    => Token::PURPOSE_LOGIN,
+            'purpose'    => $purpose,
             'token'      => uniqid('l', true),
             'expires_at' => $expire,
         ]);
-
-        return $token;
     }
 
     /**
      * After replicated/duplicated/copied
      * but before save()
+     *
+     * @param  Model  $fromItem
      *
      * @return void
      */
@@ -305,7 +307,7 @@ class User extends AppUser
     /**
      * @return HasMany
      */
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
@@ -313,13 +315,14 @@ class User extends AppUser
     /**
      * @return bool
      */
-    public function canLogin()
+    public function canLogin(): bool
     {
         return ($this->is_enabled && !$this->is_deleted && !$this->order_to_delete_at);
     }
 
     /**
      * @param  string  $channel  like WebsiteService::NOTIFICATION_CHANNEL_EMAIL
+     *
      * @return bool
      */
     public function canNotificationChannel(string $channel): bool
@@ -337,6 +340,7 @@ class User extends AppUser
             case WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM:
                 $useTelegram = $this->getExtraAttribute('use_telegram');
                 $telegramId = $this->getExtraAttribute('telegram_id');
+
                 return ($useTelegram && $telegramId);
 
             default:

@@ -1,8 +1,10 @@
 <?php
 
+use Modules\WebsiteBase\app\Models\NotificationTemplate;
+
 return [
     // class of eloquent model
-    "model"     => \Modules\WebsiteBase\app\Models\NotificationTemplate::class,
+    "model"     => NotificationTemplate::class,
     // update data if exists and data differ (default false)
     "update"    => true,
     // columns to check if data already exists (AND WHERE)
@@ -11,11 +13,11 @@ return [
     "relations" => [
         "view_template" => [
             // relation method which have to exists
-            "method" => "viewTemplate",
+            "method"  => "viewTemplate",
             // column(s) to find specific #sync_relations items below
             "columns" => "code",
             // delete items if not listed here (default: false)
-            "delete" => false,
+            "delete"  => false,
         ],
     ],
     // data rows itself
@@ -29,7 +31,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "email_auth_register_success",
-                ]
+                ],
             ],
         ],
         [
@@ -41,7 +43,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "email_auth_forget_password",
-                ]
+                ],
             ],
         ],
         [
@@ -53,7 +55,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "email_user_login_info",
-                ]
+                ],
             ],
         ],
         [
@@ -65,7 +67,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "email_system_info",
-                ]
+                ],
             ],
         ],
         [
@@ -77,7 +79,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "email_contact_request_message",
-                ]
+                ],
             ],
         ],
         [
@@ -89,7 +91,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "telegram_auth_register_success",
-                ]
+                ],
             ],
         ],
         [
@@ -101,7 +103,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "telegram_auth_forget_password",
-                ]
+                ],
             ],
         ],
         [
@@ -113,7 +115,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "telegram_user_login_info",
-                ]
+                ],
             ],
         ],
         [
@@ -125,7 +127,7 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "telegram_system_info",
-                ]
+                ],
             ],
         ],
         [
@@ -137,8 +139,8 @@ return [
             "#sync_relations"      => [
                 "view_template" => [
                     "telegram_contact_request_message",
-                ]
+                ],
             ],
         ],
-    ]
+    ],
 ];

@@ -2,15 +2,25 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\WebsiteBase\app\Models\User as UserModel;
 
 class UserSearch extends User
 {
-    public string $modelName = 'User';
+    /**
+     * @var string
+     */
+    public string $eloquentModelName = UserModel::class;
+
+    /**
+     * @var string
+     */
     public string $searchStringLike = '';
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void
@@ -20,11 +30,12 @@ class UserSearch extends User
 
     /**
      * The base builder before all filter manipulations.
-     * Usually used for all collections (default, selected, unselected), but can overwritten.
+     * Usually used for all collections (default, selected, unselected), but can be overwritten.
      *
      * @param  string  $collectionName
      *
      * @return Builder|null
+     * @throws Exception
      */
     public function getBaseBuilder(string $collectionName): ?Builder
     {
