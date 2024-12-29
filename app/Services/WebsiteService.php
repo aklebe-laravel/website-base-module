@@ -73,7 +73,7 @@ class WebsiteService extends BaseService
      */
     public function isEmailEnabled(): bool
     {
-        /** @var Config $websiteBaseConfig */
+        /** @var ConfigService $websiteBaseConfig */
         $websiteBaseConfig = app('website_base_config');
 
         return !!$websiteBaseConfig->get('channels.email.enabled', false);
@@ -84,7 +84,7 @@ class WebsiteService extends BaseService
      */
     public function isTelegramEnabled(): bool
     {
-        /** @var Config $websiteBaseConfig */
+        /** @var ConfigService $websiteBaseConfig */
         $websiteBaseConfig = app('website_base_config');
 
         return !!$websiteBaseConfig->get('channels.telegram.enabled', false);

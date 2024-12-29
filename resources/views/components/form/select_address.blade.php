@@ -1,4 +1,9 @@
 @php
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\ModelBase;
+    use Modules\Form\app\Forms\Base\NativeObjectBase;
+    use Modules\WebsiteBase\app\Models\Address;
+
     /**
      * default input text element
      *
@@ -19,14 +24,14 @@
      * @var array $html_data data attributes
      * @var array $x_data
      * @var int $element_index
-     * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var JsonResource $object
+     * @var ModelBase $form_instance
      */
 
     $list = [];
 
     if ($form_instance->getOwnerUserId()) {
-        $collection = \Modules\WebsiteBase\app\Models\Address::with([])->where('user_id', $form_instance->getOwnerUserId())->orderBy('lastname', 'ASC')->get();
+        $collection = Address::with([])->where('user_id', $form_instance->getOwnerUserId())->orderBy('lastname', 'ASC')->get();
 
         foreach ($collection as $item) {
             $list[] = [
@@ -44,5 +49,5 @@
 
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions($list, ['label'], 'id', [-1 => __('No choice')]),
+    'options' => app('system_base')->toHtmlSelectOptions($list, ['label'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', NativeObjectBase::UNSELECT_RELATION_IDENT)),
     ])

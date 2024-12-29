@@ -28,7 +28,7 @@
             <div class="col-12 col-md-6">
                 <button
                         class="btn-link link-primary"
-                        wire:click="$dispatchTo('{{ $this->relatedLivewireForm }}', 'open-form', {id: {{ data_get($item, 'id') }} })"
+                        wire:click="$dispatchTo('{{ $this->relatedLivewireForm }}', 'open-form', {id: '{{ data_get($item, $this->columnNameId) }}' })"
                 >
                     {{ $item->name }}
                 </button>

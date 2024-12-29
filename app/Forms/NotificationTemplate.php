@@ -74,7 +74,7 @@ class NotificationTemplate extends ModelBase
                                         'html_element' => 'select',
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\ViewTemplate::orderBy('code',
                                             'ASC')->get(), ['code', 'view_file', 'id'], 'id',
-                                            [self::UNSELECT_RELATION_IDENT => __('No choice')]),
+                                            app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
                                         'label'        => __('View Template'),
                                         'description'  => __('View template used as content.'),
                                         'validator'    => [

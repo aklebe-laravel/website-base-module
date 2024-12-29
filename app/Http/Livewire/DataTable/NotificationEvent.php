@@ -32,7 +32,7 @@ class NotificationEvent extends BaseDataTable
             'css_group' => 'col-12 col-md-3 text-start',
             'css_item'  => '',
             'options'   => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS,
-                first: [NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL => '['.__('All Channels').']']),
+                first: app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'   => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;

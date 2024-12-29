@@ -1,7 +1,7 @@
 {
   "name": "aklebe-laravel/website-base-module",
   "type": "laravel-module",
-  "description": "",
+  "description": "Website module with a bunch of functionalities for a multi store website.",
   "authors": [
     {
       "name": "Andreas Klebe",

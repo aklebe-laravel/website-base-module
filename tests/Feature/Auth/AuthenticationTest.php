@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\tests\Feature\Auth;
 use Livewire\Livewire;
 use Modules\SystemBase\tests\TestCase;
 use Modules\WebsiteBase\app\Http\Livewire\Form\AuthLogin;
+use Modules\WebsiteBase\app\Models\User;
 
 class AuthenticationTest extends TestCase
 {
@@ -17,7 +18,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen()
     {
-        $validUser = app(\Modules\WebsiteBase\app\Models\User::class)->frontendItems()->inRandomOrder()->where('email', 'like', '%js-dummy%@local.test')->first();
+        $validUser = app(User::class)->frontendItems()->inRandomOrder()->where('email', 'StuffTest1@local.test')->first();
         $this->assertTrue(!!$validUser);
 
         $livewire = Livewire::test(AuthLogin::class);

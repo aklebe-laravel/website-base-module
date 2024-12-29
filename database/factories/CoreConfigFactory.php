@@ -14,11 +14,13 @@ class CoreConfigFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            'path'  => implode('.', fake()->words(rand(1, 4))),
-            'value' => implode(' ', fake()->words(rand(3, 4))),
+            'path'        => implode('.', fake()->words(rand(1, 4))),
+            'label'       => fake()->unique()->words(rand(1, 3), true),
+            'description' => fake()->unique()->words(rand(5, 15), true),
+            'value'       => implode(' ', fake()->words(rand(3, 4))),
         ];
     }
 }

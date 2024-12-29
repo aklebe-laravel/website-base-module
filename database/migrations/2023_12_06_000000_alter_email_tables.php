@@ -10,7 +10,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (Schema::hasColumn('notification_events', 'notification_concern_id')) {
             Schema::table('notification_events', function (Blueprint $table) {
@@ -46,7 +46,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('notification_concern_notification_event');
     }

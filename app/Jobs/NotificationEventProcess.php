@@ -17,7 +17,7 @@ use Modules\WebsiteBase\app\Models\NotificationEvent;
 use Modules\WebsiteBase\app\Models\User;
 use Modules\WebsiteBase\app\Notifications\Emails\NotifyDefault;
 use Modules\WebsiteBase\app\Notifications\Emails\NotifyUser;
-use Modules\WebsiteBase\app\Services\Config;
+use Modules\WebsiteBase\app\Services\ConfigService;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
 use Modules\WebsiteBase\app\Services\WebsiteService;
 use Psr\Container\ContainerExceptionInterface;
@@ -34,9 +34,9 @@ class NotificationEventProcess implements ShouldQueue
     public NotificationEvent $event;
 
     /**
-     * @var Config
+     * @var ConfigService
      */
-    protected Config $websiteBaseConfig;
+    protected ConfigService $websiteBaseConfig;
 
     /**
      * @var WebsiteService

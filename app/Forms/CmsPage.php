@@ -120,7 +120,7 @@ class CmsPage extends ModelBase
                                             'ASC')->get(), [
                                             'id',
                                             'name'
-                                        ], 'id', [self::UNSELECT_RELATION_IDENT => __('No choice')]),
+                                        ], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
                                         'description'  => __('Parent Page'),
                                         'validator'    => [
                                             'nullable',
@@ -135,7 +135,7 @@ class CmsPage extends ModelBase
                                             'ASC')->get(), [
                                             'id',
                                             'code'
-                                        ], 'id', [self::UNSELECT_RELATION_IDENT => __('No choice')]),
+                                        ], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
                                         'description'  => __('The Store assigned to this page'),
                                         'validator'    => [
                                             'nullable',
@@ -150,7 +150,7 @@ class CmsPage extends ModelBase
                                             'html',
                                             'plain',
                                             'markdown'
-                                        ], first: [self::UNSELECT_RELATION_IDENT => __('No choice')]),
+                                        ], first: app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
                                         'description'  => __('Format and behaviour of content calculation.'),
                                         'validator'    => [
                                             'nullable',
@@ -159,12 +159,8 @@ class CmsPage extends ModelBase
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
                                     'locale'        => [
-                                        'html_element' => 'select',
+                                        'html_element' => 'select_country',
                                         'label'        => __('Language'),
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\Country::orderBy('nice_name',
-                                            'ASC')->selectRaw('*, LOWER(iso) as iso')->get(), ['nice_name', 'iso'],
-                                            'iso', [self::UNSELECT_RELATION_IDENT => '['.__('No choice').']']),
-                                        'cmpCi'        => true,
                                         'description'  => __('Language'),
                                         'validator'    => ['string', 'Max:6'],
                                         'css_group'    => 'col-12 col-lg-6',

@@ -114,6 +114,27 @@ return [
                 ],
             ],
         ],
+        '0011a' => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'core-config-from-0001.php',
+                ],
+            ],
+        ],
+        '0011b' => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'core-config-from-0001.php',
+                    'core-config-from-0005.php',
+                    'core-config-from-0006.php',
+                    'core-config-from-0007.php',
+                    'core-config-from-0008.php',
+                    'core-config-from-0010.php',
+                ],
+            ],
+        ],
     ],
 
 ];

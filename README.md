@@ -28,7 +28,21 @@ Cached lifetime in seconds for extra attribute entities. Set to 0 (forever) in p
 php artisan website-base:attr-clean
 ```
 
-Removes all attribute assignments where model no longer exists.
+Removes all attribute assignments where model no longer exists. It is scheduled every 2 hours by default.
+
+#### Core-Config
+
+Config for app and modules stored in database. See table ```core_config```.
+
+Values for ```options``` json in ```core_config```:
+
+
+| Json key    | type   | Description                                         |
+|-------------|--------|-----------------------------------------------------|
+| form        | object | Form specific object values                         |
+| - new_group | bool   | For forms: start a new group for this element field |
+| - full_row  | bool   | For forms: use a full row for this element field    |
+
 
 ### Manage Eloquent Models
 
@@ -39,7 +53,7 @@ Http/Livewire/Form/xxx.php
 Http/Livewire/DataTable/xxx.php
 ```
 
-xxx should have the same name like eloquent model.
+By default ```xxx``` should have the same name as eloquent model.
 
 #### NotificationEvent
 

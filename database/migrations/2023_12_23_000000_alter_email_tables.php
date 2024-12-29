@@ -10,7 +10,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // important: old migration already refactored for new installations,
         // so check if there is an old name present
@@ -33,9 +33,8 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
-        // Schema::dropIfExists('notification_concern_notification_event');
     }
 
 };

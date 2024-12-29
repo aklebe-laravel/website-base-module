@@ -7,21 +7,19 @@ return [
     'model'   => CoreConfig::class,
     // update data if exists and data differ (default false)
     'update'  => true,
-    // if update true only: don't update this fields
-    'ignore_update_fields' => [
-        'value'
-    ],
     // columns to check if data already exists (AND WHERE)
     'uniques' => ['store_id', 'path'],
     // data rows itself
     'data'    => [
         [
-            'store_id'    => null,
-            'path'        => 'broadcast.enabled',
-            'value'       => '0',
-            'label'       => 'Enable broadcast',
-            'form_input'  => 'switch',
-            'description' => 'Enable pusher/broadcast.',
+            'store_id' => null,
+            'module'   => 'website-base',
+            'path'     => 'channels.email.enabled',
+        ],
+        [
+            'store_id' => null,
+            'module'   => 'website-base',
+            'path'     => 'channels.telegram.enabled',
         ],
     ],
 ];
