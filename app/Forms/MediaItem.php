@@ -125,7 +125,7 @@ class MediaItem extends ModelBase
                                         'disabled'     => (bool) $this->fixedMediaType, // disable if fixed value
                                         'label'        => __('Media Type'),
                                         'options'      => [
-                                            '' => __('No choice'),
+                                            ... app('system_base')->getHtmlSelectOptionNoValue('No choice'),
                                             ... WebsiteMediaItemModel::getMediaTypesAsSelectOptions(),
                                         ],
                                         'description'  => __('Type of this media'),
@@ -137,7 +137,7 @@ class MediaItem extends ModelBase
                                         'disabled'     => (bool) $this->fixedObjectType, // disable if fixed value
                                         'label'        => __('Object Type'),
                                         'options'      => [
-                                            '' => __('No choice'),
+                                            ... app('system_base')->getHtmlSelectOptionNoValue('No choice'),
                                             ... WebsiteMediaItemModel::getObjectTypesAsSelectOptions(),
                                         ],
                                         'description'  => __('What should this media used for'),

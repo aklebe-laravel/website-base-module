@@ -118,11 +118,8 @@ class Address extends ModelBase
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'country_iso'      => [
-                                        'html_element' => 'select',
+                                        'html_element' => 'select_country',
                                         'label'        => __('Country'),
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\Country::orderBy('name',
-                                            'ASC')->get(), ['name'], 'iso',
-                                            [self::UNSELECT_RELATION_IDENT => '['.__('No choice').']']),
                                         'description'  => __('Country'),
                                         //                                        'validator'    => ['nullable', 'integer'],
                                         'validator'    => ['string', 'Max:80'],

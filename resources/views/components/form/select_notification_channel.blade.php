@@ -1,4 +1,5 @@
 @php
+    use Modules\Form\app\Forms\Base\ModelBase;
     use Modules\WebsiteBase\app\Services\WebsiteService;
 
     /**
@@ -22,7 +23,7 @@
      * @var array $x_data
      * @var int $element_index
      * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var ModelBase $form_instance
      */
 
     /** @var WebsiteService $websiteService */
@@ -30,5 +31,5 @@
 
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS, null, null, [null => __('No choice')]),
+    'options' => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS, null, null, app('system_base')->getHtmlSelectOptionNoValue('No choice')),
     ])

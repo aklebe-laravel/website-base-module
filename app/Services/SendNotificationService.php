@@ -16,9 +16,9 @@ use Telegram\Bot\Exceptions\TelegramSDKException;
 class SendNotificationService extends BaseService
 {
     /**
-     * @var Config
+     * @var ConfigService
      */
-    protected Config $websiteBaseConfig;
+    protected ConfigService $websiteBaseConfig;
 
     /**
      * @var WebsiteService

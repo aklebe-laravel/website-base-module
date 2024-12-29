@@ -10,7 +10,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // add notification_channel to notification_templates
         if (!Schema::hasColumn('notification_templates', 'notification_channel')) {
@@ -42,7 +42,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('notification_templates', function (Blueprint $table) {
             $table->dropColumn('notification_channel');

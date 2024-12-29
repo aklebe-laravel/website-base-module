@@ -4,7 +4,6 @@ namespace Modules\WebsiteBase\app\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Modules\Acl\app\Models\AclGroup;
 use Modules\Acl\app\Services\UserService;

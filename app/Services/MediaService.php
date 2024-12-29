@@ -319,61 +319,65 @@ class MediaService extends BaseService
     }
 
     /**
-     * @param  string  $type
+     * Find all files in media path and compare it with MediaItems->file_name.
+     * If no item was found, the file will be deleted.
      *
-     * @return bool
+     * @param  string  $type
+     * @param  bool    $simulate
+     *
+     * @return array
      */
-    public function deleteUnusedMediaFiles(string $type): bool
+    public function deleteUnusedMediaFiles(string $type, bool $simulate = false): array
     {
+        $startTime = microtime(true);
         $fileService = app('system_base_file');
+        $path = $this->getMediaItemPathRaw($type);
 
-        $fileMatchList = [];
+        $listByFilenames = [];
         $infoList = [
-            'files_total'   => 0,
-            'files_matched' => 0,
-            'files_deleted' => 0,
+            'simulated'             => $simulate,
+            'success'               => false,
+            'type'                  => $type,
+            'path'                  => $path,
+            'files_total'           => 0,
+            'files_matched_by_name' => 0,
+            'files_deleted'         => 0,
+            'process_in_seconds'    => 0,
         ];
 
-        $path = $this->getMediaItemPathRaw($type);
         if (!is_dir($path)) {
-            return false;
+            return $infoList;
         }
         $this->info("Searching files for type \"$type\" in \"$path\" ...");
 
         // find all files
-        $fileService->runDirectoryFiles($path, function (string $file, array $sourcePathInfo) use (&$infoList, &$fileMatchList) {
+        $fileService->runDirectoryFiles($path, function (string $file, array $sourcePathInfo) use (&$infoList, &$listByFilenames) {
             $infoList['files_total']++;
-            // we could set this to whitelist, but we need the result
-            if (preg_match($this->mediaFileRegexPattern, $sourcePathInfo['basename'], $matches)) {
-                $infoList['files_matched']++;
-                if ($id = (int) $matches[1]) {
-                    $fileMatchList[$id][] = $file;
-                }
-            }
+            $listByFilenames[$sourcePathInfo['basename']][] = $file;
 
-            //Log::debug($sourcePathInfo['basename']);
-            return true;
+            return $infoList;
         });
 
-        $this->debug("Matched regex pattern: ".count($fileMatchList));
-        //$this->debug(print_r($fileMatchList, true));
-
-        $matchedIds = array_keys($fileMatchList);
-        $mediaItemsExists = MediaItem::whereIn('id', $matchedIds)->pluck('id')->toArray();
+        $matchedIds = array_keys($listByFilenames);
+        $mediaItemsExists = MediaItem::whereIn('file_name', $matchedIds)->pluck('file_name')->toArray();
         $diff = array_diff($matchedIds, $mediaItemsExists);
-        $this->debug("Matched to delete: ".count($diff), $diff);
+        $infoList['files_matched_by_name'] = count($diff);
 
         $deleted = 0;
         foreach ($diff as $id) {
-            foreach ($fileMatchList[$id] as $file) {
-                //$this->debug("deleting file: \"$file\" ...");
-                if (unlink($file)) {
+            foreach ($listByFilenames[$id] as $file) {
+                if ($simulate || unlink($file)) {
                     $deleted++;
                 }
             }
         }
-        $this->info("Files deleted: ".$deleted);
 
-        return true;
+        $infoList['success'] = true;
+        $infoList['files_deleted'] = $deleted;
+        $infoList['process_in_seconds'] = number_format(microtime(true) - $startTime, 2, '.', '');
+
+        $this->info(json_encode($infoList, JSON_PRETTY_PRINT));
+
+        return $infoList;
     }
 }

@@ -27,6 +27,15 @@ class CoreConfig extends Model
     protected $guarded = [];
 
     /**
+     * properties should always cast from json to an array and via versa
+     *
+     * @var string[]
+     */
+    protected $casts = [
+        'options' => 'array',
+    ];
+
+    /**
      * You can use this instead of newFactory()
      *
      * @var string

@@ -1,4 +1,7 @@
 @php
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\NativeObjectBase;
+    use Modules\Form\app\Forms\Base\ModelBase;
     use Modules\TelegramApi\app\Services\TelegramService;
 
     /**
@@ -21,8 +24,8 @@
      * @var array $html_data data attributes
      * @var array $x_data
      * @var int $element_index
-     * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var JsonResource $object
+     * @var ModelBase $form_instance
      */
 
     /** @var TelegramService $telegramService */
@@ -35,5 +38,5 @@
 
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions($telegramGroups, ['display_name'], 'id', [-1 => __('No choice')]),
+    'options' => app('system_base')->toHtmlSelectOptions($telegramGroups, ['display_name'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', NativeObjectBase::UNSELECT_RELATION_IDENT)),
     ])

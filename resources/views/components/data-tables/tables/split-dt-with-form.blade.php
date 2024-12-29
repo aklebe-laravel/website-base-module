@@ -1,4 +1,6 @@
 @php
+    use Modules\SystemBase\app\Services\LivewireService;
+
     /**
      * @var string $modelName like "User" (@todo: only uses for bottom javascript, wich is used for image uploads)
      * @var string $livewireForm like "website-base::form.user"
@@ -7,8 +9,6 @@
      * @var bool $isFormOpen
      * @var array $objectInstanceDefaultValues
      */
-
-    use Modules\SystemBase\app\Services\LivewireService;
 
     if (!isset($livewireTableOptions)) {
         $livewireTableOptions = [];

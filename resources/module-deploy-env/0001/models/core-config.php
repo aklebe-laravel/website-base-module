@@ -4,59 +4,70 @@ use Modules\WebsiteBase\app\Models\CoreConfig;
 
 return [
     // class of eloquent model
-    "model"   => CoreConfig::class,
+    'model'   => CoreConfig::class,
     // update data if exists and data differ (default false)
-    "update"  => false,
+    'update'  => true,
+    // if update true only: don't update this fields
+    'ignore_update_fields' => [
+        'value'
+    ],
     // columns to check if data already exists (AND WHERE)
-    "uniques" => ["store_id", "path"],
+    'uniques' => ['store_id', 'path'],
     // data rows itself
-    "data"    => [
+    'data'    => [
         [
             'store_id'    => null,
-            "path"        => "site.public",
-            "value"       => "0",
-            "form_input"  => "switch",
-            "description" => "Site is public (1) or forced to login for everyone (0).",
+            'path'        => 'site.public',
+            'value'       => '0',
+            'label'       => 'Public site',
+            'form_input'  => 'switch',
+            'description' => 'Site is public (1) or forced to login for everyone (0).',
         ],
         [
             'store_id'    => null,
-            "path"        => "site.auth",
-            "value"       => "1",
-            "form_input"  => "switch",
-            "description" => "Auth functionality available (forms, etc...)",
+            'path'        => 'site.auth.enabled',
+            'value'       => '1',
+            'label'       => 'Enable Auth',
+            'form_input'  => 'switch',
+            'description' => 'Auth functionality available (forms, etc...)',
         ],
         [
             'store_id'    => null,
-            "path"        => "site.auth.register.enabled",
-            "value"       => "1",
-            "form_input"  => "switch",
-            "description" => "User registering allowed",
+            'path'        => 'site.auth.register.enabled',
+            'value'       => '1',
+            'label'       => 'Allow register users',
+            'form_input'  => 'switch',
+            'description' => 'User registering allowed',
         ],
         [
             'store_id'    => null,
-            "path"        => "site.auth.login.enabled",
-            "value"       => "1",
-            "form_input"  => "switch",
-            "description" => "User login allowed",
+            'path'        => 'site.auth.login.enabled',
+            'value'       => '1',
+            'label'       => 'Allow user login',
+            'form_input'  => 'switch',
+            'description' => 'User login allowed',
         ],
         [
             'store_id'    => null,
-            "path"        => "email.enabled",
-            "value"       => "0",
-            "form_input"  => "switch",
-            "description" => "Email transport allowed or not",
+            'path'        => 'email.enabled',
+            'value'       => '0',
+            'label'       => 'Allow emails',
+            'form_input'  => 'switch',
+            'description' => 'Email transport allowed or not',
         ],
         [
             'store_id'    => null,
-            "path"        => "email.rate-limiter.max",
-            "value"       => "100",
-            "description" => "Max emails per day or more true: per email.rate-limiter.reset",
+            'path'        => 'email.rate-limiter.max',
+            'value'       => '100',
+            'label'       => 'Max emails per day',
+            'description' => 'Max emails per day (or better allow x per email.rate-limiter.reset)',
         ],
         [
             'store_id'    => null,
-            "path"        => "email.rate-limiter.reset",
-            "value"       => "86400",
-            "description" => "Email Rate Limiter Reset in Seconds",
+            'path'        => 'email.rate-limiter.reset',
+            'value'       => '86400',
+            'label'       => 'Email limit reset',
+            'description' => 'Email rate limiter reset in seconds',
         ],
     ],
 ];

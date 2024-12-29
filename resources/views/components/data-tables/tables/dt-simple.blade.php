@@ -1,8 +1,10 @@
 @php
+    use Modules\SystemBase\app\Services\LivewireService;
+
     if (!isset($livewireTableOptions)) {
         $livewireTableOptions = [];
     }
-    $livewireTableKey = \Modules\SystemBase\app\Services\LivewireService::getKey('manage-default-dt-key');
+    $livewireTableKey = LivewireService::getKey('manage-default-dt-key');
 @endphp
 <div>
     {{--Data Table--}}

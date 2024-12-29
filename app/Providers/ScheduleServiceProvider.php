@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Providers\Base\ScheduleBaseServiceProvider;
 use Modules\WebsiteBase\app\Models\MediaItem as WebsiteBaseMediaItem;
 use Modules\WebsiteBase\app\Services\MediaService;
@@ -28,6 +29,15 @@ class ScheduleServiceProvider extends ScheduleBaseServiceProvider
          * Delete unused media files.
          */
         $schedule->call(function () {
+
+            // Do not delete media files on developer environments because database can switch sometimes to test something.
+            // In this case files would be deleted because media ids don't match to files.
+            if (!app('system_base')->isEnvGroupImportant()) {
+                Log::warning('No media deletion on this stage. Skipping maintenance process.');
+
+                return;
+            }
+
             $mediaService = app(MediaService::class);
 
             // for all valid media types ...
@@ -37,6 +47,7 @@ class ScheduleServiceProvider extends ScheduleBaseServiceProvider
 
             //
             app('system_base')->logExecutionTime('Finished removed unused media files.');
+
         })->monthlyOn(25, '03:00');
 
     }

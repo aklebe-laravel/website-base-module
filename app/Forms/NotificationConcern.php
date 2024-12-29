@@ -85,7 +85,7 @@ class NotificationConcern extends ModelBase
                                         'html_element' => 'select',
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationTemplate::orderBy('code',
                                             'ASC')->get(), ['code', 'notification_channel', 'id'], 'id',
-                                            [self::UNSELECT_RELATION_IDENT => __('No choice')]),
+                                            app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
                                         'label'        => __('Notification Template'),
                                         'description'  => __('Notification template used as content.'),
                                         'validator'    => [

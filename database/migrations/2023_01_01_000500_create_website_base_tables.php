@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
+use Modules\WebsiteBase\app\Models\ViewTemplate;
 
 return new class () extends Migration {
     /**
@@ -11,7 +12,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (!Schema::hasTable('countries')) {
             Schema::create('countries', function (Blueprint $table) {
@@ -287,7 +288,7 @@ return new class () extends Migration {
                 $table->string('view_file', 255)->nullable()->comment('dot seperated view path to file');
                 $table->string('parameter_variant', 255)
                     ->nullable()
-                    ->comment('code of parameter variant like "'.\Modules\WebsiteBase\app\Models\ViewTemplate::PARAMETER_VARIANT_DEFAULT.'"');
+                    ->comment('code of parameter variant like "'.ViewTemplate::PARAMETER_VARIANT_DEFAULT.'"');
                 $table->string('description', 255)->nullable()->comment('short info');
                 $table->timestamps();
             });
@@ -417,7 +418,7 @@ return new class () extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('acl_resource_notification_event');
         Schema::dropIfExists('notification_event_user');
@@ -431,7 +432,6 @@ return new class () extends Migration {
         Schema::dropIfExists('jobs');
         Schema::dropIfExists('media_item_user');
         Schema::dropIfExists('media_items');
-        $attribute = new ModelAttributeAssignment;
         foreach (ModelAttributeAssignment::ATTRIBUTE_TYPE_MAP as $v) {
             Schema::dropIfExists(ModelAttributeAssignment::ATTRIBUTE_ASSIGNMENT_TYPE_TABLE_PREFIX.$v['table_suffix']);
         }
@@ -444,12 +444,10 @@ return new class () extends Migration {
         Schema::dropIfExists('countries');
     }
 
-    protected function createAssignmentTable($typeName, callable $tableDeclaration)
+    protected function createAssignmentTable($typeName, callable $tableDeclaration): void
     {
-        /** @var ModelAttributeAssignment $attribute */
-        $attribute = new ModelAttributeAssignment;
         Schema::create(ModelAttributeAssignment::ATTRIBUTE_ASSIGNMENT_TYPE_TABLE_PREFIX.ModelAttributeAssignment::ATTRIBUTE_TYPE_MAP[$typeName]['table_suffix'],
-            function (Blueprint $table) use ($typeName, $tableDeclaration, $attribute) {
+            function (Blueprint $table) use ($typeName, $tableDeclaration) {
                 $table->id();
                 $table->unsignedBigInteger('model_id')->comment('product id, user id, ...');
                 $table->unsignedBigInteger('model_attribute_assignment_id')->unsigned();

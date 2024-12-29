@@ -1,7 +1,7 @@
 {
     "name": "WebsiteBase",
     "alias": "website-base",
-    "description": "",
+    "description": "Website module with a bunch of functionalities for a multi store website.",
     "keywords": [],
     "priority": 3000,
     "providers": [

@@ -7,6 +7,8 @@ use Modules\SystemBase\database\seeders\BaseModelSeeder;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\Store;
 use Modules\WebsiteBase\app\Models\User;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class MediaItemSeeder extends BaseModelSeeder
 {
@@ -14,6 +16,8 @@ class MediaItemSeeder extends BaseModelSeeder
      * Run the database seeds.
      *
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function run(): void
     {

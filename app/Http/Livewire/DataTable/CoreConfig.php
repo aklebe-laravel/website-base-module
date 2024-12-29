@@ -29,10 +29,12 @@ class CoreConfig extends BaseDataTable
     {
         return [
             [
-                'name'       => 'id',
-                'label'      => 'Link',
-                'format'     => 'number',
-                'css_all'    => 'text-muted font-monospace text-end w-5',
+                'name'       => 'module',
+                'label'      => 'Module',
+                'options'    => [
+                    'str_limit' => 3,
+                ],
+                'css_all'    => 'small w-5',
                 'searchable' => true,
                 'sortable'   => true,
             ],

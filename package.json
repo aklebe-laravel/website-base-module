@@ -1,5 +1,6 @@
 {
   "private": true,
+  "description": "Website module with a bunch of functionalities for a multi store website.",
   "scripts": {
     "dev": "vite",
     "build": "vite build"

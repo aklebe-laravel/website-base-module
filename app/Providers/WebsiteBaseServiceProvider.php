@@ -7,7 +7,7 @@ use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Console\AttributeCleanups;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\User;
-use Modules\WebsiteBase\app\Services\Config;
+use Modules\WebsiteBase\app\Services\ConfigService;
 use Modules\WebsiteBase\app\Services\MediaService;
 use Modules\WebsiteBase\app\Services\Setting;
 use Modules\WebsiteBase\app\Services\WebsiteService;
@@ -39,7 +39,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
 
         $this->app->singleton('website_base_settings', Setting::class);
         $this->app->singleton('website_base_media', MediaService::class);
-        $this->app->singleton('website_base_config', Config::class);
+        $this->app->singleton('website_base_config', ConfigService::class);
         $this->app->singleton(WebsiteService::class, WebsiteService::class);
         $this->app->bind('media', MediaItem::class);
 
