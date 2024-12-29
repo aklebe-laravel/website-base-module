@@ -227,7 +227,7 @@ class Module extends NativeObjectBase
 
         $result = [
             'config.store_id'  => [
-                'html_element'      => 'select_store',
+                'html_element'      => 'website-base::select_store',
                 'livewire_live'     => true,
                 'livewire_debounce' => 300,
                 'label'             => __('Choose store.'),
