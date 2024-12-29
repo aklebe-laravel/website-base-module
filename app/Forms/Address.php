@@ -118,7 +118,7 @@ class Address extends ModelBase
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'country_iso'      => [
-                                        'html_element' => 'select_country',
+                                        'html_element' => 'website-base::select_country',
                                         'label'        => __('Country'),
                                         'description'  => __('Country'),
                                         //                                        'validator'    => ['nullable', 'integer'],

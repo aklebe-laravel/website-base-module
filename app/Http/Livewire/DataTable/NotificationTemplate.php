@@ -23,7 +23,7 @@ class NotificationTemplate extends BaseDataTable
     /**
      *
      */
-    const FILTER_NOTIFICATION_CHANNEL_ALL = '';
+    const string FILTER_NOTIFICATION_CHANNEL_ALL = '';
 
     /**
      * @return void

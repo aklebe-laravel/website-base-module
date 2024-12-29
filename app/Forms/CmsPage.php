@@ -159,7 +159,7 @@ class CmsPage extends ModelBase
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
                                     'locale'        => [
-                                        'html_element' => 'select_country',
+                                        'html_element' => 'website-base::select_country',
                                         'label'        => __('Language'),
                                         'description'  => __('Language'),
                                         'validator'    => ['string', 'Max:6'],
