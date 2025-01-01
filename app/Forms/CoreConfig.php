@@ -83,19 +83,19 @@ class CoreConfig extends ModelBase
                                     ],
                                     'value'       => [
                                         'html_element' => function () {
-                                            return $this->jsonResource->resource->form_input ?? 'textarea';
+                                            return $this->getDataSource()->resource->form_input ?? 'textarea';
                                         },
                                         'label'        => __('Value'),
                                         'description'  => function () {
-                                            return $this->jsonResource->resource->description ?? '...';
+                                            return $this->getDataSource()->resource->description ?? '...';
                                         },
                                         'validator'    => function () {
                                             $r = ['nullable'];
-                                            switch ($this->jsonResource->resource->form_input) {
+                                            switch ($this->getDataSource()->resource->form_input) {
                                                 case 'switch':
                                                     $r[] = 'bool';
                                                     // @todo: replace this type cast in event after read model
-                                                    $this->jsonResource->resource->value = (bool) $this->jsonResource->resource->value;
+                                                    $this->getDataSource()->resource->value = (bool) $this->getDataSource()->resource->value;
                                                     break;
                                             }
                                             return $r;

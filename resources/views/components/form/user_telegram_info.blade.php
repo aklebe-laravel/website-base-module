@@ -1,5 +1,11 @@
 @php
-    use Modules\TelegramApi\app\Services\TelegramService;use Modules\WebsiteBase\app\Forms\UserProfile;use Modules\WebsiteBase\app\Services\WebsiteTelegramService;
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\ModelBase;
+    use Modules\SystemBase\app\Services\ModuleService;
+    use Modules\TelegramApi\app\Services\TelegramService;
+    use Modules\WebsiteBase\app\Forms\UserProfile;
+    use Modules\WebsiteBase\app\Services\WebsiteTelegramService;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
 
     /**
      *
@@ -14,12 +20,13 @@
      * @var string $livewire
      * @var array $html_data
      * @var array $x_data
-     * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var JsonResource $object
+     * @var ModelBase $form_instance
+     * @var NativeObjectBaseLivewire $form_livewire
      */
 
-    /** @var \Modules\SystemBase\app\Services\ModuleService $moduleService */
-    $moduleService = app(\Modules\SystemBase\app\Services\ModuleService::class);
+    /** @var ModuleService $moduleService */
+    $moduleService = app(ModuleService::class);
     $_telegramId = null;
     if ($moduleTelegramExists = $moduleService->moduleExists('TelegramApi')) {
         /** @var WebsiteTelegramService $websiteTelegramService */
@@ -54,7 +61,7 @@
             @if ($websiteTelegramService->isTelegramEnabled() && $_telegramBot)
                 @if ($_telegramId)
                     <button class="btn btn-danger"
-                            x-on:click="messageBox.show('telegram.login.delete', {'telegram-delete-me': {livewire_id: '{{ $form_instance->livewireId }}', name: 'website-base::form.user-profile', item_id: {{ $object->getKey() }}}})"
+                            x-on:click="messageBox.show('telegram.login.delete', {'telegram-delete-me': {livewire_id: '{{ $form_livewire->getId() }}', name: 'website-base::form.user-profile', item_id: {{ $object->getKey() }}}})"
                     >
                         {{ __('Delete Telegram ID ...') }}
                     </button>

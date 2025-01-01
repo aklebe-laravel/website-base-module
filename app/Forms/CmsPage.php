@@ -40,7 +40,7 @@ class CmsPage extends ModelBase
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'code'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'code'),
             'tab_controls' => [
                 'base_item' => [
                     'disabled'  => $defaultSettings['disabled'],

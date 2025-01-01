@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 use Modules\Form\app\Forms\Base\NativeObjectBase;
 use Modules\SystemBase\app\Forms\Base\ModuleCoreConfigBase;
 use Modules\SystemBase\app\Services\ModuleService;
@@ -11,15 +12,6 @@ use Modules\WebsiteBase\app\Models\CoreConfig as CoreConfigModel;
 
 class Module extends NativeObjectBase
 {
-    /**
-     * @var array|string[]
-     */
-    public array $liveUpdate = [
-        'config' => [
-            'store_id' => 2,
-        ],
-    ];
-
     /**
      * Relations commonly built in with(...)
      * * Also used for:
@@ -55,21 +47,42 @@ class Module extends NativeObjectBase
     protected string $moduleDescription = '';
 
     /**
+     * @return array
+     */
+    public function makeObjectInstanceDefaultValues(): array
+    {
+        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+            'core_config' => [
+                'store_id' => app('website_base_settings')->getStore()->getKey(),
+            ],
+        ]);
+    }
+
+    /**
      * @param  mixed|null  $id
      *
      * @return JsonResource
      */
-    public function getJsonResource(mixed $id = null): JsonResource
+    public function initDataSource(mixed $id = null): JsonResource
     {
-        if ($this->jsonResource) {
-            return $this->jsonResource;
+        if ($this->getDataSource()) {
+            return $this->getDataSource();
         }
 
         if ($id) {
             /** @var SystemService $sys */
             $sys = app('system_base');
             // store id by form store id, default from settings
-            $storeId = (int)data_get($this->liveUpdate, 'config.store_id', app('website_base_settings')->getStore()->getKey());
+            $storeId = (int) data_get($this->formLivewire->liveUpdate, 'core_config.store_id', self::UNSELECT_RELATION_IDENT);
+            // if first time, use default store (which is the current store)
+            if ($storeId === self::UNSELECT_RELATION_IDENT) {
+                $storeId = (int) data_get($this->formLivewire->objectInstanceDefaultValues, 'core_config.store_id');
+            }
+            // any invalid values = back to null store ...
+            if ($storeId < 1) {
+                $storeId = null;
+            }
+
             /** @var ModuleService $moduleService */
             $moduleService = app('system_base_module');
             $moduleList = $moduleService->getItemInfoList(false);
@@ -80,32 +93,28 @@ class Module extends NativeObjectBase
                     //Log::debug(print_r($module, true));
                     $this->moduleDescription = data_get($module, 'module_json.description');
 
-                    // Preload collection of configs used by module.
-                    // No sort needed, config itself is sorted we run through.
-                    $coreConfigModelCollection = CoreConfigModel::with([])->where('module', $moduleSnakeName)->where('store_id', $storeId)->get();
                     $coreConfig = app('website_base_config');
                     // config is sorted by position and path
-                    $config = $coreConfig->getConfigTree($storeId);
+                    $config = $coreConfig->getConfigModuleTree($storeId, $moduleSnakeName);
 
-                    data_set($module, 'config.store_id', $storeId);
+                    data_set($module, 'core_config.store_id', $storeId);
 
                     // set jsonResource using config tree
                     app('system_base')->runThroughArray($config,
-                        function (string $key, mixed $value, string $currentRoot, int $currentDeep) use (&$module, $coreConfigModelCollection, $moduleSnakeName) {
+                        function (string $key, mixed $value, string $currentRoot, int $currentDeep) use (&$module, $moduleSnakeName) {
                             $configPath = ($currentRoot ? $currentRoot.'.' : '').$key;
-                            if ($c = $coreConfigModelCollection->where('path', $configPath)->first()) {
-                                $name = $this->getConfigElementName($configPath, $moduleSnakeName);
-                                data_set($module, $name, $value);
-                            }
+                            $name = $this->getConfigElementName($configPath, $moduleSnakeName);
+                            data_set($module, $name, $value);
                         });
 
                     //
-                    $this->jsonResource = new JsonResource($module);
+                    $this->setDataSource(new JsonResource($module));
 
                     // prepare module specific form data if exists ...
                     if ($moduleConfigFormClass = $sys->findModuleClass('ModuleCoreConfig', 'model-forms', false, $module['studly_name'])) {
                         $this->moduleConfigFormClass = new $moduleConfigFormClass();
-                        $this->moduleConfigFormClass->extendJsonResource($this->jsonResource);
+                        // extend data for extra tab pages for the specific module
+                        $this->moduleConfigFormClass->extendDataSource($this->getDataSource());
                     }
 
                     break;
@@ -113,7 +122,7 @@ class Module extends NativeObjectBase
             }
         }
 
-        return $this->jsonResource;
+        return $this->getDataSource();
     }
 
     /**
@@ -128,17 +137,15 @@ class Module extends NativeObjectBase
 
         $tabSettingsElements = [];
         //@todo: rename all modules paths in core config to 'module.system-base.' smth like that ...
-        if ($this->jsonResource) {
-            $moduleSnake = data_get($this->jsonResource, 'snake_name');
-            $moduleStudly = data_get($this->jsonResource, 'studly_name');
+        if ($this->getDataSource()) {
+            $moduleSnake = data_get($this->getDataSource(), 'snake_name');
+            $moduleStudly = data_get($this->getDataSource(), 'studly_name');
             $tabSettingsElements = $this->getTabCoreConfig($moduleSnake, $moduleStudly);
         }
 
-        //Log::debug(print_r($this->jsonResource, true));
-
         $formConfig = [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'name'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'name'),
             'description'  => __($this->moduleDescription),
             'tab_controls' => [
                 'base_item' => [
@@ -226,7 +233,7 @@ class Module extends NativeObjectBase
     {
 
         $result = [
-            'config.store_id'  => [
+            'core_config.store_id' => [
                 'html_element'      => 'website-base::select_store',
                 'livewire_live'     => true,
                 'livewire_debounce' => 300,
@@ -238,20 +245,27 @@ class Module extends NativeObjectBase
                 ],
                 'css_group'         => 'col-12',
             ],
-            '__'.uuid_create() => [
+            '__'.uuid_create()     => [
                 'html_element' => 'hr',
                 'css_group'    => 'col-12',
             ],
         ];
-        $storeId = data_get($this->jsonResource, 'config.store_id');
+        $storeId = data_get($this->getDataSource(), 'core_config.store_id');
 
         // Preload collection of configs used by module.
         // No sort needed, config itself is sorted we run through.
-        $coreConfigModelCollection = CoreConfigModel::with([])->where('module', $moduleSnakeName)->where('store_id', $storeId)->get();
+        // @todo: maybe inaccurate row for label and description in this way ...
+        $coreConfigModelCollection = CoreConfigModel::with([])
+                                                    ->where('module', $moduleSnakeName)
+                                                    ->where(function ($b) use ($storeId) {
+                                                        $b->where('store_id', $storeId);
+                                                        $b->orWhereNull('store_id');
+                                                    })
+                                                    ->get();
 
         // get prepared config by getJsonResource()
         // config is sorted by position, path
-        $config = data_get($this->jsonResource, 'config.module.'.$moduleSnakeName, []);
+        $config = data_get($this->getDataSource(), 'core_config.module.'.$moduleSnakeName, []);
         $configElementCount = 0;
         $prevCount = 0;
         app('system_base')->runThroughArray($config,
@@ -309,7 +323,7 @@ class Module extends NativeObjectBase
      */
     protected function getConfigElementName(string $path, ?string $moduleSnakeName = null): string
     {
-        return 'config.module.'.($moduleSnakeName ?? '_').'.'.$path;
+        return 'core_config.module.'.($moduleSnakeName ?? '_').'.'.$path;
     }
 
 

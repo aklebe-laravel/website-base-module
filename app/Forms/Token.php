@@ -34,7 +34,7 @@ class Token extends ModelBase
      */
     public function isOwnUser(): bool
     {
-        return $this->jsonResource && ($this->getOwnerUserId() == Auth::id());
+        return $this->getDataSource() && ($this->getOwnerUserId() == Auth::id());
     }
 
     /**
@@ -72,7 +72,7 @@ class Token extends ModelBase
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'id'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'id'),
             'tab_controls' => [
                 'base_item' => [
                     'disabled'  => $defaultSettings['disabled'],

@@ -57,7 +57,7 @@ class NotificationEvent extends ModelBase
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'id'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'id'),
             'tab_controls' => [
                 'base_item' => [
                     'tab_pages' => [
@@ -194,7 +194,7 @@ class NotificationEvent extends ModelBase
                         ],
                         [
                             // don't show if creating a new object ...
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Notification Concerns'),
                             ],
@@ -219,7 +219,7 @@ class NotificationEvent extends ModelBase
                         ],
                         [
                             // don't show if creating a new object ...
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Users'),
                             ],
@@ -248,7 +248,7 @@ class NotificationEvent extends ModelBase
                         ],
                         [
                             // don't show if creating a new object ...
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Resources'),
                             ],

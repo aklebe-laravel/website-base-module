@@ -29,7 +29,7 @@ class Changelog extends ModelBase
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'id'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'id'),
             'tab_controls' => [
                 'base_item' => [
                     'disabled'  => $defaultSettings['disabled'],

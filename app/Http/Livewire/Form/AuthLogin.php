@@ -84,8 +84,8 @@ class AuthLogin extends ModelBase
         }
 
         $credentials = [
-            'email'    => data_get($this->formObjectAsArray, 'email'),
-            'password' => data_get($this->formObjectAsArray, 'password'),
+            'email'    => data_get($this->dataTransfer, 'email'),
+            'password' => data_get($this->dataTransfer, 'password'),
         ];
 
         // Check user exist, is disabled, deleted or want to be deleted
@@ -146,7 +146,7 @@ class AuthLogin extends ModelBase
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower(data_get($this->formObjectAsArray, 'email',
+        return Str::transliterate(Str::lower(data_get($this->dataTransfer, 'email',
                 '')).'|'.Request::getClientIp());
     }
 

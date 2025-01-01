@@ -12,17 +12,17 @@ class ModelBaseExtraAttributes extends ModelBase
     /**
      * Creates a tab config for all extra attributes available
      *
-     * @param  JsonResource|null  $jsonResource
+     * @param  JsonResource|null  $dataSource
      *
      * @return array
      */
-    public function getTabExtraAttributes(?JsonResource $jsonResource = null): array
+    public function getTabExtraAttributes(?JsonResource $dataSource = null): array
     {
-        /** @var TraitAttributeAssignment $jsonResource */
+        /** @var TraitAttributeAssignment $dataSource */
         $formElementsExtraAttributes = [];
 
-        if ($jsonResource) {
-            foreach ($jsonResource->getModelAttributeAssigmentCollection() as $extraAttribute) {
+        if ($dataSource) {
+            foreach ($dataSource->getModelAttributeAssigmentCollection() as $extraAttribute) {
 
                 $description = $extraAttribute->description ?: $extraAttribute->modelAttribute->description;
                 $description = __($description);
@@ -46,7 +46,6 @@ class ModelBaseExtraAttributes extends ModelBase
 
         $tab = [
             // can be also enabled if creating new ones
-            //            'disabled' => !$jsonResource->getKey(),
             'tab'     => [
                 'label' => __('Extra Attributes'),
             ],

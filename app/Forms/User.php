@@ -13,7 +13,7 @@ class User extends ModelBaseExtraAttributes
     const string PARENT_RELATION_METHOD_NAME = 'users';
 
     /**
-     * Set for example 'web_uri' or 'shared_id' to try load from this if is not numeric in getJsonResource().
+     * Set for example 'web_uri' or 'shared_id' to try load from this if is not numeric in initDataSource().
      * Model have to be trait by TraitBaseModel to become loadByFrontEnd()
      *
      * @var string
@@ -51,12 +51,12 @@ class User extends ModelBaseExtraAttributes
 
     public function getOwnerUserId(): mixed
     {
-        return $this->jsonResource->getKey();
+        return $this->getDataSource()->getKey();
     }
 
     public function isOwnUser(): bool
     {
-        return $this->jsonResource && ($this->getOwnerUserId() == Auth::id());
+        return $this->getDataSource() && ($this->getOwnerUserId() == Auth::id());
     }
 
     /**
@@ -79,11 +79,11 @@ class User extends ModelBaseExtraAttributes
 
         $defaultSettings = $this->getDefaultFormSettingsByPermission();
 
-        $extraAttributeTab = $this->getTabExtraAttributes($this->jsonResource);
+        $extraAttributeTab = $this->getTabExtraAttributes($this->getDataSource());
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'name'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'name'),
             'tab_controls' => [
                 'base_item' => [
                     'tab_pages' => [
@@ -171,7 +171,7 @@ class User extends ModelBaseExtraAttributes
                         ],
                         [
                             'visible'  => $defaultSettings['can_edit'],
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Addresses'),
                             ],
@@ -201,7 +201,7 @@ class User extends ModelBaseExtraAttributes
                             ],
                         ],
                         [
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Images'),
                             ],
@@ -231,7 +231,7 @@ class User extends ModelBaseExtraAttributes
                             ],
                         ],
                         [
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Groups'),
                             ],
@@ -259,7 +259,7 @@ class User extends ModelBaseExtraAttributes
                             ],
                         ],
                         [
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Resources'),
                             ],
@@ -282,7 +282,7 @@ class User extends ModelBaseExtraAttributes
                             ],
                         ],
                         [
-                            'disabled' => !$this->jsonResource->getKey(),
+                            'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Tokens'),
                             ],

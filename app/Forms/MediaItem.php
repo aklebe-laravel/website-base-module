@@ -84,10 +84,10 @@ class MediaItem extends ModelBase
 
         return [
             ... $parentFormData,
-            'title'        => $this->makeFormTitle($this->jsonResource, 'name'),
+            'title'        => $this->makeFormTitle($this->getDataSource(), 'name'),
             'css_classes'  => 'form-edit',
             //                        'x_model'       => 'object',
-            'livewire'     => 'formObjectAsArray',
+            'livewire'     => 'dataTransfer',
             'tab_controls' => [
                 'base_item' => [
                     'tab_pages' => [

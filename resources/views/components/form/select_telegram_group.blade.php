@@ -3,6 +3,7 @@
     use Modules\Form\app\Forms\Base\NativeObjectBase;
     use Modules\Form\app\Forms\Base\ModelBase;
     use Modules\TelegramApi\app\Services\TelegramService;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
 
     /**
      * default input text element
@@ -26,6 +27,7 @@
      * @var int $element_index
      * @var JsonResource $object
      * @var ModelBase $form_instance
+     * @var NativeObjectBaseLivewire $form_livewire
      */
 
     /** @var TelegramService $telegramService */

@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Providers;
 use Modules\SystemBase\app\Providers\Base\ModuleBaseServiceProvider;
 use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Console\AttributeCleanups;
+use Modules\WebsiteBase\app\Console\CoreConfig;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\User;
 use Modules\WebsiteBase\app\Services\ConfigService;
@@ -68,6 +69,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
 
         $this->commands([
             AttributeCleanups::class,
+            CoreConfig::class,
         ]);
     }
 

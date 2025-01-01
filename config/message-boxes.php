@@ -34,8 +34,7 @@ return [
         'default'    => [
             'rating' => [
                 'title'                => 'Submit User Rating',
-                'message-box-template' => 'forms.user-rating',//view('forms.user-rating')->render(),
-                //                'fetch-content' => route('get.form.rating.product'),
+                'message-box-template' => 'forms.user-rating',
                 'fetch-content'        => '/get-form-rating/user',
                 // constant names from defaultActions[] or closure
                 'actions'              => [
