@@ -19,14 +19,14 @@ class Contact extends NativeObjectBase
      */
     protected string $objectsFrontendLabel = 'Contact Messages';
 
-    public function getJsonResource(mixed $id = null): JsonResource
+    public function initDataSource(mixed $id = null): JsonResource
     {
         $object = [
             'content' => '',
         ];
 
-        $this->jsonResource = new JsonResource($object);
-        return $this->jsonResource;
+        $this->setDataSource(new JsonResource($object));
+        return $this->getDataSource();
     }
 
     /**

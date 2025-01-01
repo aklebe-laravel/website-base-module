@@ -29,47 +29,69 @@ class ConfigService extends BaseService
     private array $configByStore = [];
 
     /**
-     * @param  int|null  $storeId
-     *
-     * @return array
+     * @var array
      */
-    public function buildConfigTree(int $storeId = null): array
-    {
-        $this->configByStore[$storeId] = [];
-
-        try {
-            $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('position')->orderBy('path');
-
-            /** @var CoreConfig $config */
-            foreach ($builder->get() as $config) {
-                if (Arr::has($this->configByStore[$storeId], $config->path)) {
-                    // Try to override deeper settings like "x.y=1" but "x.y.z" already exists
-                    throw new Exception('Invalid override for path: '.$config->path);
-                } else {
-                    Arr::set($this->configByStore[$storeId], $config->path, $config->value);
-                }
-            }
-
-        } catch (Exception $ex) {
-            Log::error("Error by getting config!", [__METHOD__]);
-            Log::error($ex->getMessage());
-        }
-
-        return $this->configByStore;
-    }
+    private array $configByStoreAndModule = [];
 
     /**
      * @param  int|null  $storeId
      *
      * @return array
      */
-    public function getConfigTree(int $storeId = null): array
+    public function buildConfigTree(?int $storeId = null): array
+    {
+        $this->configByStore[$storeId] = [];
+        $this->configByStoreAndModule[$storeId] = [];
+
+        // inherit from null store ...
+        if ($storeId !== null) {
+            // make sure null store is also filled up ...
+            $this->getConfigTree();
+            app('system_base')::arrayMergeRecursiveDistinct($this->configByStore[$storeId], $this->configByStore[null]);
+            app('system_base')::arrayMergeRecursiveDistinct($this->configByStoreAndModule[$storeId], $this->configByStoreAndModule[null]);
+            //$this->debug(print_r($this->configByStore[$storeId], true));
+        }
+
+        // get all entries of all modules by this store ...
+        $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('position')->orderBy('module')->orderBy('path');
+
+        /** @var CoreConfig $config */
+        foreach ($builder->get() as $config) {
+            Arr::set($this->configByStore[$storeId], $config->path, $config->value);
+            Arr::set($this->configByStoreAndModule[$storeId], $config->module.'.'.$config->path, $config->value);
+        }
+
+        return $this->configByStore[$storeId];
+    }
+
+    /**
+     * Build tree with soft cache
+     *
+     * @param  int|null  $storeId
+     *
+     * @return array
+     */
+    public function getConfigTree(?int $storeId = null): array
     {
         if (isset($this->configByStore[$storeId])) {
             return $this->configByStore[$storeId];
         }
 
         return $this->buildConfigTree($storeId);
+    }
+
+    /**
+     * @param  int|null     $storeId
+     * @param  string|null  $module
+     *
+     * @return array
+     */
+    public function getConfigModuleTree(?int $storeId = null, ?string $module = null): array
+    {
+        // ensure data is set (for storeId and also null store)
+        $this->getConfigTree($storeId);
+
+        return $this->configByStoreAndModule[$storeId][$module] ?? [];
     }
 
     /**
@@ -85,92 +107,119 @@ class ConfigService extends BaseService
     public function get(string $path = '', mixed $default = null, ?int $storeId = self::CURRENT_STORE_MARKER, ?string $module = null): mixed
     {
         if ($storeId === self::CURRENT_STORE_MARKER) {
-            $storeId = app('website_base_settings')->getStore()->id ?? null;
+            $storeId = app('website_base_settings')->getStore()->getKey() ?? null;
         }
 
-        if (!isset($this->configByStore[$storeId])) {
-            $this->buildConfigTree($storeId);
+        // ensure data is set (for storeId and also null store)
+        $this->getConfigTree($storeId);
+
+        // if no path, return the whole tree ...
+        if (!$path) {
+            return $this->configByStore[$storeId];
         }
 
-        if ($path) {
-            $path = str_replace('/', '.', $path);
-        }
 
         // if not exist the specific store, use the default store (null) ...
         if (($storeId !== null) && (!Arr::has($this->configByStore[$storeId], $path))) {
             return $this->get($path, $default, null, $module);
         }
 
-        if (!$path) {
-            return $this->configByStore[$storeId];
+        // try to get by module at first
+        if ($module !== null) { // && Arr::has($this->configByStoreAndModule[$storeId], $modulePath)) {
+            $modulePath = $module.'.'.$path;
+            return Arr::get($this->configByStoreAndModule[$storeId], $modulePath, $default);
         }
 
         // use store value ...
         return Arr::get($this->configByStore[$storeId], $path, $default);
     }
 
-    /**
-     * Get a prepared and preloaded config
-     *
-     *
-     * @param  string    $path
-     * @param  mixed     $value
-     * @param  int|null  $storeId
-     * @param  bool      $persist
-     *
-     * @return void
-     */
-    public function set(string $path, mixed $value, ?int $storeId = self::CURRENT_STORE_MARKER, bool $persist = false): void
-    {
-        if ($storeId === self::CURRENT_STORE_MARKER) {
-            $storeId = app('website_base_settings')->getStore()->id;
-        }
-
-        if (!isset($this->configByStore[$storeId])) {
-            $this->buildConfigTree($storeId);
-        }
-
-        $path = str_replace('/', '.', $path);
-        Arr::set($this->configByStore[$storeId], $path, $value);
-
-        if ($persist) {
-            /** @var CoreConfig $config */
-            if ($config = CoreConfig::wherePath($path)->where('store_id', $storeId)->firstOrNew()) {
-                $config->store_id = $storeId;
-                $config->path = $path;
-                $config->value = $value;
-                $config->save();
-            }
-        }
-    }
+    ///**
+    // * Get a prepared and preloaded config
+    // *
+    // *
+    // * @param  string    $path
+    // * @param  mixed     $value
+    // * @param  int|null  $storeId
+    // * @param  bool      $persist
+    // *
+    // * @return void
+    // */
+    //public function set(string $path, mixed $value, ?int $storeId = self::CURRENT_STORE_MARKER, bool $persist = false): void
+    //{
+    //    if ($storeId === self::CURRENT_STORE_MARKER) {
+    //        $storeId = app('website_base_settings')->getStore()->getKey();
+    //    }
+    //
+    //    if (!isset($this->configByStore[$storeId])) {
+    //        $this->buildConfigTree($storeId);
+    //    }
+    //
+    //    $path = str_replace('/', '.', $path);
+    //    Arr::set($this->configByStore[$storeId], $path, $value);
+    //
+    //    if ($persist) {
+    //        /** @var CoreConfig $config */
+    //        if ($config = CoreConfig::wherePath($path)->where('store_id', $storeId)->firstOrNew()) {
+    //            $config->store_id = $storeId;
+    //            $config->path = $path;
+    //            $config->value = $value;
+    //            $config->save();
+    //        }
+    //    }
+    //}
 
     /**
      * @param  string       $path
      * @param  mixed        $value
      * @param  int|null     $storeId
      * @param  string|null  $module
+     * @param  bool         $autoDelete
      *
      * @return bool
      */
-    public function save(string $path, mixed $value, ?int $storeId, ?string $module = null): bool
+    public function save(string $path, mixed $value, ?int $storeId, ?string $module = null, bool $autoDelete = true): bool
     {
         /** @var CoreConfig $configFromNullStore */
-        $configFromNullStore = CoreConfig::wherePath($path)->whereNull('store_id')->where('module', $module)->first();
-        /** @var CoreConfig $config */
-        if (!($config = CoreConfig::wherePath($path)->where('store_id', $storeId)->where('module', $module)->first())) {
+        if (!($configFromNullStore = CoreConfig::wherePath($path)->whereNull('store_id')->where('module', $module)->first())) {
+            $this->error(sprintf("Core Config Path '%s' not found for null store.", $path), [__METHOD__]);
 
-            // If not four the current store, try to copy fields like 'label' and 'description' from null store by removing the id and change store_id
-            $config2 = $configFromNullStore ? $configFromNullStore->toArray() : [];
-            if (isset($config2['id'])) {
-                unset($config2['id']);
+            return false;
+        }
+
+        $sameAsDefaultStoreValue = ($configFromNullStore->value === $value);
+
+        if ($storeId === null) {
+            $config = $configFromNullStore;
+        } else {
+            /** @var CoreConfig $config */
+            if (!($config = CoreConfig::wherePath($path)->where('store_id', $storeId)->where('module', $module)->first())) {
+
+                if ($sameAsDefaultStoreValue) {
+                    return false;
+                }
+
+                // If not four the current store, try to copy fields like 'label' and 'description' from null store by removing the id and change store_id
+                $config2 = $configFromNullStore->toArray();
+                if (isset($config2['id'])) {
+                    unset($config2['id']);
+                }
+                $config = CoreConfig::make($config2);
+
+                $config->id = null;
+                $config->store_id = $storeId;
+
+                // setup data in case of new creation
+                $config->path = $path;
+            } else {
+                // if value is same like default null store, delete this override
+                if ($autoDelete && $sameAsDefaultStoreValue) {
+                    $config->delete();
+                    $this->warning(sprintf("Core Config deleted: '%s' for store: '%s'.", $path, $storeId), [__METHOD__]);
+
+                    return false;
+                }
             }
-            $config = CoreConfig::make($config2);
-
-            $config->id = null;
-            $config->store_id = $storeId;
-
-            // setup data in case of new creation
-            $config->path = $path;
         }
 
         // no need to save?
@@ -183,7 +232,7 @@ class ConfigService extends BaseService
         $config->value = $value;
         $result = $config->save();
 
-        $this->debug(sprintf("core config changed: '%s' from '%s' to '%s' by user '%s'.", $module.' - '.$path, $oldValue, $value, Auth::user()->name));
+        $this->info(sprintf("Core Config changed: '%s' from value '%s' to '%s'. Store: '%s', User '%s'.", $module.' - '.$path, $oldValue, $value, $storeId, Auth::user()->name));
 
         return $result;
     }

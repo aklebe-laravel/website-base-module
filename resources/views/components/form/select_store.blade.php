@@ -8,7 +8,7 @@
             Store::orderBy('code','ASC')->get(),
             ['id','code'],
             'id',
-            app('system_base')->getHtmlSelectOptionNoValue('No choice', NativeObjectBase::UNSELECT_RELATION_IDENT)
+            app('system_base')->getHtmlSelectOptionNoValue('No choice')
             );
         });
 

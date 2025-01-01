@@ -1,4 +1,8 @@
 @php
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\ModelBase;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
+
     /**
      *
      * @var string $name
@@ -13,8 +17,9 @@
      * @var array $x_data
      * @var mixed $validator
      * @var string $css_group
-     * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var \Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var JsonResource $object
+     * @var ModelBase $form_instance
+     * @var NativeObjectBaseLivewire $form_livewire
      */
 
     $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');

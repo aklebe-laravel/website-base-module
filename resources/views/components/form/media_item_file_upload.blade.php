@@ -1,4 +1,10 @@
 @php
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\ModelBase;
+    use Modules\SystemBase\app\Services\LivewireService;
+    use Modules\WebsiteBase\app\Forms\MediaItem as MediaItemForm;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
+
     /**
      * @var bool $visible maybe always true because we are here
      * @var bool $disabled enabled or disabled
@@ -17,13 +23,10 @@
      * @var array $html_data data attributes
      * @var array $x_data
      * @var int $element_index
-     * @var Illuminate\Http\Resources\Json\JsonResource $object
-     * @var Modules\Form\app\Forms\Base\ModelBase $form_instance
+     * @var JsonResource $object
+     * @var ModelBase $form_instance
+     * @var NativeObjectBaseLivewire $form_livewire
      */
-
-    use Modules\SystemBase\app\Services\LivewireService;
-    use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
-    use Modules\WebsiteBase\app\Forms\MediaItem as MediaItemForm;
 
     $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');
     $objectModelId = (int)($object->id ?? 0);
@@ -51,7 +54,7 @@
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
             'parentFormClass' => $form_instance::class,
-            'parentFormLivewireId' => $form_instance->livewireId,
+            'parentFormLivewireId' => $form_livewire->getId(),
             'parentModelClass' => $form_instance->getObjectEloquentModelName(),
             ], key($livewireKey))
         @else

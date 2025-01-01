@@ -69,7 +69,7 @@ class AuthPasswordForget extends ModelBase
             return;
         }
 
-        $requestedEmail = data_get($this->formObjectAsArray, 'email', '');
+        $requestedEmail = data_get($this->dataTransfer, 'email', '');
         /** @var \Modules\WebsiteBase\app\Models\User $user */
         if ($user = \Modules\WebsiteBase\app\Models\User::getBuilderFrontendItems()
             ->where('email', $requestedEmail)

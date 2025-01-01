@@ -22,8 +22,8 @@ class AuthenticationTest extends TestCase
         $this->assertTrue(!!$validUser);
 
         $livewire = Livewire::test(AuthLogin::class);
-        $livewire->set('formObjectAsArray.email', $validUser->email);
-        $livewire->set('formObjectAsArray.password', '1234567');
+        $livewire->set('dataTransfer.email', $validUser->email);
+        $livewire->set('dataTransfer.password', '1234567');
         $livewire->call('login', $livewire->id());
 
         $this->assertAuthenticated();

@@ -11,6 +11,15 @@ use Modules\WebsiteBase\app\Services\ConfigService;
 class Module extends NativeObjectBase
 {
     /**
+     * @var array|string[]
+     */
+    public array $liveUpdate = [
+        'core_config' => [
+            'store_id' => NativeObjectBaseForm::UNSELECT_RELATION_IDENT,
+        ],
+    ];
+
+    /**
      * Called by save() or other high level calls.
      *
      * @return JsonViewResponse
@@ -28,9 +37,12 @@ class Module extends NativeObjectBase
             $configService = app('website_base_config');
 
             $configUpdateCount = 0;
-            $allModulesConfigData = data_get($validatedData, 'config.module', []);
+            $allModulesConfigData = data_get($validatedData, 'core_config.module', []);
             foreach ($allModulesConfigData as $moduleSnakeName => $moduleConfigData) { // there should be only one
-                $storeId = data_get($validatedData, 'config.store_id');
+                $storeId = (int)data_get($validatedData, 'core_config.store_id');
+                if ($storeId < 1) {
+                    $storeId = null;
+                }
 
                 $r = Arr::dot($moduleConfigData);
                 foreach ($r as $path => $value) {
