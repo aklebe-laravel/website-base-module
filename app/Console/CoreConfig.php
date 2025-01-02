@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Console;
 
 use Illuminate\Console\Command;
+use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Services\ConfigService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -35,7 +36,12 @@ class CoreConfig extends Command
     {
         $path = $this->argument('path');
         $storeId = $this->option('store_id') ?: null;
+        $storeId = (trim(strtolower($storeId)) === "null") ? null : $storeId;
         $module = $this->option('module') ?: null;
+        $module = (trim(strtolower($module)) === "null") ? null : $module;
+        if ($module) {
+            $module = ModuleService::getSnakeName($module);
+        }
 
         $configService = app(ConfigService::class);
         $v = $configService->get($path, null, $storeId, $module);
