@@ -135,6 +135,14 @@ return [
                 ],
             ],
         ],
+        '0012' => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'navigations.php',
+                ],
+            ],
+        ],
     ],
 
 ];
