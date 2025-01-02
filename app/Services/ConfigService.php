@@ -2,13 +2,16 @@
 
 namespace Modules\WebsiteBase\app\Services;
 
-use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
+/**
+ * Config value will read by optional sore_id and optional module.
+ * store_id null is a fallback for all stores and defines the valid values.
+ * module null means available for all modules.
+ */
 class ConfigService extends BaseService
 {
     const int CURRENT_STORE_MARKER = -2;
@@ -21,7 +24,9 @@ class ConfigService extends BaseService
     protected bool $useDefaultStore = true;
 
     /**
-     * Config tree by store id.
+     * Config tree of all values (and all modules) by store id.
+     * The stores not null are already inherited by default store (null) if they not exists.
+     *
      * $configByStore[null] is also possible to get the default tree.
      *
      * @var array
@@ -29,6 +34,8 @@ class ConfigService extends BaseService
     private array $configByStore = [];
 
     /**
+     * Like $configByStore but also indexed by module.
+     *
      * @var array
      */
     private array $configByStoreAndModule = [];
@@ -49,7 +56,6 @@ class ConfigService extends BaseService
             $this->getConfigTree();
             app('system_base')::arrayMergeRecursiveDistinct($this->configByStore[$storeId], $this->configByStore[null]);
             app('system_base')::arrayMergeRecursiveDistinct($this->configByStoreAndModule[$storeId], $this->configByStoreAndModule[null]);
-            //$this->debug(print_r($this->configByStore[$storeId], true));
         }
 
         // get all entries of all modules by this store ...
@@ -58,7 +64,8 @@ class ConfigService extends BaseService
         /** @var CoreConfig $config */
         foreach ($builder->get() as $config) {
             Arr::set($this->configByStore[$storeId], $config->path, $config->value);
-            Arr::set($this->configByStoreAndModule[$storeId], $config->module.'.'.$config->path, $config->value);
+            $this->configByStoreAndModule[$storeId][$config->module] ??= [];
+            Arr::set($this->configByStoreAndModule[$storeId][$config->module], $config->path, $config->value);
         }
 
         return $this->configByStore[$storeId];
@@ -95,12 +102,14 @@ class ConfigService extends BaseService
     }
 
     /**
-     * Get a prepared and preloaded config
+     * Get a config value by path.
+     *
+     * If module
      *
      * @param  string       $path
-     * @param  mixed        $default
-     * @param  int|null     $storeId
-     * @param  string|null  $module
+     * @param  mixed        $default returned default value if no config was found
+     * @param  int|null     $storeId if not set try get from current store, if not found there, try get from null (default) store
+     * @param  string|null  $module if not set, searching the whole config
      *
      * @return mixed
      */
@@ -117,7 +126,6 @@ class ConfigService extends BaseService
         if (!$path) {
             return $this->configByStore[$storeId];
         }
-
 
         // if not exist the specific store, use the default store (null) ...
         if (($storeId !== null) && (!Arr::has($this->configByStore[$storeId], $path))) {
