@@ -2,8 +2,10 @@
 
 namespace Modules\WebsiteBase\app\Services;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
@@ -58,14 +60,20 @@ class ConfigService extends BaseService
             app('system_base')::arrayMergeRecursiveDistinct($this->configByStoreAndModule[$storeId], $this->configByStoreAndModule[null]);
         }
 
-        // get all entries of all modules by this store ...
-        $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('position')->orderBy('module')->orderBy('path');
+        try {
 
-        /** @var CoreConfig $config */
-        foreach ($builder->get() as $config) {
-            Arr::set($this->configByStore[$storeId], $config->path, $config->value);
-            $this->configByStoreAndModule[$storeId][$config->module] ??= [];
-            Arr::set($this->configByStoreAndModule[$storeId][$config->module], $config->path, $config->value);
+            // get all entries of all modules by this store ...
+            $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('position')->orderBy('module')->orderBy('path');
+
+            /** @var CoreConfig $config */
+            foreach ($builder->get() as $config) {
+                Arr::set($this->configByStore[$storeId], $config->path, $config->value);
+                $this->configByStoreAndModule[$storeId][$config->module] ??= [];
+                Arr::set($this->configByStoreAndModule[$storeId][$config->module], $config->path, $config->value);
+            }
+
+        } catch (Exception $e) {
+            $this->error($e->getMessage(), [__METHOD__]);
         }
 
         return $this->configByStore[$storeId];
