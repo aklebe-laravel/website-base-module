@@ -8,9 +8,16 @@ Includes some dependencies like modules like ```Acl```, ```Form```, ```DataTable
 Provides database structure, models, navigations, CMS, management for eloquent models and notification.
 
 ### Setup
-
+- Core Configuration
+- To enable notifications you need to config the core config. For example the email channel:
+  - set ```email.enabled``` to 1
+  - set ```notification.channels.email.enabled``` to 1
 
 #### Env
+
+env ```MAIL_FROM_ADDRESS``` respective config ```mail.from.address``` will not be used to send notifications.
+Instead, all identities are users.
+There is a user ```NoReplyNotificationUser``` holds all relevant data from sender like sending emails. He has AclGroup ```Puppets``` which is important that specials.
 
 ```
 MODULE_WEBSITEBASE_CACHE_EXTRA_ATTRIBUTE_TTL=0
@@ -55,15 +62,29 @@ Http/Livewire/DataTable/xxx.php
 
 By default ```xxx``` should have the same name as eloquent model.
 
-#### NotificationEvent
+### NotificationEvent
 
-##### Fields
+#### Channels
+
+To decide the channel to received messages there are a some conditions checked by the sending process.
+
+1) Check user preferred channel
+2) If user preferred channel is not set, check the preferred channel configured on your site
+3) If there is also not set, an email will send.
+4) If user has no email or a fake email (```^.+?@(fake\..*|example\..*)$```), the email channel will not be used and another valid channel will be used.
+
+#### Data Fields
 - **event_data**: depends on the event_code
-  - **event_code**: (any)
-    - ``` {"view_path":"xxx"} ``` if send to telegram: view path (default=```telegram-api::telegram.default-message```)
-    - ``` {"buttons":"website_link"} ``` if send to telegram: code of a button container declared in: ```\Modules\TelegramApi\Services\TelegramButtonService::DEFINED_BUTTON_CONTAINERS```
   - **event_code**: AclGroups_attached_to_User
     - ``` {"acl_group":"Traders"} ``` will be triggert if group "Traders" was assigned to user
     - ``` {"acl_group":"*"} ``` (no specific group like "Traders" above was found) will be triggert if any group was assigned to user
 
 
+#### Troubleshooting
+
+If no email was sent to user:
+- core config is misconfigured, check config paths like ```channel```, ```notification```, ```email```
+- user has no email
+- user has a fake email like User::hasFakeEmail() ... ```^.+?@(fake\..*|example\..*)$```
+- Check [Setup](./README.md:10)
+- Check log

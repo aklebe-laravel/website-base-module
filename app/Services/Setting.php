@@ -4,7 +4,6 @@ namespace Modules\WebsiteBase\app\Services;
 
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Modules\WebsiteBase\app\Events\InitNavigation;
 use Modules\WebsiteBase\app\Models\Navigation as NavigationModel;
 use Modules\WebsiteBase\app\Models\Store;
@@ -32,17 +31,12 @@ class Setting
     public function getStore(): ?Store
     {
         if (!$this->store) {
-            try {
-                // @TODO: load current store by site url host
-                $stores = Store::with([])->where('code', 'default')->get();
-                $this->store = $stores ? $stores->first() : null;
-            } catch (Exception $ex) {
-                Log::error("Error by getting store!", [__METHOD__]);
-                Log::error($ex->getMessage());
-                $this->store = Store::make(['id' => 0]);
+            // @TODO: load current store by site url host
+            $this->store = Store::with([])->where('code', 'default')->first();
+            if (!$this->store) {
+                $this->store = app(Store::class);
             }
         }
-
         return $this->store;
     }
 

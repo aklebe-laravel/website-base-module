@@ -2,7 +2,7 @@
 
 namespace Modules\WebsiteBase\database\seeders;
 
-use Illuminate\Database\Seeder;
+use Modules\Acl\app\Models\AclResource;
 use Modules\SystemBase\database\seeders\BaseModelSeeder;
 use Modules\WebsiteBase\app\Models\Token;
 use Modules\WebsiteBase\app\Models\User;
@@ -19,7 +19,7 @@ class TokenSeeder extends BaseModelSeeder
         parent::run();
 
         $users = User::with(['aclGroups.aclResources'])->whereHas('aclGroups.aclResources', function ($query) {
-            return $query->where('code', '=', 'puppet');
+            return $query->where('code', '=', AclResource::RES_NON_HUMAN);
         })->get();
 
         foreach ($users as $user) {

@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
 use Modules\WebsiteBase\app\Models\NotificationEvent;
 use Modules\WebsiteBase\app\Models\User;
+use Modules\WebsiteBase\app\Services\SendNotificationService;
 use Shipu\Themevel\Facades\Theme;
 
 class NotifyDefault extends Mailable
@@ -60,12 +61,15 @@ class NotifyDefault extends Mailable
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         $toAddress = new Address($this->user->email, $this->user->name);
-        $fromAddress = new Address(config('mail.from.address'), config('mail.from.name'));
+        $sendNotificationService = app(SendNotificationService::class);
+        $fromAddress = $sendNotificationService->getSenderEmailAddress();
+        // @todo: use concern in $this->notifyEvent->notificationConcerns?
+        //$fromAddress = $sendNotificationService->getEmailAddressByEmailConcernOrDefaultSender($this->notificationConcern);
 
         $this->subject = $this->notifyEvent->getSubject($this->channel);
         if ($this->subject) {
@@ -87,9 +91,9 @@ class NotifyDefault extends Mailable
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
-    public function content()
+    public function content(): Content
     {
         $html = $this->notifyEvent->getContent($this->channel);
 

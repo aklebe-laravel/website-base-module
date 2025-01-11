@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Listeners;
 
+use Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded as ModelWithAttributesLoadedEvent;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 
 class ModelWithAttributesLoaded
@@ -19,11 +20,11 @@ class ModelWithAttributesLoaded
     /**
      * Handle the event.
      *
-     * @param  \Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded  $event
+     * @param  ModelWithAttributesLoadedEvent  $event
      *
      * @return void
      */
-    public function handle(\Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded $event)
+    public function handle(ModelWithAttributesLoadedEvent $event): void
     {
         /** @var TraitAttributeAssignment $model */
         $model = $event->model;

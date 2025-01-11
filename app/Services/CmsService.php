@@ -49,7 +49,8 @@ class CmsService extends BaseService
      * @param  string  $cmsModelClass
      * @param  string  $code
      * @param  string  $locale
-     * @param  bool  $contentOnly
+     * @param  bool    $contentOnly
+     *
      * @return mixed
      */
     public function get(string $cmsModelClass, string $code, string $locale = '', bool $contentOnly = true): mixed
@@ -61,6 +62,7 @@ class CmsService extends BaseService
         /** @var CmsContent|CmsBase $cmsModelClass */
         $ttlDefault = config('system-base.cache.default_ttl', 1);
         $ttl = config('system-base.cache.object.instance.ttl', $ttlDefault);
+
         return Cache::remember($cmsModelClass."_get_{$code}_{$locale}_".($contentOnly ? '1' : '0'), $ttl,
             function () use ($cmsModelClass, $code, $locale, $contentOnly) {
                 /** @var Builder $builder */
@@ -74,15 +76,18 @@ class CmsService extends BaseService
                         if ($item) {
                             return $item->content ?? '';
                         }
+
                         return ''; // force empty string
                     }
                 }
+
                 return $item;
             });
     }
 
     /**
      * @param  string  $routeUri
+     *
      * @return CmsPage|null
      */
     public function getRoutePage(string $routeUri): ?CmsPage
@@ -91,6 +96,7 @@ class CmsService extends BaseService
 
         $ttlDefault = config('system-base.cache.default_ttl', 1);
         $ttl = config('system-base.cache.object.instance.ttl', $ttlDefault);
+
         return Cache::remember(CmsPage::class."_routePage_{$routeUri}_{$locale}", $ttl,
             function () use ($routeUri, $locale) {
                 /** @var Builder $builder */
@@ -100,6 +106,7 @@ class CmsService extends BaseService
                     ->where('locale', $locale);
                 /** @var CmsPage $item */
                 $item = $builder->first();
+
                 return $item;
             });
     }
@@ -111,7 +118,8 @@ class CmsService extends BaseService
      * 3) run blade parser
      *
      * @param  CmsBase  $item
-     * @param  string  $raw
+     * @param  string   $raw
+     *
      * @return string
      */
     public function getCalculated(CmsBase $item, string $raw): string
@@ -122,6 +130,7 @@ class CmsService extends BaseService
             $error = sprintf('[[[RECURSION DETECTED class: "%s", code: "%s"]]]', get_class($item), $item->code);
             $this->error($error, [$item, __METHOD__]);
             $error = "<div class='small alert alert-danger'>$error</div>";
+
             return $error;
         }
 
@@ -162,6 +171,7 @@ class CmsService extends BaseService
 
     /**
      * @param  CmsBase  $o
+     *
      * @return string
      */
     protected function getAlreadyParsedKey(CmsBase $o): string
@@ -171,7 +181,8 @@ class CmsService extends BaseService
 
     /**
      * @param  CmsBase  $o
-     * @param  bool  $setOrRemove
+     * @param  bool     $setOrRemove
+     *
      * @return void
      */
     protected function setAlreadyParsed(CmsBase $o, bool $setOrRemove = true): void
@@ -186,6 +197,7 @@ class CmsService extends BaseService
 
     /**
      * @param  CmsBase  $o
+     *
      * @return bool
      */
     protected function isAlreadyParsed(CmsBase $o): bool
@@ -224,13 +236,13 @@ class CmsService extends BaseService
 
     /**
      * @param  string  $cmsClass
-     * @param  array  $placeholderParameters
-     * @param  array  $parameters
-     * @param  array  $recursiveData
+     * @param  array   $placeholderParameters
+     * @param  array   $parameters
+     * @param  array   $recursiveData
+     *
      * @return string
      */
-    protected function callbackParserFunctionCmsBase(string $cmsClass, array $placeholderParameters, array $parameters,
-        array $recursiveData): string
+    protected function callbackParserFunctionCmsBase(string $cmsClass, array $placeholderParameters, array $parameters, array $recursiveData): string
     {
         if ($code = data_get($placeholderParameters, "code", '')) {
             $property = data_get($placeholderParameters, "property", 'content');
@@ -248,9 +260,11 @@ class CmsService extends BaseService
                         'id'           => $item->getKey(),
                     ])->render();
                 }
+
                 return $result;
             }
         }
+
         return '';
     }
 

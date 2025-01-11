@@ -2,16 +2,13 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Telegram\Bot\Exceptions\TelegramSDKException;
 
 class Contact extends NativeObjectBase
 {
@@ -37,7 +34,7 @@ class Contact extends NativeObjectBase
     ];
 
     /**
-     * Overwrite this to setup the default Call if Enter pressed in Form
+     * Overwrite this to set up the default Call if Enter pressed in Form
      *
      * @return string
      */
@@ -48,28 +45,38 @@ class Contact extends NativeObjectBase
 
     /**
      * @param  mixed  $livewireId
-     * @return Application|RedirectResponse|Redirector|void
+     *
+     * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws TelegramSDKException
      */
     #[On('send')]
-    public function send(mixed $livewireId)
+    public function send(mixed $livewireId): void
     {
         if (!$this->checkLivewireId($livewireId)) {
             return;
         }
 
         if ($validatedData = $this->validateForm()) {
-            $this->addSuccessMessage("Message was sent successfully");
 
-            $validatedData['user'] = Auth::user();
-            //            Mail::send(new ContactSendMessage($validatedData));
             /** @var SendNotificationService $sendNotificationService */
             $sendNotificationService = app(SendNotificationService::class);
-            $sendNotificationService->sendNotificationConcern('contact_request_message', $validatedData['user'],
-                ['contactData' => $validatedData]);
 
+            if ($users = $sendNotificationService->getStaffSupportUsers()) {
+                foreach ($users as $user) {
+                    $currentUser = Auth::user();
+                    Log::info(sprintf("Sending contact message to from '%s' to '%s'", $currentUser->name, $user->name));
+
+                    // To be clear:
+                    // 1) $user is the staff support we want to send this message
+                    // 2) $validatedData['user'] is the current user/customer who wrote this contact message
+                    $validatedData['user'] = $currentUser;
+                    $sendNotificationService->sendNotificationConcern('contact_request_message', $user, ['contactData' => $validatedData]);
+                }
+                $this->addSuccessMessage("Message was sent successfully");
+            } else {
+                $this->addErrorMessage("Message could not be sent.");
+            }
 
             $this->closeForm();
         } else {

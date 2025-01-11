@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Listeners;
 
 use Illuminate\Support\Facades\Log;
+use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting as ModelWithAttributesDeletingEvent;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 
 class ModelWithAttributesDeleting
@@ -20,11 +21,11 @@ class ModelWithAttributesDeleting
     /**
      * Handle the event.
      *
-     * @param  \Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting  $event
+     * @param  ModelWithAttributesDeletingEvent  $event
      *
      * @return void
      */
-    public function handle(\Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting $event)
+    public function handle(ModelWithAttributesDeletingEvent $event): void
     {
         /** @var TraitAttributeAssignment $model */
         $model = $event->model;

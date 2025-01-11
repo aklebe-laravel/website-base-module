@@ -65,7 +65,9 @@ class User extends ModelBaseExtraAttributes
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'shared_id' => uniqid('js_suid_'),
+            'is_enabled' => false,
+            'is_deleted' => false,
+            'shared_id'  => uniqid('js_suid_'),
         ]);
     }
 

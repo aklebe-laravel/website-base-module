@@ -12,6 +12,7 @@ return [
     // delete this
     'delete'  => [
         'site.auth',
+        'channels.email.enabled',
     ],
 ];
 

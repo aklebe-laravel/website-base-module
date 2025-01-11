@@ -11,7 +11,7 @@ return [
 
     'deployments' => [
         // Identifier to remember this deployment was already done.
-        '0001' => [
+        '0001'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -39,7 +39,7 @@ return [
                 ],
             ],
         ],
-        '0002' => [
+        '0002'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -47,7 +47,7 @@ return [
                 ],
             ],
         ],
-        '0003' => [
+        '0003'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -58,7 +58,7 @@ return [
                 ],
             ],
         ],
-        '0004' => [
+        '0004'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -66,7 +66,7 @@ return [
                 ],
             ],
         ],
-        '0005' => [
+        '0005'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -74,7 +74,7 @@ return [
                 ],
             ],
         ],
-        '0006' => [
+        '0006'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -82,7 +82,7 @@ return [
                 ],
             ],
         ],
-        '0007' => [
+        '0007'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -90,7 +90,7 @@ return [
                 ],
             ],
         ],
-        '0008' => [
+        '0008'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -98,7 +98,7 @@ return [
                 ],
             ],
         ],
-        '0009' => [
+        '0009'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -106,7 +106,7 @@ return [
                 ],
             ],
         ],
-        '0010' => [
+        '0010'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
@@ -135,11 +135,24 @@ return [
                 ],
             ],
         ],
-        '0012' => [
+        '0012'  => [
             [
                 'cmd'     => 'models',
                 'sources' => [
                     'navigations.php',
+                ],
+            ],
+        ],
+        '0013'  => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'model-attributes.php',
+                    'model-attribute-assignments.php',
+                    'acl-resources.php',
+                    'acl-groups.php',
+                    'users.php',
+                    'core-config.php',
                 ],
             ],
         ],

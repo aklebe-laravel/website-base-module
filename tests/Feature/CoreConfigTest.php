@@ -14,7 +14,7 @@ class CoreConfigTest extends TestCase
     public function test_example()
     {
         $response = $this->get('/');
-        $publicSite = app('website_base_config')->get('site.public');
+        $publicSite = app('website_base_config')->getValue('site.public');
         $response->assertStatus($publicSite ? 200 : 302);
     }
 
@@ -59,7 +59,7 @@ class CoreConfigTest extends TestCase
         ];
 
         $this->runList($testList, function ($name, $data) {
-            $result = call_user_func_array([app('website_base_config'), 'get'], $data['params']);
+            $result = call_user_func_array([app('website_base_config'), 'getValue'], $data['params']);
             if ($result != $data['result']) {
                 $this->fail(sprintf("Result for object %s: %s, but expected: %s. Params: %s", $name, $result,
                     $data['result'], json_encode($data['params'])));

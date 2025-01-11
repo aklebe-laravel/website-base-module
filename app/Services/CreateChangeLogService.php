@@ -32,9 +32,10 @@ class CreateChangeLogService extends BaseService
 
     /**
      * @param  array  $data
+     *
      * @return Changelog
      */
-    private function foundCommit(array $data): Changelog
+    public function foundCommit(array $data): Changelog
     {
         $this->parseCommitData($commit);
         if ($changeLogModel = Changelog::with([])

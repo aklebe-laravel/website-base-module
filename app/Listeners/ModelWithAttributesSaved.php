@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Listeners;
 
+use Modules\WebsiteBase\app\Events\ModelWithAttributesSaved as ModelWithAttributesSavedEvent;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 
 class ModelWithAttributesSaved
@@ -19,11 +20,11 @@ class ModelWithAttributesSaved
     /**
      * Handle the event.
      *
-     * @param  \Modules\WebsiteBase\app\Events\ModelWithAttributesSaved  $event
+     * @param  ModelWithAttributesSavedEvent  $event
      *
      * @return void
      */
-    public function handle(\Modules\WebsiteBase\app\Events\ModelWithAttributesSaved $event)
+    public function handle(ModelWithAttributesSavedEvent $event): void
     {
         /** @var TraitAttributeAssignment $model */
         $model = $event->model;

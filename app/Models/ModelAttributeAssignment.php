@@ -22,6 +22,9 @@ class ModelAttributeAssignment extends Model
     const string ATTRIBUTE_TYPE_TEXT = 'text';
     const string ATTRIBUTE_TYPE_INTEGER = 'integer';
     const string ATTRIBUTE_TYPE_DOUBLE = 'double';
+    const string ATTRIBUTE_TYPE_OBJECT = 'object';
+    const string ATTRIBUTE_TYPE_ARRAY = 'array';
+    const string ATTRIBUTE_TYPE_JSON = 'json'; // same like array
 
     /**
      * Filled up in constructor
@@ -38,6 +41,21 @@ class ModelAttributeAssignment extends Model
             'type'         => 'string',
             'table_suffix' => 'texts',
             'validator'    => ['nullable', 'string'],
+        ],
+        self::ATTRIBUTE_TYPE_OBJECT  => [
+            'type'         => 'object',
+            'table_suffix' => 'texts',
+            'validator'    => ['nullable', 'object'],
+        ],
+        self::ATTRIBUTE_TYPE_ARRAY   => [
+            'type'         => 'array',
+            'table_suffix' => 'texts',
+            'validator'    => ['nullable', 'array'],
+        ],
+        self::ATTRIBUTE_TYPE_JSON    => [
+            'type'         => 'array',
+            'table_suffix' => 'texts',
+            'validator'    => ['nullable', 'array'],
         ],
         self::ATTRIBUTE_TYPE_INTEGER => [
             'type'         => 'int',

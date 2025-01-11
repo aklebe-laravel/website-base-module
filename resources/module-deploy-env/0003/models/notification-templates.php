@@ -1,6 +1,7 @@
 <?php
 
 use Modules\WebsiteBase\app\Models\NotificationTemplate;
+use Modules\WebsiteBase\app\Services\Notification\Channels\Email;
 
 return [
     // class of eloquent model
@@ -25,7 +26,7 @@ return [
         [
             'is_enabled'           => true,
             'code'                 => 'auth_register_success',
-            'notification_channel' => 'email',
+            'notification_channel' => Email::name,
             'subject'              => 'You registered successfully: {{ config("app.name") }}',
             'description'          => 'User registered successfully.',
             '#sync_relations'      => [
@@ -37,7 +38,7 @@ return [
         [
             'is_enabled'           => true,
             'code'                 => 'auth_forget_password',
-            'notification_channel' => 'email',
+            'notification_channel' => Email::name,
             'subject'              => 'Forget your password? {{ config("app.name") }}',
             'description'          => 'User forgot password.',
             '#sync_relations'      => [
@@ -49,7 +50,7 @@ return [
         [
             'is_enabled'           => true,
             'code'                 => 'user_login_info',
-            'notification_channel' => 'email',
+            'notification_channel' => Email::name,
             'subject'              => 'Your login data: {{ config("app.name") }}',
             'description'          => 'Send user login data.',
             '#sync_relations'      => [
@@ -61,7 +62,7 @@ return [
         [
             'is_enabled'           => true,
             'code'                 => 'system_info',
-            'notification_channel' => 'email',
+            'notification_channel' => Email::name,
             'subject'              => 'System info: {{ config("app.name") }}',
             'description'          => 'Send system info.',
             '#sync_relations'      => [
@@ -73,72 +74,12 @@ return [
         [
             'is_enabled'           => true,
             'code'                 => 'contact_request_message',
-            'notification_channel' => 'email',
+            'notification_channel' => Email::name,
             'subject'              => 'Contact Request: {{ config("app.name") }}',
             'description'          => 'Contact request.',
             '#sync_relations'      => [
                 'view_template' => [
                     'email_contact_request_message',
-                ],
-            ],
-        ],
-        [
-            'is_enabled'           => true,
-            'code'                 => 'auth_register_success',
-            'notification_channel' => 'telegram',
-            'subject'              => 'You registered successfully: {{ config("app.name") }}',
-            'description'          => 'User registered successfully.',
-            '#sync_relations'      => [
-                'view_template' => [
-                    'telegram_auth_register_success',
-                ],
-            ],
-        ],
-        [
-            'is_enabled'           => true,
-            'code'                 => 'auth_forget_password',
-            'notification_channel' => 'telegram',
-            'subject'              => 'Forget your password? {{ config("app.name") }}',
-            'description'          => 'User forgot password.',
-            '#sync_relations'      => [
-                'view_template' => [
-                    'telegram_auth_forget_password',
-                ],
-            ],
-        ],
-        [
-            'is_enabled'           => true,
-            'code'                 => 'user_login_info',
-            'notification_channel' => 'telegram',
-            'subject'              => 'Your login data: {{ config("app.name") }}',
-            'description'          => 'Send user login data.',
-            '#sync_relations'      => [
-                'view_template' => [
-                    'telegram_user_login_info',
-                ],
-            ],
-        ],
-        [
-            'is_enabled'           => true,
-            'code'                 => 'system_info',
-            'notification_channel' => 'telegram',
-            'subject'              => 'System info: {{ config("app.name") }}',
-            'description'          => 'Send system info.',
-            '#sync_relations'      => [
-                'view_template' => [
-                    'telegram_system_info',
-                ],
-            ],
-        ],
-        [
-            'is_enabled'           => true,
-            'code'                 => 'contact_request_message',
-            'notification_channel' => 'telegram',
-            'subject'              => 'Contact Request: {{ config("app.name") }}',
-            'description'          => 'Contact request.',
-            '#sync_relations'      => [
-                'view_template' => [
-                    'telegram_contact_request_message',
                 ],
             ],
         ],

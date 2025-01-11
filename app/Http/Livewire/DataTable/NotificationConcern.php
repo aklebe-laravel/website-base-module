@@ -5,7 +5,7 @@ namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Acl\app\Models\AclResource;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
-use Modules\WebsiteBase\app\Services\WebsiteService;
+use Modules\WebsiteBase\app\Services\SendNotificationService;
 
 class NotificationConcern extends BaseDataTable
 {
@@ -23,7 +23,7 @@ class NotificationConcern extends BaseDataTable
     /**
      *
      */
-    const FILTER_NOTIFICATION_CHANNEL_ALL = '';
+    const string FILTER_NOTIFICATION_CHANNEL_ALL = '';
 
     /**
      * @return void
@@ -39,8 +39,8 @@ class NotificationConcern extends BaseDataTable
             'soft_reset' => true,
             'css_group'  => 'col-12 col-md-3 text-start',
             'css_item'   => '',
-            'options'    => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS,
-                first: app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
+            'options'    => app('system_base')->toHtmlSelectOptions(app(SendNotificationService::class)->getRegisteredChannelNames(), null, null,
+                app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;

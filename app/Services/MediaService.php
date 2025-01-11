@@ -86,9 +86,9 @@ class MediaService extends BaseService
                     $configKeyQuality = data_get($data, 'config.quality');
                     $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
 
-                    $width = (int) $config->get($configKeyWidth, $configKeyWidthDefault);
-                    $height = (int) $config->get($configKeyHeight, $configKeyHeightDefault);
-                    $quality = (int) $config->get($configKeyQuality, $configKeyQualityDefault);
+                    $width = (int) $config->getValue($configKeyWidth, $configKeyWidthDefault);
+                    $height = (int) $config->getValue($configKeyHeight, $configKeyHeightDefault);
+                    $quality = (int) $config->getValue($configKeyQuality, $configKeyQualityDefault);
 
                     // resize with aspect ratio
                     $img->resize($width, $height, $aspectRatio);

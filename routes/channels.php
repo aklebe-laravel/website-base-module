@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 $channelPrefix = Str::studly(env('BROADCAST_CHANNEL_PREFIX'));
 Broadcast::channel($channelPrefix.'{id}', function ($user, $id) {
-    if (app('website_base_config')->get('broadcast.enabled', false)) {
+    if (app('website_base_config')->getValue('broadcast.enabled', false)) {
 
         return true; // @todo: decide here authorized to this channel
     } else {
