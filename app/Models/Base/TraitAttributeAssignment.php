@@ -33,6 +33,11 @@ trait TraitAttributeAssignment
     protected array $extraAttributes = [];
 
     /**
+     * @var array
+     */
+    protected array $extraAttributeTypes = [];
+
+    /**
      * @var bool
      * @todo: How to disable the whole created collection?
      */
@@ -79,17 +84,11 @@ trait TraitAttributeAssignment
         if ($collection = $this->getModelAttributeAssigmentCollection()) {
             foreach ($collection as $item) {
 
-                switch ($item->attribute_type) {
-                    case ModelAttributeAssignment::ATTRIBUTE_TYPE_INTEGER:
-                        $v = (int) $item->default_value;
-                        break;
-                    case ModelAttributeAssignment::ATTRIBUTE_TYPE_DOUBLE:
-                        $v = (double) $item->default_value;
-                        break;
-                    default:
-                        $v = $item->default_value;
-                }
-                $this->extraAttributes[$item->modelAttribute->code] = $v;
+                // at first remember the type
+                $this->extraAttributeTypes[$item->modelAttribute->code] = $item->attribute_type;
+
+                // after type is saved, set the value in default way
+                $this->setExtraAttribute($item->modelAttribute->code, $item->default_value);
             }
         }
     }
@@ -140,7 +139,8 @@ trait TraitAttributeAssignment
         $cacheParams = $this->getCacheParametersExtraAttributeEntity();
 
         // No assignment needed, because refreshing $this->extraAttributes[xxx] already
-        $this->extraAttributes = Cache::remember($cacheParams['key'], $cacheParams['ttl'],
+
+        $ea = Cache::remember($cacheParams['key'], $cacheParams['ttl'],
             function () use ($cacheParams) {
                 $r = [];
                 // $this->extraAttributes have at least default values at this point
@@ -152,10 +152,13 @@ trait TraitAttributeAssignment
                 return $r;
             });
 
+        $this->setExtraAttributes($ea);
+
         $this->extraAttributesLoaded = true;
     }
 
     /**
+     * Attribute 'extra_attributes'
      * Mutator should load automatically
      *
      * @return Attribute
@@ -190,6 +193,31 @@ trait TraitAttributeAssignment
      */
     public function setExtraAttribute(string $attributeCode, mixed $value): void
     {
+        switch ($this->extraAttributeTypes[$attributeCode]) {
+            case ModelAttributeAssignment::ATTRIBUTE_TYPE_INTEGER:
+                $value = (int) $value;
+                break;
+
+            case ModelAttributeAssignment::ATTRIBUTE_TYPE_DOUBLE:
+                $value = (double) $value;
+                break;
+
+            case ModelAttributeAssignment::ATTRIBUTE_TYPE_ARRAY:
+                if ($value !== null && !is_array($value)) {
+                    $value = json_decode($value, true);
+                }
+                break;
+
+            case ModelAttributeAssignment::ATTRIBUTE_TYPE_OBJECT:
+                if ($value !== null && !is_object($value)) {
+                    $value = (object) json_decode($value, true);
+                }
+                break;
+        }
+
+        //if ($value !== null) {
+        //    Log::debug(__METHOD__, [$attributeCode, $this->extraAttributeTypes[$attributeCode], $value]);
+        //}
         $this->extraAttributes[$attributeCode] = $value;
     }
 
@@ -214,6 +242,8 @@ trait TraitAttributeAssignment
     }
 
     /**
+     * Value has valid values if setExtraAttribute() was uses to set the value (which should always).
+     *
      * @param  string      $attributeCode
      * @param  mixed|null  $default
      *
@@ -256,9 +286,9 @@ trait TraitAttributeAssignment
             try {
                 $attrModelIdent = $this->getAttributeModelIdent();
                 $collection = ModelAttributeAssignment::with(['modelAttribute'])
-                                                      ->where('model', '=', $attrModelIdent)
-                                                      ->orderBy('form_position')
-                                                      ->get();
+                    ->where('model', '=', $attrModelIdent)
+                    ->orderBy('form_position')
+                    ->get();
             } catch (Exception $ex) {
                 Log::error("Error by getting model attributes!", [static::class]);
                 Log::error($ex->getMessage());
@@ -282,8 +312,8 @@ trait TraitAttributeAssignment
         /** @var ModelAttributeAssignment $attribute */
         if ($attribute = $collection->first()) {
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                             ->where('model_id', '=', $this->id)
-                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+                ->where('model_id', '=', $this->id)
+                ->where('model_attribute_assignment_id', '=', $attribute->id)
             ) {
                 return $builder;
             }
@@ -334,11 +364,24 @@ trait TraitAttributeAssignment
         /** @var ModelAttributeAssignment $attribute */
         if ($attribute = $collection->first()) {
 
+            // cast array and objects to json strings
+            if (is_array($value) || is_object($value)) {
+                // make NULL if [] or {}
+                if (empty($value)) {
+                    $value = null;
+                } else {
+                    $value = json_encode($value);
+                }
+            }
+
+            // check attribute already exists ...
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                             ->where('model_id', '=', $this->id)
-                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+                ->where('model_id', '=', $this->id)
+                ->where('model_attribute_assignment_id', '=', $attribute->id)
             ) {
                 if ($item = $builder->first()) {
+
+                    // if yes, just update it
                     $item->value = $value;
 
                     $builder->update([
@@ -350,6 +393,7 @@ trait TraitAttributeAssignment
                 }
             }
 
+            // if not already exist, create a new one ...
             DB::table(static::getAttributeTypeTableName($attribute->attribute_type))->insert([
                 'model_id'                      => $this->id,
                 'model_attribute_assignment_id' => $attribute->id,
@@ -393,8 +437,8 @@ trait TraitAttributeAssignment
         if ($attribute = $collection->first()) {
 
             if ($builder = DB::table(static::getAttributeTypeTableName($attribute->attribute_type))
-                             ->where('model_id', '=', $this->id)
-                             ->where('model_attribute_assignment_id', '=', $attribute->id)
+                ->where('model_id', '=', $this->id)
+                ->where('model_attribute_assignment_id', '=', $attribute->id)
             ) {
                 if ($item = $builder->first()) {
                     $builder->delete($item->id);

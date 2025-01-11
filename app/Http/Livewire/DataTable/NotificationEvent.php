@@ -7,7 +7,7 @@ use Livewire\Attributes\On;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
 use Modules\WebsiteBase\app\Models\NotificationEvent as NotificationEventModel;
 use Modules\WebsiteBase\app\Services\NotificationEventService;
-use Modules\WebsiteBase\app\Services\WebsiteService;
+use Modules\WebsiteBase\app\Services\SendNotificationService;
 
 class NotificationEvent extends BaseDataTable
 {
@@ -31,7 +31,7 @@ class NotificationEvent extends BaseDataTable
             'position'  => 1700, // between elements rows and search
             'css_group' => 'col-12 col-md-3 text-start',
             'css_item'  => '',
-            'options'   => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS,
+            'options'   => app('system_base')->toHtmlSelectOptions(app(SendNotificationService::class)->getRegisteredChannelNames(),
                 first: app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'   => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {

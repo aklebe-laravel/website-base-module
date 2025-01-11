@@ -11,13 +11,14 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
 use Modules\WebsiteBase\app\Models\NotificationConcern as NotificationConcernModel;
+use Modules\WebsiteBase\app\Services\SendNotificationService;
 
 class NotificationConcern extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
-     * True to allow add meta data user id
+     * True to allow to add metadata like user id
      *
      * @var bool
      */
@@ -25,6 +26,7 @@ class NotificationConcern extends Mailable
 
     /**
      * public properties are accessible in view template
+     *
      * @var User
      */
     public User $user;
@@ -39,8 +41,7 @@ class NotificationConcern extends Mailable
      *
      * @return void
      */
-    public function __construct(User $user, NotificationConcernModel $notificationConcern, array $viewData = [],
-        array $tags = [], array $metaData = [])
+    public function __construct(User $user, NotificationConcernModel $notificationConcern, array $viewData = [], array $tags = [], array $metaData = [])
     {
         $this->user = $user;
         $this->notificationConcern = $notificationConcern;
@@ -52,13 +53,16 @@ class NotificationConcern extends Mailable
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
+        //
         $toAddress = new Address($this->user->email, $this->user->name);
-        $fromAddress = new Address(config('mail.from.address'), config('mail.from.name'));
+        $sendNotificationService = app(SendNotificationService::class);
+        $fromAddress = $sendNotificationService->getEmailAddressByEmailConcernOrDefaultSender($this->notificationConcern);
 
+        //
         $this->subject = $this->notificationConcern->notificationTemplate->subject;
 
         if ($this->subject) {
@@ -76,9 +80,9 @@ class NotificationConcern extends Mailable
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
-    public function content()
+    public function content(): Content
     {
         if ($html = $this->notificationConcern->getContent()) {
 
@@ -92,6 +96,7 @@ class NotificationConcern extends Mailable
 
     /**
      * @param  string  $content
+     *
      * @return string
      */
     protected function renderStringWithBlade(string $content): string

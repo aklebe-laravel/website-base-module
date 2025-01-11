@@ -11,11 +11,12 @@ trait BaseWebsiteBaseDataTable
      *
      * @return void
      */
-    protected function initBeforeRender(): void
+    protected function initBooted(): void
     {
+        parent::initBooted();
+
         $this->addMessageBoxButton('accept-rating', 'website-base');
         $this->addMessageBoxButton('send-email', 'website-base');
-        $this->addMessageBoxButton('telegram-delete-me', 'website-base');
         $this->addMessageBoxButton('import', 'website-base');
     }
 

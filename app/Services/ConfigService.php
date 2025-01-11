@@ -5,7 +5,6 @@ namespace Modules\WebsiteBase\app\Services;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
@@ -63,7 +62,7 @@ class ConfigService extends BaseService
         try {
 
             // get all entries of all modules by this store ...
-            $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('position')->orderBy('module')->orderBy('path');
+            $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('module')->orderBy('position')->orderBy('path');
 
             /** @var CoreConfig $config */
             foreach ($builder->get() as $config) {
@@ -115,13 +114,13 @@ class ConfigService extends BaseService
      * If module
      *
      * @param  string       $path
-     * @param  mixed        $default returned default value if no config was found
-     * @param  int|null     $storeId if not set try get from current store, if not found there, try get from null (default) store
-     * @param  string|null  $module if not set, searching the whole config
+     * @param  mixed        $default  returned default value if no config was found
+     * @param  int|null     $storeId  if not set try get from current store, if not found there, try get from null (default) store
+     * @param  string|null  $module   if not set, searching the whole config
      *
      * @return mixed
      */
-    public function get(string $path = '', mixed $default = null, ?int $storeId = self::CURRENT_STORE_MARKER, ?string $module = null): mixed
+    public function getValue(string $path = '', mixed $default = null, ?int $storeId = self::CURRENT_STORE_MARKER, ?string $module = null): mixed
     {
         if ($storeId === self::CURRENT_STORE_MARKER) {
             $storeId = app('website_base_settings')->getStore()->getKey() ?? null;
@@ -137,12 +136,13 @@ class ConfigService extends BaseService
 
         // if not exist the specific store, use the default store (null) ...
         if (($storeId !== null) && (!Arr::has($this->configByStore[$storeId], $path))) {
-            return $this->get($path, $default, null, $module);
+            return $this->getValue($path, $default, null, $module);
         }
 
         // try to get by module at first
         if ($module !== null) { // && Arr::has($this->configByStoreAndModule[$storeId], $modulePath)) {
             $modulePath = $module.'.'.$path;
+
             return Arr::get($this->configByStoreAndModule[$storeId], $modulePath, $default);
         }
 

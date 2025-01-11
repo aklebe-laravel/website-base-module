@@ -5,8 +5,6 @@ namespace Modules\WebsiteBase\app\Console;
 use Illuminate\Console\Command;
 use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Services\ConfigService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Command\Command as CommandResult;
 
 class CoreConfig extends Command
@@ -29,8 +27,6 @@ class CoreConfig extends Command
      * Execute the console command.
      *
      * @return int
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function handle(): int
     {
@@ -44,7 +40,7 @@ class CoreConfig extends Command
         }
 
         $configService = app(ConfigService::class);
-        $v = $configService->get($path, null, $storeId, $module);
+        $v = $configService->getValue($path, null, $storeId, $module);
 
         $this->output->writeln(sprintf("Path: '%s', Value: '%s'", $path, $v));
         return CommandResult::SUCCESS;

@@ -11,6 +11,7 @@ use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleted;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesSaved;
+use Modules\WebsiteBase\app\Events\ValidNotificationChannel;
 use Modules\WebsiteBase\app\Listeners\MailSending;
 use Modules\WebsiteBase\app\Listeners\MailSent;
 use Modules\WebsiteBase\app\Listeners\UserOnline;
@@ -46,6 +47,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         MessageSent::class                 => [
             MailSent::class,
+        ],
+        ValidNotificationChannel::class    => [
+            \Modules\WebsiteBase\app\Listeners\ValidNotificationChannel::class,
         ],
     ];
 

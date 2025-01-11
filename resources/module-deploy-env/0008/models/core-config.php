@@ -19,6 +19,7 @@ return [
             'store_id'    => null,
             'path'        => 'notification.simulate',
             'value'       => '0',
+            'position'    => 1600,
             'label'       => 'Simulate notifications',
             'form_input'  => 'switch',
             'description' => 'Fake all notifications and send them to log.',

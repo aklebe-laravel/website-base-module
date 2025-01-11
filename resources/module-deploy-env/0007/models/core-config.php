@@ -18,6 +18,7 @@ return [
         [
             'store_id'    => null,
             'path'        => 'broadcast.enabled',
+            'position'    => 1320,
             'value'       => '0',
             'label'       => 'Enable broadcast',
             'form_input'  => 'switch',

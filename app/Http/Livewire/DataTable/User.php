@@ -41,9 +41,12 @@ class User extends BaseDataTable
     {
         parent::initBooted();
 
+        $this->addMessageBoxButton('accept-rating', 'website-base');
+
         if ($this->canManage()) {
             $this->rowCommands = [
                 'claim_user' => 'website-base::livewire.js-dt.tables.columns.buttons.claim-user',
+                'rate_user' => 'market::livewire.js-dt.tables.columns.buttons.rate-user',
                 ...$this->rowCommands,
             ];
         } else {
@@ -275,7 +278,7 @@ class User extends BaseDataTable
     protected function isItemWarn($item): bool
     {
         /** @var UserModel $item */
-        return ((!$item->email) || (!$item->name) || (!$item->shared_id) || $item->hasAclResource('puppet', []));
+        return ((!$item->email) || (!$item->name) || (!$item->shared_id) || $item->hasAclResource(AclResource::RES_NON_HUMAN, []));
     }
 
 }

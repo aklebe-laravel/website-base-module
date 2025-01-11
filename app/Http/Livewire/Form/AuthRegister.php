@@ -3,9 +3,7 @@
 namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
@@ -35,7 +33,7 @@ class AuthRegister extends ModelBase
     ];
 
     /**
-     * Overwrite this to setup the default Call if Enter pressed in Form
+     * Overwrite this to set up the default Call if Enter pressed in Form
      *
      * @return string
      */
@@ -46,7 +44,7 @@ class AuthRegister extends ModelBase
 
     /**
      * @param  mixed  $livewireId
-     * @return Application|RedirectResponse|Redirector|void
+     * @return RedirectResponse|void
      */
     #[On('register')]
     public function register(mixed $livewireId)

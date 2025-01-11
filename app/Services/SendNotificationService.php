@@ -4,14 +4,16 @@ namespace Modules\WebsiteBase\app\Services;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Mailables\Address;
+use Modules\Acl\app\Models\AclGroup;
 use Modules\SystemBase\app\Services\Base\BaseService;
-use Modules\TelegramApi\app\Services\TelegramService;
+use Modules\WebsiteBase\app\Events\ValidNotificationChannel;
+use Modules\WebsiteBase\app\Models\NotificationConcern;
 use Modules\WebsiteBase\app\Models\NotificationConcern as NotificationConcernModel;
-use Modules\WebsiteBase\app\Notifications\Emails\NotificationConcern as NotificationConcernEmail;
+use Modules\WebsiteBase\app\Models\User as WebsiteBaseUser;
+use Modules\WebsiteBase\app\Services\Notification\Channels\BaseChannel;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Telegram\Bot\Exceptions\TelegramSDKException;
 
 class SendNotificationService extends BaseService
 {
@@ -26,9 +28,9 @@ class SendNotificationService extends BaseService
     protected WebsiteService $websiteBaseService;
 
     /**
-     * @var TelegramService
+     * @var array
      */
-    private TelegramService $telegramService;
+    private array $registeredChannels = [];
 
     /**
      *
@@ -39,22 +41,20 @@ class SendNotificationService extends BaseService
 
         $this->websiteBaseConfig = app('website_base_config');
         $this->websiteBaseService = app(WebsiteService::class);
-        $this->telegramService = app(TelegramService::class);
     }
 
     /**
      * @param  string  $notificationConcernCode
-     * @param  mixed  $userOrUserList  List of user ids or user instances, or just one item
-     * @param  array  $viewData
-     * @param  array  $tags
-     * @param  array  $metaData
+     * @param  mixed   $userOrUserList  List of user ids or user instances, or just one item
+     * @param  array   $viewData
+     * @param  array   $tags
+     * @param  array   $metaData
+     *
      * @return bool
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws TelegramSDKException
      */
-    public function sendNotificationConcern(string $notificationConcernCode, mixed $userOrUserList,
-        array $viewData = [], array $tags = [], array $metaData = []): bool
+    public function sendNotificationConcern(string $notificationConcernCode, WebsiteBaseUser|array $userOrUserList, array $viewData = [], array $tags = [], array $metaData = []): bool
     {
         if (!$userOrUserList) {
             return false;
@@ -76,9 +76,9 @@ class SendNotificationService extends BaseService
                 continue;
             }
 
-            if ($channel = $user->calculatedNotificationChannel()) {
-                $this->debug(sprintf("Calculated channel: '%s' for user '%s' .", $channel, $user->name));
-            }
+            // $channel is also allowed to be null ...
+            $channel = $user->calculatedNotificationChannel();
+            $this->debug(sprintf("Calculated channel: '%s' for user '%s' .", $channel, $user->name));
 
             if (!($notificationConcern = NotificationConcernModel::with([])
                 ->validItems()
@@ -86,14 +86,16 @@ class SendNotificationService extends BaseService
                 ->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
                     $b2->where('notification_channel', $channel);
                 })
-                ->first())) {
+                ->first())
+            ) {
                 if (!($notificationConcern = NotificationConcernModel::with([])
                     ->validItems()
                     ->where('reason_code', '=', $notificationConcernCode)
                     ->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
                         $b2->whereNull('notification_channel');
                     })
-                    ->first())) {
+                    ->first())
+                ) {
                     $this->error(__('Missing or invalid notification concern: :reason, channel: :channel',
                         ['reason' => $notificationConcernCode, 'channel' => $channel]));
                     continue;
@@ -103,35 +105,11 @@ class SendNotificationService extends BaseService
             $tags = ($notificationConcern->tags ?? []) + $tags;
             $metaData = ($notificationConcern->meta_data ?? []) + $metaData;
 
-            return $this->sendNotificationToChannel($user, forceChannel: $channel, sendToChannelEmail: function () use (
-                $user, $notificationConcern, $viewData, $tags, $metaData
-            ) {
-                // Send email by queue.
-                Mail::send(new NotificationConcernEmail($user, $notificationConcern, $viewData, $tags, $metaData));
-                $this->info("Sent mail to user: ", [
-                    $user->name,
-                    $user->email,
-                    __METHOD__
-                ]);
-                return true;
-            }, sendToChannelTelegram: function () use ($user, $notificationConcern, $viewData, $tags, $metaData) {
-                $d = [
-                    // 'view_path' => '...',
-                    'user'    => $user,
-                    'subject' => $notificationConcern->getSubject(),
-                    'content' => $notificationConcern->getContent(),
-                ];
-                if ($message = $this->telegramService->prepareTelegramMessage(app('system_base')->arrayMergeRecursiveDistinct($viewData,
-                    $d))) {
-                    $buttons = config('combined-module-telegram-api.button_groups.website_link', []);
-                    $this->telegramService->apiSendMessage($message, $user->getExtraAttribute('telegram_id'), $buttons);
-                    return true;
-                } else {
-                    $this->error(sprintf("Empty telegram message for notification concern: %s",
-                        $notificationConcern->getKey()), [__METHOD__]);
+            if ($c = $this->getRegisteredChannel($channel)) {
+                if (!$c->sendNotificationConcern($user, $notificationConcern, $viewData, $tags, $metaData)) {
                     return false;
                 }
-            });
+            }
 
         }
 
@@ -139,71 +117,141 @@ class SendNotificationService extends BaseService
     }
 
     /**
-     * @param  \Modules\WebsiteBase\app\Models\User  $user
-     * @param  string|null  $forceChannel  if empty use user preferred channel
-     * @param  callable|null  $sendToChannelEmail
-     * @param  callable|null  $sendToChannelTelegram
-     * @param  callable|null  $sendToChannelPortal
-     * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @param  BaseChannel  $channel
+     *
+     * @return void
      */
-    public function sendNotificationToChannel(\Modules\WebsiteBase\app\Models\User $user, ?string $forceChannel = null,
-        ?callable $sendToChannelEmail = null, ?callable $sendToChannelTelegram = null,
-        ?callable $sendToChannelPortal = null): bool
+    public function registerChannel(BaseChannel $channel): void
     {
-        $channel = $forceChannel ?: $user->calculatedNotificationChannel();
-        switch ($channel) {
+        $this->registeredChannels[] = $channel;
+    }
 
-            case WebsiteService::NOTIFICATION_CHANNEL_EMAIL:
-
-                if (!$this->websiteBaseService->isEmailEnabled()) {
-                    $this->warning(sprintf("Email disabled. Email was not sent to user: %s", $user->name),
-                        [__METHOD__]);
-                    return false;
-                }
-
-                if (!$this->websiteBaseConfig->get('notification.channels.email.enabled', false)) {
-                    $this->warning(sprintf("Notification email disabled. Email was not sent to user: %s", $user->name),
-                        [__METHOD__]);
-                    return false;
-                }
-
-                $this->debug(sprintf("Sending email to user: %s", $user->name), [$user->email, __METHOD__]);
-
-                if ($this->websiteBaseConfig->get('notification.simulate', false)) {
-                    $this->info("Simulating notification: ", [$channel, $user->name, $user->email]);
-                    return true;
-                } else {
-                    return $sendToChannelEmail();
-                }
-
-            case WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM:
-
-                if (!$this->websiteBaseService->isTelegramEnabled()) {
-                    return false;
-                }
-
-                if (!$this->websiteBaseConfig->get('notification.channels.telegram.enabled', false)) {
-                    $this->error(sprintf("Telegram disabled. Telegram message was not sent to user: %s", $user->name),
-                        [__METHOD__]);
-                    return false;
-                }
-
-                $this->debug(sprintf("Sending telegram message to user: %s", $user->name), [__METHOD__]);
-
-                if ($this->websiteBaseConfig->get('notification.simulate', false)) {
-                    $this->info("Simulating notification: ", [$channel, $user->name]);
-                    return true;
-                } else {
-                    return $sendToChannelTelegram();
-                }
-
-            default:
-                $this->warning(sprintf("Channel not supported: %s.", $channel), [__METHOD__]);
-                return false;
-
+    /**
+     * @return array
+     */
+    public function getRegisteredChannels(): array
+    {
+        if (!$this->registeredChannels) {
+            // gather channels once
+            ValidNotificationChannel::dispatch();
         }
+
+        return $this->registeredChannels;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegisteredChannelNames(): array
+    {
+        $result = [];
+        if ($this->getRegisteredChannels()) {
+            foreach ($this->registeredChannels as $channel) {
+                $result[] = $channel::name;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param  string  $channelName
+     *
+     * @return BaseChannel|null
+     */
+    public function getRegisteredChannel(string $channelName): ?BaseChannel
+    {
+        if ($this->getRegisteredChannels()) {
+            foreach ($this->registeredChannels as $channel) {
+                if ($channel::name === $channelName) {
+                    return $channel;
+                };
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  string  $channelName
+     *
+     * @return bool
+     */
+    public function hasRegisteredChannelName(string $channelName): bool
+    {
+        return $this->getRegisteredChannel($channelName) !== null;
+    }
+
+    /**
+     * @param  NotificationConcernModel  $notificationConcern
+     *
+     * @return Address|null
+     */
+    public function getEmailAddressByEmailConcernOrDefaultSender(NotificationConcern $notificationConcern): ?Address
+    {
+        //
+        $fromName = $notificationConcern->sender;
+        $fromEmail = $notificationConcern->sender;
+        if (!$fromEmail) {
+            if ($fromUser = $this->getSender()) {
+                $fromName = $fromUser->name;
+                $fromEmail = $fromUser->email;
+            }
+        }
+
+        if (!$fromEmail) {
+            return null;
+        }
+
+        return new Address($fromEmail, $fromName);
+    }
+
+    /**
+     * @return WebsiteBaseUser|null
+     */
+    public function getSender(): ?WebsiteBaseUser
+    {
+        if ($senderId = $this->websiteBaseConfig->getValue('notification.user.sender')) {
+            return app(WebsiteBaseUser::class)->with([])->whereId($senderId)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Address|null
+     */
+    public function getSenderEmailAddress(): ?Address
+    {
+        if ($sender = $this->getSender()) {
+            return new Address($sender->email, $sender->name);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return AclGroup|null
+     */
+    public function getStaffSupportUserGroup(): ?AclGroup
+    {
+        if ($aclGroupId = $this->websiteBaseConfig->getValue('notification.acl_group.support')) {
+            return app(AclGroup::class)->with([])->whereId($aclGroupId)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return iterable
+     */
+    public function getStaffSupportUsers(): iterable
+    {
+        if ($aclGroup = $this->getStaffSupportUserGroup()) {
+            return $aclGroup->users;
+        }
+
+        return [];
     }
 
 }

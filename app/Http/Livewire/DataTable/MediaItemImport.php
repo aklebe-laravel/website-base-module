@@ -172,15 +172,15 @@ class MediaItemImport extends MediaItem
         /** @var ConfigService $config */
         $config = app('website_base_config');
 
-        if (!$config->get('import.enabled', false)) {
+        if (!$config->getValue('import.enabled', false)) {
             $this->addErrorMessage("Import disabled!");
 
             return false;
         }
 
         // max attempts 0 = no limiter
-        if ($maxAttempts = (int) $config->get('import.rate-limiter.max', 0)) {
-            $secondsToReset = (int) $config->get('import.rate-limiter.reset', 60 * 60 * 24);
+        if ($maxAttempts = (int) $config->getValue('import.rate-limiter.max', 0)) {
+            $secondsToReset = (int) $config->getValue('import.rate-limiter.reset', 60 * 60 * 24);
 
             // @todo: another rate limiter per user per import file
             // ...
@@ -189,11 +189,11 @@ class MediaItemImport extends MediaItem
             // https://laravel.com/docs/11.x/rate-limiting
             $executed = RateLimiter::attempt('import-rate-limiter-amount-and-user-'.(Auth::id() ?? 0), $maxAttempts, function () use ($config, $itemId) {
 
-                if ($maxAttemptsPerFile = (int) $config->get('import.rate-limiter.file.max', 1)) {
-                    $secondsToReset = (int) $config->get('import.rate-limiter.file.reset', 300);
+                if ($maxAttemptsPerFile = (int) $config->getValue('import.rate-limiter.file.max', 1)) {
+                    $secondsToReset = (int) $config->getValue('import.rate-limiter.file.reset', 300);
                     $executed = RateLimiter::attempt('import-rate-limiter-per-file-'.(Auth::id() ?? 0), $maxAttemptsPerFile, function () use ($config, $itemId) {
 
-                        $dispatchInMinutes = (int) $config->get('import.rate-limiter.delay', 0);
+                        $dispatchInMinutes = (int) $config->getValue('import.rate-limiter.delay', 0);
                         /** @var MediaItemModel $mediaItem */
                         if (($mediaItem = MediaItemModel::find($itemId)) && ($mediaItem->getKey())) {
                             MediaItemImportJob::dispatch($mediaItem)->delay(now()->addMinutes($dispatchInMinutes));

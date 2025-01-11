@@ -6,6 +6,7 @@ use App\Models\User as AppUser;
 use Chelout\RelationshipEvents\Concerns\HasBelongsToManyEvents;
 use Chelout\RelationshipEvents\Concerns\HasOneEvents;
 use Chelout\RelationshipEvents\Traits\HasDispatchableEvents;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,13 +16,14 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Modules\Acl\app\Models\AclResource;
 use Modules\SystemBase\app\Services\SystemService;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Base\TraitBaseMedia;
 use Modules\WebsiteBase\app\Models\Base\UserTrait;
-use Modules\WebsiteBase\app\Services\WebsiteService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use Modules\WebsiteBase\app\Services\Notification\Channels\BaseChannel;
+use Modules\WebsiteBase\app\Services\SendNotificationService;
+use Throwable;
 
 /**
  * @mixin IdeHelperUser
@@ -144,8 +146,8 @@ class User extends AppUser
             $q->whereNotNull('shared_id')->where('shared_id', '<>', '');
         })
             // no puppets/non-humans ...
-                     ->with(['aclGroups.aclResources'])->whereDoesntHave('aclGroups.aclResources', function ($query) {
-                return $query->where('code', '=', 'puppet');
+            ->with(['aclGroups.aclResources'])->whereDoesntHave('aclGroups.aclResources', function ($query) {
+                return $query->where('code', '=', AclResource::RES_NON_HUMAN);
             });
     }
 
@@ -321,79 +323,85 @@ class User extends AppUser
     }
 
     /**
-     * @param  string  $channel  like WebsiteService::NOTIFICATION_CHANNEL_EMAIL
-     *
-     * @return bool
+     * @return array
      */
-    public function canNotificationChannel(string $channel): bool
+    public function getPreferredNotificationChannels(): array
     {
-        if ($preferredChannel = $this->getExtraAttribute('preferred_notification_channel')) {
-            if ($preferredChannel !== $channel) {
-                return false;
+        if ($preferredChannels = $this->getExtraAttribute('preferred_notification_channels', [])) {
+            if (is_array($preferredChannels)) {
+                return $preferredChannels;
             }
         }
 
-        switch ($channel) {
-            case WebsiteService::NOTIFICATION_CHANNEL_EMAIL:
-                return !!$this->email && !$this->hasFakeEmail();
+        return [];
+    }
 
-            case WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM:
-                $useTelegram = $this->getExtraAttribute('use_telegram');
-                $telegramId = $this->getExtraAttribute('telegram_id');
+    /**
+     * Check if $channel is in user preferred notification channels and the channel can be used.
+     *
+     * @param  string  $channel  'email'
+     *
+     * @return bool
+     */
+    public function canSendNotificationToChannel(string $channel): bool
+    {
+        $notificationService = app(SendNotificationService::class);
+        if ($prefList = $this->getPreferredNotificationChannels()) {
+            foreach ($prefList as $preferredChannel) {
+                if ($channel !== $preferredChannel) {
+                    continue;
+                }
 
-                return ($useTelegram && $telegramId);
-
-            default:
-                return false;
+                /** @var BaseChannel $c */
+                if ($c = $notificationService->getRegisteredChannel($preferredChannel)) {
+                    return $c->canNotifyUser($this);
+                }
+            }
+        } else {
+            // no preferred channels, so everything is valid,
+            // check channel can be used in general
+            /** @var BaseChannel $c */
+            if ($c = $notificationService->getRegisteredChannel($channel)) {
+                return $c->canNotifyUser($this);
+            }
         }
+
+        return false;
     }
 
     /**
      * @return string|null
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function calculatedNotificationChannel(): ?string
     {
-        switch ($this->getExtraAttribute('preferred_notification_channel')) {
-
-            case '':
-            case null:
-            case WebsiteService::NOTIFICATION_CHANNEL_EMAIL:
-                // check first email ...
-                if ($this->canNotificationChannel(WebsiteService::NOTIFICATION_CHANNEL_EMAIL)) {
-                    return WebsiteService::NOTIFICATION_CHANNEL_EMAIL;
+        try {
+            // check all user preferred channels first
+            $notificationService = app(SendNotificationService::class);
+            foreach ($this->getPreferredNotificationChannels() as $preferredChannel) {
+                /** @var BaseChannel $c */
+                if ($c = $notificationService->getRegisteredChannel($preferredChannel)) {
+                    if ($c->canNotifyUser($this)) {
+                        return $preferredChannel;
+                    }
                 }
-                // check next telegram ...
-                if ($this->canNotificationChannel(WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM)) {
-                    return WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM;
-                }
-                break;
-
-            case WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM:
-                // check first telegram ...
-                if ($this->canNotificationChannel(WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM)) {
-                    return WebsiteService::NOTIFICATION_CHANNEL_TELEGRAM;
-                }
-                // check next email ...
-                if ($this->canNotificationChannel(WebsiteService::NOTIFICATION_CHANNEL_EMAIL)) {
-                    return WebsiteService::NOTIFICATION_CHANNEL_EMAIL;
-                }
-                break;
-        }
-
-        // get store config or null
-        if ($configValue = app('website_base_config')->get('notification.preferred_channel')) {
-            if ($this->canNotificationChannel($configValue)) {
-                return $configValue;
             }
+
+            // if no user preferred channels, get channel by store config
+            if ($configValue = app('website_base_config')->getValue('notification.preferred_channel')) {
+                // and check user can use it
+                if ($this->canSendNotificationToChannel($configValue)) {
+                    return $configValue;
+                }
+            }
+        } catch (Throwable $e) {
+            Log::error($e->getMessage(), [__METHOD__]);
         }
 
         return null;
     }
 
     /**
-     * User could be created by different channel like telegram, so email was faked.
+     * User could be created by different channels like telegram, and may fake email.
      *
      * @return bool
      */

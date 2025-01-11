@@ -1,9 +1,9 @@
 @php
     use Illuminate\Http\Resources\Json\JsonResource;
-    use Modules\Form\app\Forms\Base\NativeObjectBase;
+    use Modules\Acl\app\Models\AclResource;
     use Modules\Form\app\Forms\Base\ModelBase;
-    use Modules\TelegramApi\app\Services\TelegramService;
     use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
+    use Modules\WebsiteBase\app\Models\User;
 
     /**
      * default input text element
@@ -29,16 +29,8 @@
      * @var ModelBase $form_instance
      * @var NativeObjectBaseLivewire $form_livewire
      */
-
-    /** @var TelegramService $telegramService */
-    $telegramService = app(TelegramService::class);
-    if ($telegramGroups = $telegramService->getBotGroups()) {
-        $telegramGroups = $telegramGroups->toArray();
-    } else {
-        $telegramGroups= [];
-    }
-
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions($telegramGroups, ['display_name'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', NativeObjectBase::UNSELECT_RELATION_IDENT)),
+    'options' => app('system_base')->toHtmlSelectOptions(
+        $user = User::withAclResources([AclResource::RES_NON_HUMAN])->orderBy('name')->get(), ['id', 'name'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice')),
     ])

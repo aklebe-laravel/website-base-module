@@ -26,9 +26,9 @@ class MailSending
      *
      * @return bool
      */
-    public function handle(MessageSending $event)
+    public function handle(MessageSending $event): bool
     {
-        if (!app('website_base_config')->get('email.enabled', false)) {
+        if (!app('website_base_config')->getValue('email.enabled', false)) {
             $emails = collect($event->message->getTo())->map(fn($item) => $item->getAddress())->toArray();
             Log::warning("Sending emails disabled. Skip.", [$event->message->getSubject(), $emails, __METHOD__]);
 
@@ -36,7 +36,7 @@ class MailSending
         }
 
         // max attempts 0 = no limiter
-        if ($maxAttempts = (int) app('website_base_config')->get('email.rate-limiter.max', 0)) {
+        if ($maxAttempts = (int) app('website_base_config')->getValue('email.rate-limiter.max', 0)) {
             $emails = collect($event->message->getTo())->map(fn($item) => $item->getAddress())->toArray();
             // if no hits remaining, return false
             if (!($remainingCount = RateLimiter::remaining('email-rate-limiter', $maxAttempts))) {

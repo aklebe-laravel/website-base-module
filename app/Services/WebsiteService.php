@@ -10,33 +10,32 @@ use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Http\Middleware\StoreUserValid;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class WebsiteService extends BaseService
 {
-    const string NOTIFICATION_CHANNEL_NOTHING = 'nothing';
-    const string NOTIFICATION_CHANNEL_EMAIL = 'email';
-    const string NOTIFICATION_CHANNEL_SMS = 'sms';
-    const string NOTIFICATION_CHANNEL_TELEGRAM = 'telegram';
-    const string NOTIFICATION_CHANNEL_WHATSAPP = 'whatsapp';
-    const array NOTIFICATION_CHANNELS = [
-        self::NOTIFICATION_CHANNEL_EMAIL,
-        // self::NOTIFICATION_CHANNEL_SMS,
-        self::NOTIFICATION_CHANNEL_TELEGRAM,
-        // self::NOTIFICATION_CHANNEL_WHATSAPP,
-    ];
+    /**
+     * @var ConfigService
+     */
+    protected mixed $websiteBaseConfig;
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->websiteBaseConfig = app('website_base_config');
+    }
 
     /**
      * Depends on config setting and user ACL.
      *
      * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function isStoreVisibleForUser(): bool
     {
-        if ($publicPortal = app('website_base_config')->get('site.public', false)) {
+        if ($this->websiteBaseConfig->getValue('site.public', false)) {
             return true;
         }
 
@@ -51,12 +50,10 @@ class WebsiteService extends BaseService
 
     /**
      * @return array|string[]
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function getDefaultMiddleware(): array
     {
-        $publicPortal = app('website_base_config')->get('site.public', false);
+        $publicPortal = $this->websiteBaseConfig->getValue('site.public', false);
 
         //
         $forceAuthMiddleware = [
@@ -66,28 +63,6 @@ class WebsiteService extends BaseService
 
         //$forceAuthMiddleware = ['auth', 'verified'];
         return $publicPortal ? [] : $forceAuthMiddleware;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmailEnabled(): bool
-    {
-        /** @var ConfigService $websiteBaseConfig */
-        $websiteBaseConfig = app('website_base_config');
-
-        return !!$websiteBaseConfig->get('channels.email.enabled', false);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTelegramEnabled(): bool
-    {
-        /** @var ConfigService $websiteBaseConfig */
-        $websiteBaseConfig = app('website_base_config');
-
-        return !!$websiteBaseConfig->get('channels.telegram.enabled', false);
     }
 
     /**

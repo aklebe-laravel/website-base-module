@@ -1,6 +1,6 @@
 @php
     use Illuminate\Http\Resources\Json\JsonResource;use Modules\Form\app\Forms\Base\ModelBase;
-    use Modules\WebsiteBase\app\Services\WebsiteService;
+    use Modules\WebsiteBase\app\Services\SendNotificationService;
     use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
 
     /**
@@ -28,10 +28,10 @@
      * @var NativeObjectBaseLivewire $form_livewire
      */
 
-    /** @var WebsiteService $websiteService */
-    $websiteService = app(WebsiteService::class);
-
+    $systemService = app('system_base');
+    $registeredChannels = $systemService->assignArrayKeysByValue(app(SendNotificationService::class)->getRegisteredChannelNames());
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions(WebsiteService::NOTIFICATION_CHANNELS, null, null, app('system_base')->getHtmlSelectOptionNoValue('No choice')),
+    'options' => app('system_base')->toHtmlSelectOptions(
+        $registeredChannels, first: app('system_base')->getHtmlSelectOptionNoValue('No choice')),
     ])

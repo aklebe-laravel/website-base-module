@@ -10,7 +10,6 @@ use Modules\SystemBase\app\Services\SystemService;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Telegram\Bot\Exceptions\TelegramSDKException;
 
 class AuthPasswordForget extends ModelBase
 {
@@ -37,7 +36,7 @@ class AuthPasswordForget extends ModelBase
     ];
 
     /**
-     * Overwrite this to setup the default Call if Enter pressed in Form
+     * Overwrite this to set up the default Call if Enter pressed in Form
      *
      * @return string
      */
@@ -52,8 +51,6 @@ class AuthPasswordForget extends ModelBase
      * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws TelegramSDKException
-     * @todo: throttle
      */
     #[On('password-forget')]
     public function passwordForget(mixed $livewireId): void
@@ -99,7 +96,7 @@ class AuthPasswordForget extends ModelBase
 
         // open form again ...
         // $this->openForm(null, true);
-        // ... or redirect to login
+        // ... or redirect to log in
         $this->redirectRoute('login');
     }
 

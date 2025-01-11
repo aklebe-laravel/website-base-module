@@ -31,7 +31,9 @@ class ModelBaseExtraAttributes extends ModelBase
                 $attributeInputModule = $attributeInputData['module'];
                 $attributeInput = $attributeInputData['element'];
 
-                $formElementsExtraAttributes['extra_attributes.'.$extraAttribute->modelAttribute->code] = [
+                $formElementsExtraAttributes['extra_attributes_'.$extraAttribute->modelAttribute->code] = [
+                    'name'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
+                    //'property'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
                     'html_element' => $attributeInputModule ? ($attributeInputModule.'::'.$attributeInput) : $attributeInput,
                     'label'        => $description,
                     'description'  => $description.' (Extra Attribute)',
@@ -58,14 +60,16 @@ class ModelBaseExtraAttributes extends ModelBase
     }
 
     /**
-     * @param  array  $itemData
+     * @param  array             $itemData
      * @param  JsonViewResponse  $jsonResponse
-     * @param  mixed  $objectInstance
+     * @param  mixed             $objectInstance
+     *
      * @return bool
      */
     public function onBeforeUpdateItem(array $itemData, JsonViewResponse $jsonResponse, mixed $objectInstance): bool
     {
         $this->setExtraAttributesIfNeeded($objectInstance, $itemData);
+
         return true;
     }
 
@@ -73,6 +77,7 @@ class ModelBaseExtraAttributes extends ModelBase
     /**
      * @param  mixed  $objectInstance
      * @param  array  $itemData
+     *
      * @return bool
      */
     protected function setExtraAttributesIfNeeded(mixed $objectInstance, array $itemData): bool
@@ -89,13 +94,17 @@ class ModelBaseExtraAttributes extends ModelBase
         return false;
     }
 
+    /**
+     * @param  array  $itemData
+     *
+     * @return array
+     */
     public function getCleanObjectDataForSaving(array $itemData): array
     {
         $result = parent::getCleanObjectDataForSaving($itemData);
 
         // also remove extra_attributes
-        if (app('system_base')->hasInstanceClassOrTrait($this->getObjectEloquentModelName(),
-            TraitAttributeAssignment::class)) {
+        if (app('system_base')->hasInstanceClassOrTrait($this->getObjectEloquentModelName(), TraitAttributeAssignment::class)) {
             unset($result['extra_attributes']);
             // Log::info('extra_attributes deleted!', [__METHOD__]);
         }

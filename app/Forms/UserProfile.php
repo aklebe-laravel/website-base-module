@@ -259,7 +259,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         [
-                            'visible'  => app('website_base_config')->get('users.profiles.media.enabled', false),
+                            'visible'  => app('website_base_config')->getValue('users.profiles.media.enabled', false),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Images'),

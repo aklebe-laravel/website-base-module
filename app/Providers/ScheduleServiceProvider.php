@@ -14,8 +14,7 @@ class ScheduleServiceProvider extends ScheduleBaseServiceProvider
     protected function bootEnabledSchedule(Schedule $schedule): void
     {
         /**
-         * Update all telegram bots and save their groups,channels and users.
-         * Additionally, adjust the env var TELEGRAM_BOTS_UPDATE_CACHE_TTL to minimize traffic.
+         * Remove unused extra attributes
          */
         $schedule->call(function () {
 

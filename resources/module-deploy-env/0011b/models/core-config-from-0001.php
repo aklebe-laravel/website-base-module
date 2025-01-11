@@ -19,6 +19,7 @@ return [
             'store_id' => null,
             'module'   => 'website-base',
             'path'     => 'site.public',
+            'options'     => [],
         ],
         // this replaced the old 'site.auth', more data for first insert needed
         [
@@ -28,11 +29,7 @@ return [
             'value'       => '1',
             'form_input'  => 'switch',
             'description' => 'Auth functionality available (forms, etc...)',
-            'options'     => [
-                'form' => [
-                    'new_group' => true,
-                ],
-            ],
+            'options'     => [],
         ],
         [
             'store_id' => null,
@@ -48,16 +45,24 @@ return [
             'store_id' => null,
             'module'   => 'website-base',
             'path'     => 'email.enabled',
+            'position'    => 1310,
+            'options'  => [
+                'form' => [
+                    'new_group' => true,
+                ],
+            ],
         ],
         [
             'store_id' => null,
             'module'   => 'website-base',
             'path'     => 'email.rate-limiter.max',
+            'position'    => 1370,
         ],
         [
             'store_id' => null,
             'module'   => 'website-base',
             'path'     => 'email.rate-limiter.reset',
+            'position'    => 1380,
         ],
     ],
 ];

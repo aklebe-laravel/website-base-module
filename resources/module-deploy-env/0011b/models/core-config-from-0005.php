@@ -14,6 +14,7 @@ return [
         [
             'store_id' => null,
             'module'   => 'website-base',
+            'position' => 1612,
             'path'     => 'notification.preferred_channel',
         ],
         [
@@ -30,26 +31,6 @@ return [
                     'new_group' => true,
                 ],
             ],
-        ],
-        [
-            'store_id' => null,
-            'module'   => 'website-base',
-            'path'     => 'notification.channels.telegram.enabled',
-        ],
-        [
-            'store_id' => null,
-            'module'   => 'website-base',
-            'path'     => 'notification.channels.telegram.bot',
-        ],
-        [
-            'store_id' => null,
-            'module'   => 'website-base',
-            'path'     => 'notification.channels.telegram.default_public_group',
-        ],
-        [
-            'store_id' => null,
-            'module'   => 'website-base',
-            'path'     => 'notification.channels.telegram.default_staff_group',
         ],
     ],
 ];
