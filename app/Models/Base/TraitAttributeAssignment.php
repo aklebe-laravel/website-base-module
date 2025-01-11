@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +15,7 @@ use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesSaved;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
+use Modules\WebsiteBase\app\Services\WebsiteService;
 
 trait TraitAttributeAssignment
 {
@@ -128,7 +128,7 @@ trait TraitAttributeAssignment
     {
         $cacheParams = $this->getCacheParametersExtraAttributeEntity();
 
-        return Cache::forget($cacheParams['key']);
+        return WebsiteService::getExtraAttributeCache()->forget($cacheParams['key']);
     }
 
     /**
@@ -140,7 +140,7 @@ trait TraitAttributeAssignment
 
         // No assignment needed, because refreshing $this->extraAttributes[xxx] already
 
-        $ea = Cache::remember($cacheParams['key'], $cacheParams['ttl'],
+        $ea = WebsiteService::getExtraAttributeCache()->remember($cacheParams['key'], $cacheParams['ttl'],
             function () use ($cacheParams) {
                 $r = [];
                 // $this->extraAttributes have at least default values at this point
@@ -266,7 +266,7 @@ trait TraitAttributeAssignment
         $ttlDefault = config('system-base.cache.default_ttl', 1);
         $ttl = config('system-base.cache.db.signature.ttl', $ttlDefault);
 
-        return Cache::remember(static::class.'-CONST-DEFINED-ATTRIBUTE_MODEL_IDENT', $ttl, function () {
+        return WebsiteService::getExtraAttributeCache()->remember(static::class.'-CONST-DEFINED-ATTRIBUTE_MODEL_IDENT', $ttl, function () {
             return defined(static::class.'::ATTRIBUTE_MODEL_IDENT') ? static::ATTRIBUTE_MODEL_IDENT : static::class;
         });
     }
@@ -281,7 +281,7 @@ trait TraitAttributeAssignment
     {
         $cacheParams = $this->getCacheParametersExtraAttributes();
 
-        return Cache::remember($cacheParams['key'], $cacheParams['ttl'], function () use ($cacheParams) {
+        return WebsiteService::getExtraAttributeCache()->remember($cacheParams['key'], $cacheParams['ttl'], function () use ($cacheParams) {
 
             try {
                 $attrModelIdent = $this->getAttributeModelIdent();
