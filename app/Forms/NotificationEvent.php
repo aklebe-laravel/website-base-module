@@ -22,12 +22,14 @@ class NotificationEvent extends ModelBase
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'Notification Event';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Notification Events';
@@ -72,7 +74,7 @@ class NotificationEvent extends ModelBase
                                         'label'        => 'ID',
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'is_enabled'    => [
@@ -81,7 +83,7 @@ class NotificationEvent extends ModelBase
                                         'description'  => __('Enabled or disabled for listings.'),
                                         'validator'    => [
                                             'nullable',
-                                            'bool'
+                                            'bool',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -93,7 +95,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -104,7 +106,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -116,7 +118,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -127,7 +129,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -138,7 +140,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -152,7 +154,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:30000'
+                                            'Max:30000',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -163,7 +165,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -174,7 +176,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -185,7 +187,7 @@ class NotificationEvent extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:30000'
+                                            'Max:30000',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -211,7 +213,7 @@ class NotificationEvent extends ModelBase
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -234,13 +236,13 @@ class NotificationEvent extends ModelBase
                                             'form'          => 'website-base::form.user',
                                             'table'         => 'website-base::data-table.user',
                                             'table_options' => [
-                                                'description'             => "notification_event_user_list_description",
-                                                'useCollectionUserFilter' => false,
+                                                'description'         => "notification_event_user_list_description",
+                                                'filterByParentOwner' => false,
                                             ],
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],
@@ -262,13 +264,13 @@ class NotificationEvent extends ModelBase
                                         'options'      => [
                                             'table'         => 'acl::data-table.acl-resource',
                                             'table_options' => [
-                                                'description'             => "notification_event_user_list_description",
-                                                'useCollectionUserFilter' => false,
+                                                'description'         => "notification_event_user_list_description",
+                                                'filterByParentOwner' => false,
                                             ],
                                         ],
                                         'validator'    => [
                                             'nullable',
-                                            'array'
+                                            'array',
                                         ],
                                     ],
                                 ],

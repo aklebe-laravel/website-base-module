@@ -46,7 +46,7 @@ class User extends BaseDataTable
         if ($this->canManage()) {
             $this->rowCommands = [
                 'claim_user' => 'website-base::livewire.js-dt.tables.columns.buttons.claim-user',
-                'rate_user' => 'market::livewire.js-dt.tables.columns.buttons.rate-user',
+                'rate_user'  => 'market::livewire.js-dt.tables.columns.buttons.rate-user',
                 ...$this->rowCommands,
             ];
         } else {
@@ -119,7 +119,7 @@ class User extends BaseDataTable
                 'label'      => __('Email'),
                 'searchable' => true,
                 'sortable'   => true,
-                'visible'    => false, // !$this->useCollectionUserFilter,
+                'visible'    => false, // !$this->filterByParentOwner,
                 'css_all'    => 'hide-mobile-show-lg w-20',
                 'options'    => [
                     'has_open_link' => $this->canEdit(),
@@ -214,7 +214,7 @@ class User extends BaseDataTable
 
     /**
      * The base builder before all filter manipulations.
-     * Usually used for all collections (default, selected, unselected), but can overwritten.
+     * Usually used for all collections (default, selected, unselected), but can be overwritten.
      *
      * @param  string  $collectionName
      *
@@ -224,7 +224,7 @@ class User extends BaseDataTable
     public function getBaseBuilder(string $collectionName): ?Builder
     {
         $builder = parent::getBaseBuilder($collectionName);
-        if ($this->useCollectionUserFilter) {
+        if ($this->filterByParentOwner) {
             $builder = $builder->frontendItems();
         }
 

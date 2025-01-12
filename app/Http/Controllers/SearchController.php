@@ -2,6 +2,9 @@
 
 namespace Modules\WebsiteBase\app\Http\Controllers;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Http\Controllers\Controller;
@@ -16,9 +19,10 @@ class SearchController extends Controller
 
     /**
      * @param  Request  $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     *
+     * @return Application|Factory|View|\Illuminate\Foundation\Application
      */
-    public function find(Request $request)
+    public function find(Request $request): Factory|View|\Illuminate\Foundation\Application|Application
     {
         $searchString = $request->post('search');
 
@@ -27,12 +31,11 @@ class SearchController extends Controller
         }
 
         $searchStringLike = '%'.$searchString.'%';
-        //        dump($searchString);
 
         Log::info("Search Request: ", [
             $searchString,
             $searchStringLike,
-            __METHOD__
+            __METHOD__,
         ]);
 
         return view('website-base::page', [
@@ -42,7 +45,7 @@ class SearchController extends Controller
             'contentView'          => $this->contentView,
             'renderMode'           => BaseDataTable::RENDER_MODE_FRONTEND,
             'livewireTableOptions' => [
-                'useCollectionUserFilter' => true,
+                'filterByParentOwner' => true,
             ],
         ]);
     }

@@ -330,7 +330,10 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'options'      => [
                                             'form'          => 'acl::form.acl-resource',
                                             'table'         => 'acl::data-table.acl-resource',
-                                            'table_options' => [],
+                                            'table_options' => [
+                                                'description'         => 'All acl resources find of all groups by this user.',
+                                                'filterByParentOwner' => false,
+                                            ],
                                         ],
                                         'validator'    => [
                                             'nullable',

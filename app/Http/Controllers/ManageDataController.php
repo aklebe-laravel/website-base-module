@@ -42,13 +42,13 @@ class ManageDataController extends Controller
      * @param  Request      $request
      * @param  string|null  $modelName
      * @param  mixed|null   $modelId
-     * @param  bool         $useCollectionUserFilter
+     * @param  bool         $filterByParentOwner
      * @param  bool         $showOnly
      *
      * @return View|Factory|Application
      * @throws Exception
      */
-    public function get(Request $request, ?string $modelName = null, mixed $modelId = null, bool $useCollectionUserFilter = true, bool $showOnly = false): View|Factory|Application
+    public function get(Request $request, ?string $modelName = null, mixed $modelId = null, bool $filterByParentOwner = true, bool $showOnly = false): View|Factory|Application
     {
         if (!$modelName) {
             return view('content-pages.my-shop');
@@ -118,7 +118,7 @@ class ManageDataController extends Controller
             'livewireForm'                => $livewireFormKey,
             'livewireTable'               => $livewireTable,
             'livewireTableOptions'        => [
-                'useCollectionUserFilter' => $useCollectionUserFilter,
+                'filterByParentOwner' => $filterByParentOwner,
             ],
             'formObjectId'                => $showOnly ? null : $modelId,
             'isFormOpen'                  => !$showOnly && ($modelId !== null),
