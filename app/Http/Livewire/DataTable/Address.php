@@ -122,7 +122,7 @@ class Address extends BaseDataTable
     {
         $builder = parent::getBaseBuilder($collectionName);
 
-        if ($this->useCollectionUserFilter) {
+        if ($this->filterByParentOwner) {
             $builder->whereUserId($this->getUserId());
         }
 

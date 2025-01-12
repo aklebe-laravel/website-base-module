@@ -9,6 +9,7 @@ class Token extends BaseDataTable
 {
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void
@@ -92,7 +93,7 @@ class Token extends BaseDataTable
 
     /**
      * The base builder before all filter manipulations.
-     * Usually used for all collections (default, selected, unselected), but can overwritten.
+     * Usually used for all collections (default, selected, unselected), but can be overwritten.
      *
      * @param  string  $collectionName
      *
@@ -103,7 +104,7 @@ class Token extends BaseDataTable
     {
         $builder = parent::getBaseBuilder($collectionName);
 
-        if ($this->useCollectionUserFilter) {
+        if ($this->filterByParentOwner) {
             $builder->whereUserId($this->getUserId());
         }
 
