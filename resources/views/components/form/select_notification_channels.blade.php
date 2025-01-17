@@ -29,7 +29,7 @@
      */
 
     $systemService = app('system_base');
-    $sortedChannels = $object->getExtraAttribute('preferred_notification_channels', []);
+    $sortedChannels = $object->getExtraAttribute('preferred_notification_channels', []) ?? [];
     $registeredChannels = app(SendNotificationService::class)->getRegisteredChannelNames();
     $sortedChannels = array_merge($sortedChannels, $registeredChannels);
 @endphp
