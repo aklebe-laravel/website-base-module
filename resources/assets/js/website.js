@@ -57,7 +57,7 @@ export class Website {
         } else {
             // @todo: not sure 'alpine:init' should have checked on this place
             ['DOMContentLoaded', 'alpine:init'].forEach(evt => document.addEventListener(evt, () => {
-            // ['DOMContentLoaded'].forEach(evt => document.addEventListener(evt, () => {
+                // ['DOMContentLoaded'].forEach(evt => document.addEventListener(evt, () => {
                 callback();
             }));
         }
@@ -185,6 +185,10 @@ export class Website {
         return 'xxl'
     }
 
+    /**
+     *
+     * @returns {number}
+     */
     getViewportNumber = function () {
         let classInstance = this;
         switch (classInstance.getViewport()) {
@@ -201,6 +205,60 @@ export class Website {
         }
         return 6;
     }
+
+    /**
+     *
+     * @param arr
+     * @param value
+     * @returns {boolean}
+     */
+    isInObject = function (arr, value) {
+        if (Array.isArray(arr)) {
+            let index = arr.indexOf(value);
+            return index !== -1;
+        } else if (typeof arr === 'object') {
+            return value in arr;
+        }
+    }
+
+    /**
+     *
+     * @param arr
+     * @param value
+     */
+    removeFromObject = function (arr, value) {
+        if (Array.isArray(arr)) {
+            let index = arr.indexOf(value);
+            if (index !== -1) {
+                arr = arr.splice(index, 1);
+            }
+        } else if (typeof arr === 'object') {
+            delete arr[value];
+        }
+    }
+
+    addToObject = function (arr, key, value) {
+        if (Array.isArray(arr)) {
+            arr.push(value);
+        } else if (typeof arr === 'object') {
+            arr[value] = value;
+        }
+    }
+
+    /**
+     *
+     * @param values
+     * @param elClassName
+     */
+    dumpToElement(values, elClassName = 'dump-area') {
+        let data = values;
+        let el = document.getElementsByClassName(elClassName);
+        // console.log(el);
+        for (let el2 of el) {
+            el2.innerHTML = JSON.stringify(data, null, 2);
+        }
+    };
+
 
 
 } // no ; at the end of class declaration

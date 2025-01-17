@@ -29,11 +29,11 @@
      */
 
     $systemService = app('system_base');
-    $sortedChannels = $systemService->assignArrayKeysByValue($object->getExtraAttribute('preferred_notification_channels', []));
-    $registeredChannels = $systemService->assignArrayKeysByValue(app(SendNotificationService::class)->getRegisteredChannelNames());
+    $sortedChannels = $object->getExtraAttribute('preferred_notification_channels', []);
+    $registeredChannels = app(SendNotificationService::class)->getRegisteredChannelNames();
     $sortedChannels = array_merge($sortedChannels, $registeredChannels);
 @endphp
-@include('form::components.form.multi_select', [
+@include('form::components.form.sortable_multi_select', [
     'options' => app('system_base')->toHtmlSelectOptions(
         $sortedChannels),
     ])
