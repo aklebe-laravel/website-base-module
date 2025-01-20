@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\WebsiteBase\database\factories\Token;
+namespace Modules\WebsiteBase\database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\WebsiteBase\app\Models\Token;
@@ -17,7 +17,7 @@ class TokenFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'purpose' => Token::PURPOSE_LOGIN,
