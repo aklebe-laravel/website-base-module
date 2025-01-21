@@ -15,7 +15,6 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Acl\app\Http\Middleware\AdminUserPresent;
 use Modules\Acl\app\Http\Middleware\StaffUserPresent;
-use Modules\Acl\app\Models\AclResource;
 use Modules\WebsiteBase\app\Http\Controllers\Auth\AuthenticatedSessionController;
 use Modules\WebsiteBase\app\Http\Controllers\CmsPageController;
 use Modules\WebsiteBase\app\Http\Controllers\ManageDataController;
@@ -56,7 +55,7 @@ Route::group(['middleware' => [StaffUserPresent::class]], function () {
      */
     Route::get('user/claim/{id}', [
         UserController::class,
-        'claim'
+        'claim',
     ])->name('user.claim');
 
     /**
@@ -64,7 +63,7 @@ Route::group(['middleware' => [StaffUserPresent::class]], function () {
      */
     Route::get('/preview-notify-event/{id}/{userId?}', [
         PreviewNotifyEventController::class,
-        'show'
+        'show',
     ])->name('preview-notify-event');
 
     /**
@@ -74,7 +73,7 @@ Route::group(['middleware' => [StaffUserPresent::class]], function () {
         //    Route::get('/manage-data[/{modelName}[/{modelId}]]', [ManageDataController::class, 'get'])
         ->middleware([
             'auth',
-            'verified'
+            'verified',
         ])->name('manage-data-all');
 
 });
@@ -106,23 +105,11 @@ Route::group(['middleware' => $defaultMiddleware], function () {
 
     Route::get('/changelog/{filter?}', function ($filter = null) {
 
-        $changeLogCollection = \Modules\WebsiteBase\app\Models\Changelog::with([]);
-        // get only entries with public messages
-        $changeLogCollection->whereNotNull('messages_public');
-        // if staff user, also get staff messages ...
-        if (Auth::user()->hasAclResource(AclResource::RES_STAFF)) {
-            $changeLogCollection->orWhereNotNull('messages_staff');
-        }
-        // if 'all' wanted and user is admin or developer, get all messages ...
-        if ($filter === 'all' && Auth::user()->hasAclResource([AclResource::RES_STAFF, AclResource::RES_ADMIN])) {
-            $changeLogCollection->orWhereNotNull('messages');
-        }
-
-        $changeLogCollection->orderByDesc('commit_created_at');
-
+        $nearestSeconds = 300;
         return view('content-pages.changelog', [
-            'changeLogCollection' => $changeLogCollection->get(),
-            'filter'              => $filter
+            'groupedChangelog' => app(WebsiteService::class)->getChangelogGroupNearest($nearestSeconds, $filter),
+            'filter'           => $filter,
+            'nearestSeconds'   => $nearestSeconds,
         ]);
 
     })->name('changelog');
@@ -134,7 +121,7 @@ Route::group(['middleware' => $defaultMiddleware], function () {
     // ------------------------------------------------------------------------------
     Route::get('user/stop-claim', [
         UserController::class,
-        'stopClaim'
+        'stopClaim',
     ])->name('user.stop-claim');
 
     Route::get('user/get/{id}', [UserController::class, 'get'])->name('user.get');
@@ -164,8 +151,8 @@ Route::group(['middleware' => $defaultMiddleware], function () {
 Route::group([
     'middleware' => [
         'auth',
-        'verified'
-    ]
+        'verified',
+    ],
 ], function () {
 
     Route::get('/manage-data/{modelName?}/{modelId?}', [ManageDataController::class, 'get'])->name('manage-data');
@@ -191,7 +178,7 @@ Route::group(['middleware' => []], function () {
     // ------------------------------------------------------------------------------
     Route::get('/token/{id?}', [
         AuthenticatedSessionController::class,
-        'token'
+        'token',
     ])->name('token');
 
     // ------------------------------------------------------------------------------

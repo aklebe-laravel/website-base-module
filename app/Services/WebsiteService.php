@@ -6,13 +6,16 @@ use Closure;
 use Exception;
 use Illuminate\Cache\TaggedCache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Http\Middleware\StoreUserValid;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
+use Modules\WebsiteBase\app\Models\Changelog;
 use Modules\WebsiteBase\app\Models\ModelAttribute;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
 
@@ -179,6 +182,64 @@ class WebsiteService extends BaseService
     public static function getExtraAttributeCache(): TaggedCache
     {
         return Cache::tags([self::cacheTag]);
+    }
+
+    /**
+     * @param  int     $nearestSeconds
+     * @param  string  $filter
+     *
+     * @return array
+     */
+    public function getChangelogGroupNearest(int $nearestSeconds = 300, string $filter = ''): array
+    {
+        $changeLogCollection = Changelog::with([]);
+        // get only entries with public messages
+        $changeLogCollection->whereNotNull('messages_public');
+        // if staff user, also get staff messages ...
+        if (Auth::user()->hasAclResource(AclResource::RES_STAFF)) {
+            $changeLogCollection->orWhereNotNull('messages_staff');
+        }
+        // if 'all' wanted and user is admin or developer, get all messages ...
+        if ($filter === 'all' && Auth::user()->hasAclResource([AclResource::RES_STAFF, AclResource::RES_ADMIN])) {
+            $changeLogCollection->orWhereNotNull('messages');
+        }
+
+        $changeLogCollection->orderByDesc('commit_created_at')
+            ->where('commit_created_at', '>', now()->subMonths(12));
+
+        $groupIndex = 0;
+        $lastGroupTime = '';
+        $resultGroups = [];
+        $changeLogCollection->chunk(200, function ($changelogs) use (&$resultGroups, &$groupIndex, &$lastGroupTime, $nearestSeconds) {
+            /** @var Changelog $changelog */
+            foreach ($changelogs as $changelog) {
+
+                $t = Carbon::createFromFormat('Y-m-d H:i:s', $changelog->commit_created_at);
+                if ($t->diffInSeconds($lastGroupTime, false) > $nearestSeconds) {
+                    $groupIndex++;
+                }
+                $lastGroupTime = $changelog->commit_created_at;
+
+                $map = [
+                    'messages'        => trim($changelog->messages),
+                    'messages_public' => trim($changelog->messages_public),
+                    'messages_staff'  => trim($changelog->messages_staff),
+                    'paths'           => $changelog->path,
+                    'authors'         => $changelog->author,
+                    'created'         => $changelog->commit_created_at,
+                ];
+                foreach ($map as $k => $v) {
+                    if (!$v) {
+                        continue;
+                    }
+                    if (!isset($resultGroups[$groupIndex][$k]) || !in_array($v, $resultGroups[$groupIndex][$k])) {
+                        $resultGroups[$groupIndex][$k][] = $v;
+                    }
+                }
+            }
+        });
+
+        return $resultGroups;
     }
 
 }
