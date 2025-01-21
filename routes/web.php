@@ -103,7 +103,7 @@ Route::group(['middleware' => $defaultMiddleware], function () {
         return view('content-pages.contact');
     })->name('contact');
 
-    Route::get('/changelog/{filter?}', function ($filter = null) {
+    Route::get('/changelog/{filter?}', function ($filter = '') {
 
         $nearestSeconds = 300;
         return view('content-pages.changelog', [
