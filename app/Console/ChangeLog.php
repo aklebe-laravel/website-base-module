@@ -3,8 +3,6 @@
 namespace Modules\WebsiteBase\app\Console;
 
 use Illuminate\Console\Command;
-use Modules\SystemBase\app\Services\ModuleService;
-use Modules\WebsiteBase\app\Services\ConfigService;
 use Modules\WebsiteBase\app\Services\CreateChangeLogService;
 use Symfony\Component\Console\Command\Command as CommandResult;
 
