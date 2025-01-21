@@ -8,8 +8,6 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManagerStatic as ImageStatic;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\MediaItem;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class MediaService extends BaseService
 {
@@ -62,8 +60,6 @@ class MediaService extends BaseService
      * @param  string     $originalMediaFile
      *
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function createMediaFile(MediaItem $mediaModel, string $originalMediaFile): void
     {
@@ -99,7 +95,7 @@ class MediaService extends BaseService
                             'f8f8f8'); // fit to $width and $height using background color
                     }
 
-                    $this->saveImageToMedia($img, $mediaModel, $quality, $thumbName, ($loopIndex === 0));
+                    $this->saveImageToMedia($img, $mediaModel, $originalMediaFile, $quality, $thumbName, ($loopIndex === 0));
                     $loopIndex++;
                 }
                 break;
@@ -227,13 +223,14 @@ class MediaService extends BaseService
     /**
      * @param  Image      $img
      * @param  MediaItem  $mediaModel
+     * @param  string     $originalMediaFile
      * @param  int        $quality
      * @param  string     $thumbPath
      * @param  bool       $generate  if true generate a new filename
      *
      * @return bool
      */
-    public function saveImageToMedia(Image $img, MediaItem $mediaModel, int $quality = 90, string $thumbPath = '', bool $generate = false): bool
+    public function saveImageToMedia(Image $img, MediaItem $mediaModel, string $originalMediaFile, int $quality = 90, string $thumbPath = '', bool $generate = false): bool
     {
         $relativePath = $mediaModel->relative_path ?? '';
         $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $mediaModel->id);
@@ -267,6 +264,7 @@ class MediaService extends BaseService
             $mediaModel->update([
                 'file_name'     => $fileName,
                 'relative_path' => $relativePath,
+                'extern_url'    => $originalMediaFile, // remember origin to avoid generate duplicates and waste disk space
             ]);
         }
 
@@ -379,5 +377,20 @@ class MediaService extends BaseService
         $this->info(json_encode($infoList, JSON_PRETTY_PRINT));
 
         return $infoList;
+    }
+
+    /**
+     * @param  int     $userId
+     * @param  string  $externUrl
+     *
+     * @return MediaItem|null
+     */
+    public function findUserImageByOrigin(int $userId, string $externUrl): ?MediaItem
+    {
+        return MediaItem::with([])
+            ->images()
+            ->where('extern_url', $externUrl)
+            ->where('user_id', $userId)
+            ->first();
     }
 }

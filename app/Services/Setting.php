@@ -4,12 +4,14 @@ namespace Modules\WebsiteBase\app\Services;
 
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Modules\WebsiteBase\app\Events\InitNavigation;
 use Modules\WebsiteBase\app\Models\Navigation as NavigationModel;
 use Modules\WebsiteBase\app\Models\Store;
 use Modules\WebsiteBase\app\Models\User;
 use Spatie\Navigation\Navigation;
 use Spatie\Navigation\Section;
+use Throwable;
 
 class Setting
 {
@@ -30,13 +32,23 @@ class Setting
      */
     public function getStore(): ?Store
     {
-        if (!$this->store) {
+        if ($this->store) {
+            return $this->store;
+        }
+
+        try {
             // @TODO: load current store by site url host
             $this->store = Store::with([])->where('code', 'default')->first();
-            if (!$this->store) {
-                $this->store = app(Store::class);
+            if ($this->store) {
+                return $this->store;
             }
+        } catch (Throwable $exception) {
+            Log::error("Error by getting store!", [__METHOD__]);
+            Log::error($exception->getMessage());
         }
+
+        $this->store = app(Store::class);
+
         return $this->store;
     }
 
@@ -50,6 +62,7 @@ class Setting
 
     /**
      * @param  mixed  $resources
+     *
      * @return bool
      */
     public function currentUserHasAclResource(mixed $resources): bool
@@ -92,6 +105,7 @@ class Setting
 
     /**
      * @param  Navigation  $navigation
+     *
      * @return void
      */
     public function setNavigation(Navigation $navigation): void
@@ -101,6 +115,7 @@ class Setting
 
     /**
      * @param $url
+     *
      * @return array
      */
     public function getNavigationSisters($url): array
@@ -111,6 +126,7 @@ class Setting
     /**
      * @param $url
      * @param $children
+     *
      * @return array|null
      */
     protected function walkGetSisters($url, $children): ?array
@@ -135,7 +151,8 @@ class Setting
 
     /**
      * @param  Navigation|Section  $navigation
-     * @param  NavigationModel  $navigationModel
+     * @param  NavigationModel     $navigationModel
+     *
      * @return void
      */
     protected function addNavigationItem(Navigation|Section $navigation, NavigationModel $navigationModel): void

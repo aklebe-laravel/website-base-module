@@ -7,6 +7,7 @@ use Modules\SystemBase\database\seeders\BaseModelSeeder;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\Store;
 use Modules\WebsiteBase\app\Models\User;
+use Modules\WebsiteBase\app\Services\MediaService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -25,8 +26,8 @@ class MediaItemSeeder extends BaseModelSeeder
 
         /** @var Store $store */
         if (!($store = Store::with([])
-                            ->get()
-                            ->first())
+            ->get()
+            ->first())
         ) {
             Log::error("No store found", [__METHOD__]);
 
@@ -42,7 +43,8 @@ class MediaItemSeeder extends BaseModelSeeder
 
         $imageFiles = [];
         // if there is a valid path configured and images exists, we create the media images ...
-        if ($imagePath = storage_path(config('seeders.users.media_items.image_storage_source_path'))) {
+        $storagePath = config('seeders.users.media_items.image_storage_source_path');
+        if ($imagePath = storage_path($storagePath)) {
             if (is_dir($imagePath)) {
                 if ($scanDirList = scandir($imagePath)) {
                     foreach ($scanDirList as $file) {
@@ -58,8 +60,8 @@ class MediaItemSeeder extends BaseModelSeeder
 
         // get all new generated users
         $userIds = User::with([])
-                       ->where('created_at', '>=', $seederStarted)
-                       ->pluck('id');
+            ->where('created_at', '>=', $seederStarted)
+            ->pluck('id');
         foreach ($userIds as $userId) {
 
             // product images
@@ -80,11 +82,35 @@ class MediaItemSeeder extends BaseModelSeeder
                 'description' => 'created by seeder',
             ]);
 
-            if ($imageFiles) {
-                $result = array_merge($result1, $result2);
-                foreach ($result as $createdId) {
-                    app('website_base_media')->createMediaFile(MediaItem::whereId($createdId)
-                                                                        ->first(), $imageFiles[rand(0, (count($imageFiles) - 1))]);
+            // from here create or link existing images ...
+            if (!$imageFiles) {
+                Log::error("No media images found. Check your config 'seeders.users.media_items.image_storage_source_path'. Path: '$storagePath'", [__METHOD__]);
+
+                return;
+            }
+
+            /** @var MediaService $mediaService */
+            $mediaService = app('website_base_media');
+
+            $result = array_merge($result1, $result2);
+            foreach ($result as $createdId) {
+                /** @var MediaItem $mediaItem */
+                if ($mediaItem = MediaItem::whereId($createdId)->first()) {
+                    $imageFile = $imageFiles[rand(0, (count($imageFiles) - 1))];
+                    //$mediaItem->extern_url = $imageFile;
+
+                    // check same user has same origin image to avoid generate duplicates and waste disk space
+                    /** @var MediaItem $mediaItemFound */
+                    if ($mediaItemFound = $mediaService->findUserImageByOrigin($userId, $imageFile)) {
+                        // link to existing media item ...
+                        $mediaItem->file_name = $mediaItemFound->file_name;
+                        $mediaItem->relative_path = $mediaItemFound->relative_path;
+                        $mediaItem->extern_url = $imageFile;
+                        $mediaItem->save();
+                    } else {
+                        // create image files ...
+                        $mediaService->createMediaFile($mediaItem, $imageFile);
+                    }
                 }
             }
 
