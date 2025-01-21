@@ -7,6 +7,7 @@ use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Providers\Base\ModuleBaseServiceProvider;
 use Modules\SystemBase\app\Services\ModuleService;
 use Modules\WebsiteBase\app\Console\AttributeCleanups;
+use Modules\WebsiteBase\app\Console\ChangeLog;
 use Modules\WebsiteBase\app\Console\CoreConfig;
 use Modules\WebsiteBase\app\Models\MediaItem;
 use Modules\WebsiteBase\app\Models\User;
@@ -89,6 +90,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
         $this->commands([
             AttributeCleanups::class,
             CoreConfig::class,
+            ChangeLog::class,
         ]);
     }
 
