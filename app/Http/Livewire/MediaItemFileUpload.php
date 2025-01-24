@@ -12,8 +12,6 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Modules\SystemBase\app\Http\Livewire\BaseComponent;
 use Modules\WebsiteBase\app\Models\MediaItem;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class MediaItemFileUpload extends BaseComponent
 {
@@ -84,14 +82,19 @@ class MediaItemFileUpload extends BaseComponent
      * @param  array  $files
      *
      * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     private function runUploadedMediaItems(array $files): array
     {
         $pathList = [];
         $tmpPath = Storage::path(config('livewire.temporary_file_upload.directory') ?: 'livewire-tmp');
-        if (!$this->mediaItemId && $this->objectModelId) {
+
+        // Check it's from a MediaItem form or a form like Product or User to make a quick upload ...
+        $protoParentModelInstance = app($this->parentModelClass);
+        $isMediaItemForm = ($protoParentModelInstance instanceof MediaItem);
+
+        // 1) objectModelId always have toi exists here
+        // 2) If not a MediaItem Form, we always force to create new Media item. Otherwise, we just change the image.
+        if ($this->objectModelId && (!$isMediaItemForm || !$this->mediaItemId)) {
 
             if ($this->userId) {
 
@@ -163,8 +166,6 @@ class MediaItemFileUpload extends BaseComponent
      * @param  array   $tmpFilenames
      *
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     #[On('upload:finished')]
     public function finishUpload(string $name, array $tmpFilenames): void

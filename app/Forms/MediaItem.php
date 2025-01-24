@@ -151,7 +151,7 @@ class MediaItem extends ModelBase
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'media_file_upload' => [
-                                        'html_element' => 'website-base::media_item_file_upload',
+                                        'html_element' => 'website-base::media_item_file_upload_images',
                                         'label'        => __('Media Upload'),
                                         'description'  => __('Media Upload'),
                                         'css_group'    => 'col-12 col-md-6',

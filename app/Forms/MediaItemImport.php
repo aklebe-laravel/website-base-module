@@ -18,6 +18,7 @@ class MediaItemImport extends MediaItem
      * @var string
      */
     protected string $defaultObjectType = WebsiteMediaItemModel::OBJECT_TYPE_IMPORT_PRODUCT;
+
     /**
      *
      * @return array
@@ -27,6 +28,7 @@ class MediaItemImport extends MediaItem
         $parentFormData = parent::getFormElements();
 
         data_forget($parentFormData, 'tab_controls.base_item.tab_pages.0.content.form_elements.final_url');
+        data_set($parentFormData, 'tab_controls.base_item.tab_pages.0.content.form_elements.name.label', __('Import Name'));
         data_set($parentFormData, 'tab_controls.base_item.tab_pages.0.content.form_elements.media_type.visible', false);
         data_set($parentFormData, 'tab_controls.base_item.tab_pages.0.content.form_elements.object_type.css_group', 'col-12');
         data_set($parentFormData, 'tab_controls.base_item.tab_pages.0.content.form_elements.media_file_upload', [
@@ -35,6 +37,8 @@ class MediaItemImport extends MediaItem
             'description'  => __('Upload Import Files'),
             'css_group'    => 'col-12',
         ]);
+
+        $parentFormData['description'] = __('import_description')."\n\n".$parentFormData['description'];
 
         return $parentFormData;
     }
