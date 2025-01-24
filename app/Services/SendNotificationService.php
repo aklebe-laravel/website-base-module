@@ -12,8 +12,6 @@ use Modules\WebsiteBase\app\Models\NotificationConcern;
 use Modules\WebsiteBase\app\Models\NotificationConcern as NotificationConcernModel;
 use Modules\WebsiteBase\app\Models\User as WebsiteBaseUser;
 use Modules\WebsiteBase\app\Services\Notification\Channels\BaseChannel;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class SendNotificationService extends BaseService
 {
@@ -45,16 +43,14 @@ class SendNotificationService extends BaseService
 
     /**
      * @param  string  $notificationConcernCode
-     * @param  mixed   $userOrUserList  List of user ids or user instances, or just one item
+     * @param  mixed   $userOrUserList  List of user ids, or user instances, or just one of them
      * @param  array   $viewData
      * @param  array   $tags
      * @param  array   $metaData
      *
      * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
-    public function sendNotificationConcern(string $notificationConcernCode, WebsiteBaseUser|array $userOrUserList, array $viewData = [], array $tags = [], array $metaData = []): bool
+    public function sendNotificationConcern(string $notificationConcernCode, WebsiteBaseUser|array|int $userOrUserList, array $viewData = [], array $tags = [], array $metaData = []): bool
     {
         if (!$userOrUserList) {
             return false;
