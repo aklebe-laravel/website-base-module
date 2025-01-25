@@ -52,6 +52,11 @@ class MediaItemFileUpload extends BaseComponent
     public string $parentFormClass = '';
 
     /**
+     * @var string
+     */
+    public string $parentFormLivewireClass='';
+
+    /**
      * If given, emit will be fired to update livewire
      *
      * @var string
@@ -163,7 +168,6 @@ class MediaItemFileUpload extends BaseComponent
             // create the media file using temp file ...
             app('website_base_media')->createMediaFile($mediaModel, $tmpFileFullPath);
 
-            //            $pathList[] = $tmpFileFullPath;
             $pathList[] = $mediaModel->final_url;
         }
 
@@ -187,10 +191,7 @@ class MediaItemFileUpload extends BaseComponent
         // Create media files inclusive thumbs, create MediaItem and assign relation.
         $list = $this->runUploadedMediaItems($tmpFilenames);
 
-        // // Need to open the form again
-        // $this->reopenFormIfNeeded();
-
-        // Need to open the form again, maybe more code is needed in event 'upload-process-finished'
-        $this->dispatch('upload-process-finished', 'mediaItems', $this->mediaItemId);
+        // This dispatch will add the new relation to the form and open the form again.
+        $this->dispatch('upload-process-finished', 'mediaItems', $this->mediaItemId)->to($this->parentFormLivewireClass);
     }
 }
