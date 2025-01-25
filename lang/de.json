@@ -173,6 +173,8 @@
     "launch_import_description": "Startet den Import-Prozess. Dieser Prozess wird im Hintergrund ausgeführt und kann je nach Auslastung sofort oder zum späteren Zeitpunkt ausgeführt werden. Du wirst nach dem Fertigstellen des Importvorgangs auf deinen präferierten Kanal informiert.",
     "leave_password_blank": "Beide Passwort-Felder freilassen, um das Passwort nicht zu ändern.",
     "maybe_email_sent": "Email wird versandt, sofern uns die eingegebene Adresse bekannt ist.",
+    "media_item_media_upload_description": "Das vorherige Bild wird ersetzt und ist verloren wenn der Upload beendet wurde. Hochgeladene Bilder werden direkt übernommen ohne dass es einer Speicherung des Formulars bedarf.",
+    "media_user_upload_description": "Das hochgeladene Bild wird als neues Media Item erstellt und als Avatar benutzt. Das vorherige Bild wird nicht ersetzt und ist weiterhin Teil des Benutzers. Hochgeladene Bilder werden direkt übernommen ohne dass es einer Speicherung des Formulars bedarf.",
     "notification_event_user_list_description": "Die konfigurierten Benutzer und Gruppen sind für die meisten Event-Codes nicht relevant und werden überschrieben, weil sie automatisch berechnet werden. Für den manuellen Prozess jedoch werden sie benötigt.",
     "payment_method_bank_transfer": "Überweisung",
     "payment_method_cash": "Barzahlung",

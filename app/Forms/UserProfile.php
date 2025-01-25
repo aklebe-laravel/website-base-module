@@ -193,7 +193,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                         'visible'      => $defaultSettings['can_edit'],
                                         'html_element' => 'website-base::media_item_file_upload_images',
                                         'label'        => __('Media Upload'),
-                                        'description'  => __('Media Upload'),
+                                        'description'  => __('media_user_upload_description'),
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                 ],

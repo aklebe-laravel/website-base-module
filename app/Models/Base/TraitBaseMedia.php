@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Models\Base;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Modules\WebsiteBase\app\Models\MediaItem;
@@ -63,16 +64,37 @@ trait TraitBaseMedia
      *
      * @return BelongsToMany
      */
-    public function getContentImages(string $contentCode = '', bool $forceAny = true): BelongsToMany
-    {
-        $images = $this->images()->withPivot(['content_code']);
+    abstract public function getContentImages(string $contentCode = '', bool $forceAny = true): BelongsToMany;
 
+    /**
+     * @param          $images
+     * @param  string  $contentCode
+     * @param  string  $relationTable
+     * @param  bool    $forceAny
+     *
+     * @return BelongsToMany
+     */
+    protected function prepareContentImagesBuilder($images, string $contentCode = '', string $relationTable = 'media_item_user', bool $forceAny = true): BelongsToMany
+    {
         if ($contentCode) {
-            // ...
+            $images->where(function (Builder $b) use ($contentCode, $relationTable, $forceAny) {
+                // @todo: content_code is pivot column but pivot_content_code is not working
+                $b->where($relationTable.'.content_code', '=', $contentCode);
+                if ($forceAny) {
+                    // also list no marked items
+                    // @todo: content_code is pivot column but pivot_content_code is not working
+                    $b->orWhereNull($relationTable.'.content_code');
+                }
+            });
+            if ($forceAny) {
+                // order by content_code at top to get the proper items by first()
+                $images->orderByPivot('content_code', 'desc');
+            }
         }
 
         return $images;
     }
+
 
     /**
      * @param  string  $contentCode
@@ -86,6 +108,32 @@ trait TraitBaseMedia
         $img = $images->first();
 
         return $img;
+    }
+
+    /**
+     * Save the $contentCode (like 'MAKER') to the specific media item.
+     *
+     * @param  string  $contentCode
+     * @param  int     $mediaModelId
+     * @param  bool    $unique true if there can only exist one $contentCode in the whole relationship (like 'MAKER')
+     *
+     * @return bool
+     */
+    public function saveContentImage(string $contentCode, int $mediaModelId, $unique = true): bool
+    {
+        $images = $this->getContentImages()->get();
+        // get all images for this object
+        foreach ($images as $image) {
+            // remove the old maker
+            if ($unique && ($image->pivot->content_code === $contentCode)) {
+                $image->pivot->update(['content_code' => null]);
+            }
+            // assign the new maker
+            if ($image->getKey() === $mediaModelId) {
+                $image->pivot->update(['content_code' => $contentCode]);
+            }
+        }
+        return true;
     }
 
     /**

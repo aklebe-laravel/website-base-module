@@ -165,22 +165,7 @@ class User extends AppUser
     public function getContentImages(string $contentCode = '', bool $forceAny = true): BelongsToMany
     {
         $images = $this->images()->userAvatars();
-
-        if ($contentCode) {
-            $images->where(function (Builder $b) use ($contentCode, $forceAny) {
-                // @todo: content_code is pivot column but pivot_content_code is not working
-                $b->where('media_item_user.content_code', '=', $contentCode);
-                if ($forceAny) {
-                    // also list no marked items
-                    // @todo: content_code is pivot column but pivot_content_code is not working
-                    $b->orWhereNull('media_item_user.content_code');
-                }
-            });
-            if ($forceAny) {
-                // order by content_code at top to get the proper items by first()
-                $images->orderByPivot('content_code', 'desc');
-            }
-        }
+        $this->prepareContentImagesBuilder($images, $contentCode, 'media_item_user', $forceAny);
 
         return $images;
     }
