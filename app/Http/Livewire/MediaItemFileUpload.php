@@ -11,7 +11,9 @@ use Livewire\Attributes\On;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Modules\SystemBase\app\Http\Livewire\BaseComponent;
+use Modules\WebsiteBase\app\Models\Base\TraitBaseMedia;
 use Modules\WebsiteBase\app\Models\MediaItem;
+use Modules\WebsiteBase\app\Models\User;
 
 class MediaItemFileUpload extends BaseComponent
 {
@@ -78,6 +80,8 @@ class MediaItemFileUpload extends BaseComponent
 
     /**
      * Create media files inclusive thumbs, create MediaItem and assign relation.
+     * If in MediaItem Form, the image will be changed in the existing media item.
+     * Otherwise, the uploaded image always will create a new media item and set up the MAKER.
      *
      * @param  array  $files
      *
@@ -92,7 +96,7 @@ class MediaItemFileUpload extends BaseComponent
         $protoParentModelInstance = app($this->parentModelClass);
         $isMediaItemForm = ($protoParentModelInstance instanceof MediaItem);
 
-        // 1) objectModelId always have toi exists here
+        // 1) objectModelId always must exist here
         // 2) If not a MediaItem Form, we always force to create new Media item. Otherwise, we just change the image.
         if ($this->objectModelId && (!$isMediaItemForm || !$this->mediaItemId)) {
 
@@ -121,6 +125,13 @@ class MediaItemFileUpload extends BaseComponent
                 $mediaModel = app('media')->create($createData);
                 if ($mediaModelSyncRelation) {
                     $mediaModel->$mediaModelSyncRelation()->sync([$this->objectModelId]);
+
+                    /** @var TraitBaseMedia $x */
+                    foreach ($mediaModel->$mediaModelSyncRelation()->get() as $x) {
+                        if ($x->getKey() == $this->objectModelId) {
+                            $x->saveContentImage(User::IMAGE_MAKER, $mediaModel->getKey());
+                        }
+                    }
                 }
                 $this->mediaItemId = $mediaModel->getKey();
             } else {
