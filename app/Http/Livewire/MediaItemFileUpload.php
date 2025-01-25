@@ -192,6 +192,6 @@ class MediaItemFileUpload extends BaseComponent
         $list = $this->runUploadedMediaItems($tmpFilenames);
 
         // This dispatch will add the new relation to the form and open the form again.
-        $this->dispatch('upload-process-finished', 'mediaItems', $this->mediaItemId)->to($this->parentFormLivewireClass);
+        $this->dispatch('upload-process-finished', $this->mediaItemId)->to($this->parentFormLivewireClass);
     }
 }
