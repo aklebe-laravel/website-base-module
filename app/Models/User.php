@@ -6,7 +6,6 @@ use App\Models\User as AppUser;
 use Chelout\RelationshipEvents\Concerns\HasBelongsToManyEvents;
 use Chelout\RelationshipEvents\Concerns\HasOneEvents;
 use Chelout\RelationshipEvents\Traits\HasDispatchableEvents;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -450,8 +449,8 @@ class User extends AppUser
     public function makeWithDefaults(array $attributes): static
     {
         $this->setRawAttributes(array_merge([
-            'name'              => fake()->unique()->name(),
-            'email'             => fake()->unique()->safeEmail(),
+            'name'              => Str::uuid()->toString(),
+            'email'             => Str::uuid()->toString().'@local.test',
             'shared_id'         => uniqid('js_suid_'),
             'email_verified_at' => now(),
             'password'          => '1234567',
