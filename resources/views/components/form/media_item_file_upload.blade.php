@@ -54,8 +54,10 @@
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
             'parentFormClass' => $form_instance::class,
+            'parentFormLivewireClass' => $form_livewire::class,
             'parentFormLivewireId' => $form_livewire->getId(),
             'parentModelClass' => $form_instance->getObjectEloquentModelName(),
+            //'forceMediaType' => MediaItemModel::MEDIA_TYPE_..., // do not force here
             ], key($livewireKey))
         @else
             <div class="bg-light text-danger p-4">

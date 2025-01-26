@@ -55,6 +55,7 @@
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
             'parentFormClass' => $form_instance::class,
+            'parentFormLivewireClass' => $form_livewire::class,
             'parentFormLivewireId' => $form_livewire->getId(),
             'parentModelClass' => $form_instance->getObjectEloquentModelName(),
             'forceMediaType' => MediaItemModel::MEDIA_TYPE_IMAGE,
