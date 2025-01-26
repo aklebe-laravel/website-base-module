@@ -54,7 +54,7 @@ class MediaItemFileUpload extends BaseComponent
     /**
      * @var string
      */
-    public string $parentFormLivewireClass='';
+    public string $parentFormLivewireClass = '';
 
     /**
      * If given, emit will be fired to update livewire
