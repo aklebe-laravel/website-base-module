@@ -1,6 +1,5 @@
 @php
     use Illuminate\Database\Eloquent\Collection;
-    use Modules\Form\app\Forms\Base\NativeObjectBase;
 
     /** @var Collection $siteUserAddresses */
 
@@ -15,5 +14,5 @@
     }
 @endphp
 @include('form::components.form.select', [
-    'options' => app('system_base')->toHtmlSelectOptions($list, ['label', 'id'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', NativeObjectBase::UNSELECT_RELATION_IDENT)),
+    'options' => app('system_base')->toHtmlSelectOptions($list, ['label', 'id'], 'id', app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
     ])

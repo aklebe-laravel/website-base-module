@@ -32,7 +32,7 @@ class NotificationEvent extends BaseDataTable
             'css_group' => 'col-12 col-md-3 text-start',
             'css_item'  => '',
             'options'   => app('system_base')->toHtmlSelectOptions(app(SendNotificationService::class)->getRegisteredChannelNames(),
-                first: app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
+                first: app('system_base')->toSelectOptionSimple('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'   => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;
@@ -139,9 +139,9 @@ class NotificationEvent extends BaseDataTable
 
         // check for validItems() before send it to $service->launch()
         if (!($event = NotificationEventModel::with([])
-                                             ->validItems()
-                                             ->whereId($itemId)
-                                             ->count())
+            ->validItems()
+            ->whereId($itemId)
+            ->count())
         ) {
             $this->addErrorMessage(__('Event not found or disabled/invalid.'));
 

@@ -53,6 +53,14 @@ class Setting
     }
 
     /**
+     * @return int|null
+     */
+    public function getStoreId(): ?int
+    {
+        return $this->getStore()?->getKey() ?? null;
+    }
+
+    /**
      * @return User|null
      */
     public function currentUser(): ?User

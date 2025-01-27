@@ -15,7 +15,7 @@ class Module extends NativeObjectBase
      */
     public array $liveUpdate = [
         'core_config' => [
-            'store_id' => NativeObjectBaseForm::UNSELECT_RELATION_IDENT,
+            'store_id' => 0,
         ],
     ];
 

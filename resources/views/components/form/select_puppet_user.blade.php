@@ -32,5 +32,5 @@
 @endphp
 @include('form::components.form.select', [
     'options' => app('system_base')->toHtmlSelectOptions(
-        $user = User::withAclResources([AclResource::RES_NON_HUMAN])->orderBy('name')->get(), ['id', 'name'], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice')),
+        $user = User::withAclResources([AclResource::RES_NON_HUMAN])->orderBy('name')->get(), ['id', 'name'], 'id', app('system_base')->toSelectOptionSimple('No choice')),
     ])

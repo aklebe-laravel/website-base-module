@@ -41,6 +41,7 @@ trait BaseWebsiteBaseDataTable
     protected function getFilterOptionsForImages(): array
     {
         return [
+            ... app('system_base')->selectOptionsCompact[app('system_base')::selectValueNoChoice],
             'images'    => [
                 'label'   => 'With Images',
                 'builder' => function (Builder $builder, string $filterElementKey, string $filterValue) {

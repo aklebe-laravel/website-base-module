@@ -57,7 +57,7 @@ class NotificationTemplate extends ModelBase
                                         'label'        => __('ID'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'is_enabled'           => [
@@ -66,7 +66,7 @@ class NotificationTemplate extends ModelBase
                                         'description'  => __('Enabled or disabled for listings.'),
                                         'validator'    => [
                                             'nullable',
-                                            'bool'
+                                            'bool',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -74,7 +74,7 @@ class NotificationTemplate extends ModelBase
                                         'html_element' => 'select',
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\ViewTemplate::orderBy('code',
                                             'ASC')->get(), ['code', 'view_file', 'id'], 'id',
-                                            app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
+                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'label'        => __('View Template'),
                                         'description'  => __('View template used as content.'),
                                         'validator'    => [
@@ -90,7 +90,7 @@ class NotificationTemplate extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -101,7 +101,7 @@ class NotificationTemplate extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
@@ -112,7 +112,7 @@ class NotificationTemplate extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -123,7 +123,7 @@ class NotificationTemplate extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],

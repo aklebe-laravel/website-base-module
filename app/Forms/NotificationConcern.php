@@ -29,7 +29,7 @@ class NotificationConcern extends ModelBase
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled' => true,
-            'store_id'   => app('website_base_settings')->getStore()->getKey(),
+            'store_id'   => app('website_base_settings')->getStoreId(),
         ]);
     }
 
@@ -58,7 +58,7 @@ class NotificationConcern extends ModelBase
                                         'label'        => __('ID'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'is_enabled'               => [
@@ -67,7 +67,7 @@ class NotificationConcern extends ModelBase
                                         'description'  => __('Enabled or disabled for listings.'),
                                         'validator'    => [
                                             'nullable',
-                                            'bool'
+                                            'bool',
                                         ],
                                         'css_group'    => 'col-12 col-md-4',
                                     ],
@@ -85,7 +85,7 @@ class NotificationConcern extends ModelBase
                                         'html_element' => 'select',
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationTemplate::orderBy('code',
                                             'ASC')->get(), ['code', 'notification_channel', 'id'], 'id',
-                                            app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
+                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'label'        => __('Notification Template'),
                                         'description'  => __('Notification template used as content.'),
                                         'validator'    => [
@@ -101,7 +101,7 @@ class NotificationConcern extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -112,7 +112,7 @@ class NotificationConcern extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'email',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -123,7 +123,7 @@ class NotificationConcern extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -134,7 +134,7 @@ class NotificationConcern extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -145,7 +145,7 @@ class NotificationConcern extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],

@@ -120,7 +120,7 @@ class NotificationConcern extends Model
         return $query->where(function (Builder $q) {
             $q->where('is_enabled', true);
             $q->where(function (Builder $b1) {
-                $b1->where('store_id', app('website_base_settings')->getStore()->getKey());
+                $b1->where('store_id', app('website_base_settings')->getStoreId());
             });
             $q->where(function (Builder $b1) {
                 $b1->whereDoesntHave('notificationTemplate')
@@ -137,7 +137,7 @@ class NotificationConcern extends Model
      */
     protected function isValid(): Attribute
     {
-        $result = $this->is_enabled && ($this->store->id === app('website_base_settings')->getStore()->getKey()) && (!$this->notificationTemplate || $this->notificationTemplate->isValid);
+        $result = $this->is_enabled && ($this->store->id === app('website_base_settings')->getStoreId()) && (!$this->notificationTemplate || $this->notificationTemplate->isValid);
 
         return Attribute::make(get: fn() => $result);
     }

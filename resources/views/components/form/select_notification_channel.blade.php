@@ -33,5 +33,5 @@
 @endphp
 @include('form::components.form.select', [
     'options' => app('system_base')->toHtmlSelectOptions(
-        $registeredChannels, first: app('system_base')->getHtmlSelectOptionNoValue('No choice')),
+        $registeredChannels, first: app('system_base')->toSelectOptionSimple('No choice')),
     ])

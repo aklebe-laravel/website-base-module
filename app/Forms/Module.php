@@ -53,7 +53,7 @@ class Module extends NativeObjectBase
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'core_config' => [
-                'store_id' => app('website_base_settings')->getStore()->getKey(),
+                'store_id' => app('website_base_settings')->getStoreId(),
             ],
         ]);
     }
@@ -73,9 +73,9 @@ class Module extends NativeObjectBase
             /** @var SystemService $sys */
             $sys = app('system_base');
             // store id by form store id, default from settings
-            $storeId = (int) data_get($this->formLivewire->liveUpdate, 'core_config.store_id', self::UNSELECT_RELATION_IDENT);
+            $storeId = (int) data_get($this->formLivewire->liveUpdate, 'core_config.store_id', app('system_base')::selectValueNoChoice);
             // if first time, use default store (which is the current store)
-            if ($storeId === self::UNSELECT_RELATION_IDENT) {
+            if ($storeId === app('system_base')::selectValueNoChoice) {
                 $storeId = (int) data_get($this->formLivewire->objectInstanceDefaultValues, 'core_config.store_id');
             }
             // any invalid values = back to null store ...
@@ -256,12 +256,12 @@ class Module extends NativeObjectBase
         // No sort needed, config itself is sorted we run through.
         // @todo: maybe inaccurate row for label and description in this way ...
         $coreConfigModelCollection = CoreConfigModel::with([])
-                                                    ->where('module', $moduleSnakeName)
-                                                    ->where(function ($b) use ($storeId) {
-                                                        $b->where('store_id', $storeId);
-                                                        $b->orWhereNull('store_id');
-                                                    })
-                                                    ->get();
+            ->where('module', $moduleSnakeName)
+            ->where(function ($b) use ($storeId) {
+                $b->where('store_id', $storeId);
+                $b->orWhereNull('store_id');
+            })
+            ->get();
 
         // get prepared config by getJsonResource()
         // config is sorted by position, path

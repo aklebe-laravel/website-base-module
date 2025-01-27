@@ -40,14 +40,14 @@ class NotificationConcern extends BaseDataTable
             'css_group'  => 'col-12 col-md-3 text-start',
             'css_item'   => '',
             'options'    => app('system_base')->toHtmlSelectOptions(app(SendNotificationService::class)->getRegisteredChannelNames(), null, null,
-                app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
+                app('system_base')->toSelectOptionSimple('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;
                 }
                 $builder->whereHas('notificationTemplate', function ($query) use ($filterValue) {
                     $query->where('notification_channel', $filterValue)
-                          ->orWhere('notification_channel', $filterValue);
+                        ->orWhere('notification_channel', $filterValue);
                 });
             },
             'view'       => 'data-table::livewire.js-dt.filters.default-elements.select',
@@ -56,6 +56,7 @@ class NotificationConcern extends BaseDataTable
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void

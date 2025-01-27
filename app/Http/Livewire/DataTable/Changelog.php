@@ -18,11 +18,6 @@ class Changelog extends BaseDataTable
     /**
      *
      */
-    const string FILTER_ALL = '[ALL]';
-
-    /**
-     *
-     */
     const string FILTER_APP_ONLY = '[APP ONLY]';
 
     /**
@@ -34,9 +29,9 @@ class Changelog extends BaseDataTable
 
         /** @var ModuleService $moduleService */
         $moduleService = app(ModuleService::class);
-
+        $systemBase = app('system_base');
         $options = [
-            Changelog::FILTER_ALL      => Changelog::FILTER_ALL,
+            ... app('system_base')->selectOptionsCompact[app('system_base')::selectValueAll],
             // app only has special builder
             Changelog::FILTER_APP_ONLY => [
                 'label'   => Changelog::FILTER_APP_ONLY,
@@ -57,14 +52,14 @@ class Changelog extends BaseDataTable
 
         $this->addFilterElement('select-module', [
             'label'      => 'Module',
-            'default'    => 10,
+            'default'    => app('system_base')::selectValueAll,
             'position'   => 1700, // between elements rows and search
             'soft_reset' => true,
             'css_group'  => 'col-12 col-md-3 text-start',
             'css_item'   => '',
             'options'    => $options,
-            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
-                if ($filterValue !== Changelog::FILTER_ALL) {
+            'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) use ($systemBase) {
+                if ($filterValue !== $systemBase::selectValueAll) {
                     $builder->where('path', 'Modules/'.$filterValue);
                     //Log::debug("Builder extended to filter '$filterElementKey' to '$filterValue'");
                 }
@@ -75,6 +70,7 @@ class Changelog extends BaseDataTable
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void

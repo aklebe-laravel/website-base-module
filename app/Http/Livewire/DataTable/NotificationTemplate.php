@@ -40,14 +40,14 @@ class NotificationTemplate extends BaseDataTable
             'css_group'  => 'col-12 col-md-3 text-start',
             'css_item'   => '',
             'options'    => app('system_base')->toHtmlSelectOptions(app(SendNotificationService::class)->getRegisteredChannelNames(),
-                first: app('system_base')->getHtmlSelectOptionNoValue('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
+                first: app('system_base')->toSelectOptionSimple('All Channels', NotificationEvent::FILTER_NOTIFICATION_CHANNEL_ALL)),
             'builder'    => function (Builder $builder, string $filterElementKey, string $filterValue) {
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;
                 }
                 $builder->where(function (Builder $b) use ($filterValue) {
                     $b->where('notification_channel', $filterValue)
-                      ->orWhere('notification_channel', $filterValue);
+                        ->orWhere('notification_channel', $filterValue);
                 });
 
             },
@@ -57,6 +57,7 @@ class NotificationTemplate extends BaseDataTable
 
     /**
      * Overwrite to init your sort orders before session exists
+     *
      * @return void
      */
     protected function initSort(): void

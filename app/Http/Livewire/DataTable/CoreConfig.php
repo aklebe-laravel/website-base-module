@@ -2,10 +2,9 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
-use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
 use Modules\WebsiteBase\app\Models\CoreConfig as CoreConfigModel;
 
-class CoreConfig extends BaseDataTable
+class CoreConfig extends WebsiteBase
 {
     /**
      * @var string
@@ -23,11 +22,28 @@ class CoreConfig extends BaseDataTable
     }
 
     /**
+     * @return void
+     */
+    protected function initFilters(): void
+    {
+        parent::initFilters();
+
+        $this->addStoreFilter();
+    }
+
+    /**
      * @return array[]
      */
     public function getColumns(): array
     {
         return [
+            [
+                'name'       => 'store_id',
+                'label'      => 'Store',
+                'css_all'    => 'small w-5',
+                'searchable' => true,
+                'sortable'   => true,
+            ],
             [
                 'name'       => 'module',
                 'label'      => 'Module',

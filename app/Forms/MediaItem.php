@@ -67,7 +67,7 @@ class MediaItem extends ModelBase
             'is_enabled'  => true,
             'is_public'   => false,
             'user_id'     => $this->getOwnerUserId(),
-            'store_id'    => app('website_base_settings')->getStore()->getKey() ?? null,
+            'store_id'    => app('website_base_settings')->getStoreId(),
             'media_type'  => $this->fixedMediaType ?: $this->defaultMediaType,
             'object_type' => $this->fixedObjectType ?: $this->defaultObjectType,
             'position'    => 100,
@@ -125,7 +125,7 @@ class MediaItem extends ModelBase
                                         'disabled'     => (bool) $this->fixedMediaType, // disable if fixed value
                                         'label'        => __('Media Type'),
                                         'options'      => [
-                                            ... app('system_base')->getHtmlSelectOptionNoValue('No choice'),
+                                            ... app('system_base')->toSelectOptionSimple('No choice'),
                                             ... WebsiteMediaItemModel::getMediaTypesAsSelectOptions(),
                                         ],
                                         'description'  => __('Type of this media'),
@@ -137,7 +137,7 @@ class MediaItem extends ModelBase
                                         'disabled'     => (bool) $this->fixedObjectType, // disable if fixed value
                                         'label'        => __('Object Type'),
                                         'options'      => [
-                                            ... app('system_base')->getHtmlSelectOptionNoValue('No choice'),
+                                            ... app('system_base')->toSelectOptionSimple('No choice'),
                                             ... WebsiteMediaItemModel::getObjectTypesAsSelectOptions(),
                                         ],
                                         'description'  => __('What should this media used for'),

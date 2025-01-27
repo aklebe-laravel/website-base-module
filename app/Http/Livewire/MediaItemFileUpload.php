@@ -109,7 +109,7 @@ class MediaItemFileUpload extends BaseComponent
 
                 $createData = [
                     'user_id'          => $this->userId,
-                    'store_id'         => app('website_base_settings')->getStore()->getKey(),
+                    'store_id'         => app('website_base_settings')->getStoreId(),
                     'name'             => '123',
                     'description'      => '',
                     'meta_description' => '',

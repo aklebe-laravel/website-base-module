@@ -123,7 +123,7 @@ class ConfigService extends BaseService
     public function getValue(string $path = '', mixed $default = null, ?int $storeId = self::CURRENT_STORE_MARKER, ?string $module = null): mixed
     {
         if ($storeId === self::CURRENT_STORE_MARKER) {
-            $storeId = app('website_base_settings')->getStore()->getKey() ?? null;
+            $storeId = app('website_base_settings')->getStoreId();
         }
 
         // ensure data is set (for storeId and also null store)

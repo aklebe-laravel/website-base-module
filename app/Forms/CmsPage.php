@@ -18,12 +18,14 @@ class CmsPage extends ModelBase
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'Cms Page';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Cms Pages';
@@ -56,7 +58,7 @@ class CmsPage extends ModelBase
                                         'label'        => __('ID'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'is_enabled'    => [
@@ -65,7 +67,7 @@ class CmsPage extends ModelBase
                                         'description'  => __('Enabled or disabled displaying.'),
                                         'validator'    => [
                                             'nullable',
-                                            'bool'
+                                            'bool',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -76,7 +78,7 @@ class CmsPage extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -87,7 +89,7 @@ class CmsPage extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -98,7 +100,7 @@ class CmsPage extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -109,7 +111,7 @@ class CmsPage extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -119,12 +121,12 @@ class CmsPage extends ModelBase
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\CmsPage::orderBy('code',
                                             'ASC')->get(), [
                                             'id',
-                                            'name'
-                                        ], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
+                                            'name',
+                                        ], 'id', app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'description'  => __('Parent Page'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -134,12 +136,12 @@ class CmsPage extends ModelBase
                                         'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\Store::orderBy('code',
                                             'ASC')->get(), [
                                             'id',
-                                            'code'
-                                        ], 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
+                                            'code',
+                                        ], 'id', app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'description'  => __('The Store assigned to this page'),
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
@@ -149,12 +151,12 @@ class CmsPage extends ModelBase
                                         'options'      => app('system_base')->toHtmlSelectOptions([
                                             'html',
                                             'plain',
-                                            'markdown'
-                                        ], first: app('system_base')->getHtmlSelectOptionNoValue('No choice', self::UNSELECT_RELATION_IDENT)),
+                                            'markdown',
+                                        ], first: app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'description'  => __('Format and behaviour of content calculation.'),
                                         'validator'    => [
                                             'nullable',
-                                            'string'
+                                            'string',
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],

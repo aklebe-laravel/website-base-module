@@ -19,7 +19,7 @@ class CmsBase extends Model
     public function scopeCurrentStoreItems(Builder $query): Builder
     {
         return $query->where(function ($q) {
-            $q->where('store_id', app('website_base_settings')->getStore()->getKey());
+            $q->where('store_id', app('website_base_settings')->getStoreId());
             $q->orWhereNull('store_id');
             $q->orderBy('store_id', 'desc');
         });

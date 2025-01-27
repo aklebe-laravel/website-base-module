@@ -7,7 +7,7 @@
             Country::orderBy('nice_name', 'ASC')->selectRaw('*, LOWER(iso) as iso')->get(),
             ['nice_name', 'iso'],
             'iso',
-            app('system_base')->getHtmlSelectOptionNoValue('No choice')
+            app('system_base')->toSelectOptionSimple('No choice')
             );
         });
 

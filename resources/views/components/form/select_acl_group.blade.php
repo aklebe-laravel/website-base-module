@@ -31,5 +31,5 @@
 @endphp
 @include('form::components.form.select', [
     'options' => app('system_base')->toHtmlSelectOptions(
-        app(AclGroup::class)->with([])->orderBy('name')->get(), 'name', 'id', app('system_base')->getHtmlSelectOptionNoValue('No choice')),
+        app(AclGroup::class)->with([])->orderBy('name')->get(), 'name', 'id', app('system_base')->toSelectOptionSimple('No choice')),
     ])
