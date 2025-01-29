@@ -5,6 +5,8 @@ namespace Modules\WebsiteBase\app\Services;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
@@ -32,50 +34,27 @@ class ConfigService extends BaseService
      *
      * @var array
      */
-    private array $configByStore = [];
-
-    /**
-     * Like $configByStore but also indexed by module.
-     *
-     * @var array
-     */
-    private array $configByStoreAndModule = [];
+    private array $configContainer = [];
 
     /**
      * @param  int|null  $storeId
      *
-     * @return array
+     * @return string
      */
-    public function buildConfigTree(?int $storeId = null): array
+    private function getCacheKey(?int $storeId): string
     {
-        $this->configByStore[$storeId] = [];
-        $this->configByStoreAndModule[$storeId] = [];
+        return sprintf("%s%s", config('website-base.cache.core_config.prefix'), $storeId);
+    }
 
-        // inherit from null store ...
-        if ($storeId !== null) {
-            // make sure null store is also filled up ...
-            $this->getConfigTree();
-            app('system_base')::arrayMergeRecursiveDistinct($this->configByStore[$storeId], $this->configByStore[null]);
-            app('system_base')::arrayMergeRecursiveDistinct($this->configByStoreAndModule[$storeId], $this->configByStoreAndModule[null]);
-        }
-
-        try {
-
-            // get all entries of all modules by this store ...
-            $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('module')->orderBy('position')->orderBy('path');
-
-            /** @var CoreConfig $config */
-            foreach ($builder->get() as $config) {
-                Arr::set($this->configByStore[$storeId], $config->path, $config->value);
-                $this->configByStoreAndModule[$storeId][$config->module] ??= [];
-                Arr::set($this->configByStoreAndModule[$storeId][$config->module], $config->path, $config->value);
-            }
-
-        } catch (Exception $e) {
-            $this->error($e->getMessage(), [__METHOD__]);
-        }
-
-        return $this->configByStore[$storeId];
+    /**
+     * @param  int|null  $storeId
+     *
+     * @return void
+     */
+    private function resetCache(?int $storeId): void
+    {
+        Cache::forget($this->getCacheKey($storeId));
+        Log::info(sprintf("Reset cache key for store: '%s'", $storeId));
     }
 
     /**
@@ -87,11 +66,50 @@ class ConfigService extends BaseService
      */
     public function getConfigTree(?int $storeId = null): array
     {
-        if (isset($this->configByStore[$storeId])) {
-            return $this->configByStore[$storeId];
-        }
+        if (!($cacheKey = $this->getCacheKey($storeId))) {
+            // someone is calling core config before env config is ready ...
 
-        return $this->buildConfigTree($storeId);
+            //throw new Exception(__('website-base cache not found'));
+
+            Log::error(sprintf("Cache key not found for store: '%s'", $storeId));
+            return [];
+        }
+        //Log::debug(__METHOD__, [$cacheKey, (int) config('website-base.cache.core_config.ttl', 1)]);
+
+        return $this->configContainer[$storeId] = Cache::remember($cacheKey, (int) config('website-base.cache.core_config.ttl', 1), function () use ($storeId) {
+
+            Log::debug(sprintf("Creating new config cache for store: '%s'", $storeId));
+
+            $r['stores'] = [];
+            $r['store_modules'] = [];
+
+            // inherit from null store ...
+            if ($storeId !== null) {
+                // make sure null store is also filled up ...
+                $r2 = $this->getConfigTree();
+
+                app('system_base')::arrayMergeRecursiveDistinct($r['stores'], $r2['stores']);
+                app('system_base')::arrayMergeRecursiveDistinct($r['store_modules'], $r2['store_modules']);
+            }
+
+            try {
+
+                // get all entries of all modules by this store ...
+                $builder = CoreConfig::with([])->where('store_id', $storeId)->orderBy('module')->orderBy('position')->orderBy('path');
+
+                /** @var CoreConfig $config */
+                foreach ($builder->get() as $config) {
+                    Arr::set($r['stores'], $config->path, $config->value);
+                    $r['store_modules'][$config->module] ??= [];
+                    Arr::set($r['store_modules'][$config->module], $config->path, $config->value);
+                }
+
+            } catch (Exception $e) {
+                $this->error($e->getMessage(), [__METHOD__]);
+            }
+
+            return $r;
+        });
     }
 
     /**
@@ -102,10 +120,8 @@ class ConfigService extends BaseService
      */
     public function getConfigModuleTree(?int $storeId = null, ?string $module = null): array
     {
-        // ensure data is set (for storeId and also null store)
-        $this->getConfigTree($storeId);
-
-        return $this->configByStoreAndModule[$storeId][$module] ?? [];
+        // ensure data is set by calling getConfigTree($storeId) ... (for storeId and also null store)
+        return $this->getConfigTree($storeId)['store_modules'][$module] ?? [];
     }
 
     /**
@@ -131,23 +147,23 @@ class ConfigService extends BaseService
 
         // if no path, return the whole tree ...
         if (!$path) {
-            return $this->configByStore[$storeId];
+            return $this->configContainer[$storeId]['stores'];
         }
 
         // if not exist the specific store, use the default store (null) ...
-        if (($storeId !== null) && (!Arr::has($this->configByStore[$storeId], $path))) {
+        if (($storeId !== null) && (!Arr::has($this->configContainer[$storeId]['stores'], $path))) {
             return $this->getValue($path, $default, null, $module);
         }
 
         // try to get by module at first
-        if ($module !== null) { // && Arr::has($this->configByStoreAndModule[$storeId], $modulePath)) {
+        if ($module !== null) { // && Arr::has($this->configContainer[$storeId]['store_modules'], $modulePath)) {
             $modulePath = $module.'.'.$path;
 
-            return Arr::get($this->configByStoreAndModule[$storeId], $modulePath, $default);
+            return Arr::get($this->configContainer[$storeId]['store_modules'], $modulePath, $default);
         }
 
         // use store value ...
-        return Arr::get($this->configByStore[$storeId], $path, $default);
+        return Arr::get($this->configContainer[$storeId]['stores'], $path, $default);
     }
 
     ///**
@@ -167,12 +183,12 @@ class ConfigService extends BaseService
     //        $storeId = app('website_base_settings')->getStore()->getKey();
     //    }
     //
-    //    if (!isset($this->configByStore[$storeId])) {
+    //    if (!isset($this->configContainer[$storeId]['stores'])) {
     //        $this->buildConfigTree($storeId);
     //    }
     //
     //    $path = str_replace('/', '.', $path);
-    //    Arr::set($this->configByStore[$storeId], $path, $value);
+    //    Arr::set($this->configContainer[$storeId]['stores'], $path, $value);
     //
     //    if ($persist) {
     //        /** @var CoreConfig $config */
@@ -232,6 +248,7 @@ class ConfigService extends BaseService
                 if ($autoDelete && $sameAsDefaultStoreValue) {
                     $config->delete();
                     $this->warning(sprintf("Core Config deleted: '%s' for store: '%s'.", $path, $storeId), [__METHOD__]);
+                    $this->resetCache($storeId);
 
                     return false;
                 }
@@ -249,6 +266,7 @@ class ConfigService extends BaseService
         $result = $config->save();
 
         $this->info(sprintf("Core Config changed: '%s' from value '%s' to '%s'. Store: '%s', User '%s'.", $module.' - '.$path, $oldValue, $value, $storeId, Auth::user()->name));
+        $this->resetCache($storeId);
 
         return $result;
     }
