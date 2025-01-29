@@ -4,8 +4,6 @@ namespace Modules\WebsiteBase\app\Forms;
 
 use Illuminate\Support\Facades\Auth;
 use Modules\WebsiteBase\app\Forms\Base\ModelBaseExtraAttributes;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class UserProfile extends ModelBaseExtraAttributes
 {
@@ -42,14 +40,14 @@ class UserProfile extends ModelBaseExtraAttributes
      *
      * @var string
      */
-    protected string $objectFrontendLabel = 'User';
+    protected string $objectFrontendLabel = 'User Profile';
 
     /**
      * Plural
      *
      * @var string
      */
-    protected string $objectsFrontendLabel = 'Users';
+    protected string $objectsFrontendLabel = 'User Profiles';
 
     /**
      * @return mixed
@@ -91,8 +89,6 @@ class UserProfile extends ModelBaseExtraAttributes
     /**
      *
      * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function getFormElements(): array
     {
@@ -113,7 +109,7 @@ class UserProfile extends ModelBaseExtraAttributes
                 'base_item' => [
                     'disabled'  => $defaultSettings['disabled'],
                     'tab_pages' => [
-                        [
+                        'common'        => [
                             'tab'     => [
                                 'label' => __('Common'),
                             ],
@@ -199,7 +195,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
+                        'avatars'       => [
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Avatars'),
@@ -228,7 +224,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
+                        'addresses'     => [
                             'visible'  => $defaultSettings['can_edit'],
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
@@ -258,7 +254,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
+                        'images'        => [
                             'visible'  => app('website_base_config')->getValue('users.profiles.media.enabled', false),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
@@ -288,8 +284,8 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
-                            'visible'  => $defaultSettings['can_edit'],
+                        'acl_groups'    => [
+                            'visible'  => $defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclGroups->count() > 0),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Groups'),
@@ -314,8 +310,8 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
-                            'visible'  => $defaultSettings['can_edit'],
+                        'acl_resources' => [
+                            'visible'  => $defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclResources->count() > 0),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Resources'),
@@ -343,7 +339,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                 ],
                             ],
                         ],
-                        [
+                        'tokens'        => [
                             'visible'  => $defaultSettings['can_edit'],
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
@@ -352,7 +348,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             'content'  => [
                                 'form_elements' => [
                                     'tokens' => [
-                                        'html_element' => $defaultSettings['element_dt'],
+                                        'html_element' => 'element-dt-selected-no-interaction',
                                         'label'        => __('Tokens'),
                                         'css_group'    => 'col-12',
                                         'options'      => [

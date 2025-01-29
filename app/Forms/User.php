@@ -18,7 +18,7 @@ class User extends ModelBaseExtraAttributes
      *
      * @var string
      */
-    public string $frontendKey = 'shared_id';
+    public const string frontendKey = 'shared_id';
 
     /**
      * Relations for using in with().

@@ -72,8 +72,11 @@ class SendNotificationService extends BaseService
                 continue;
             }
 
-            // $channel is also allowed to be null ...
-            $channel = $user->calculatedNotificationChannel();
+            if (!($channel = $user->calculatedNotificationChannel())) {
+                $this->error("Invalid Notification Channel!", [$channel, $user->name, __METHOD__]);
+                return false;
+            }
+
             $this->debug(sprintf("Calculated channel: '%s' for user '%s' .", $channel, $user->name));
 
             if (!($notificationConcern = NotificationConcernModel::with([])
