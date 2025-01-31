@@ -1,9 +1,8 @@
 @php
-    use Modules\Form\app\Forms\Base\NativeObjectBase;
+    use Modules\SystemBase\app\Services\CacheService;
     use Modules\WebsiteBase\app\Models\Store;
 
-    $ttlDefault = config('system-base.cache.default_ttl', 1);
-    $options = Cache::remember('form_element.select_store.options', $ttlDefault, function () {
+    $options = app(CacheService::class)->rememberForever('form_element.select_store.options', function () {
         return app('system_base')->toHtmlSelectOptions(
             Store::orderBy('code','ASC')->get(),
             ['id','code'],

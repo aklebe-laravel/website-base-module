@@ -3,9 +3,9 @@
 namespace Modules\WebsiteBase\app\Services;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Process;
 use Modules\SystemBase\app\Services\Base\BaseService;
+use Modules\SystemBase\app\Services\CacheService;
 use Modules\SystemBase\app\Services\ModuleService;
 use Modules\SystemBase\app\Services\ThemeService;
 use Modules\WebsiteBase\app\Models\Changelog;
@@ -38,10 +38,7 @@ class CreateChangeLogService extends BaseService
     public function foundCommit(array $data): Changelog
     {
         $this->parseCommitData($commit);
-        if ($changeLogModel = Changelog::with([])
-            ->where('path', $data['path'])
-            ->where('hash', $data['hash'])
-            ->first()) {
+        if ($changeLogModel = Changelog::with([])->where('path', $data['path'])->where('hash', $data['hash'])->first()) {
         } else {
             $changeLogModel = Changelog::create([
                 'hash'              => $data['hash'],
@@ -67,13 +64,14 @@ class CreateChangeLogService extends BaseService
         // just to remember: array<array{index: int, hash: string, path: string, author: string, date: string, date_raw: string, messages: array}>
 
         $cacheKey = 'git_history_'.$path;
-        Cache::rememberForever($cacheKey, function () use ($path) {
+        app(CacheService::class)->rememberForever($cacheKey, function () use ($path) {
 
             $fullPath = base_path($path);
             if (is_dir($fullPath)) {
 
                 if (!is_file($fullPath.'/.git/config')) {
                     $this->debug('No git found for path:', [$fullPath, __METHOD__]);
+
                     return $fullPath;
                 }
 
@@ -119,13 +117,13 @@ class CreateChangeLogService extends BaseService
 
     /**
      * @param  array  $paths  empty means: app, all modules and all themes
+     *
      * @return void
      */
     public function updateGitHistories(array $paths = []): void
     {
-
         $cacheKey = 'git_all_histories_'.implode('_', $paths);
-        Cache::rememberForever($cacheKey, function () use ($paths) {
+        app(CacheService::class)->rememberForever($cacheKey, function () use ($paths) {
 
             // Automatically fill paths?
             if (!$paths) {
@@ -138,6 +136,7 @@ class CreateChangeLogService extends BaseService
                 $moduleService = app(ModuleService::class);
                 $moduleService->runOrderedEnabledModules(function (?Module $module) use (&$paths) {
                     $paths[] = 'Modules/'.$module->getStudlyName();
+
                     return true;
                 });
 
@@ -158,6 +157,7 @@ class CreateChangeLogService extends BaseService
 
     /**
      * @param $commit
+     *
      * @return void
      */
     private function parseCommitData(&$commit): void

@@ -6,10 +6,10 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Cache;
 use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Services\Base\BaseService;
+use Modules\SystemBase\app\Services\CacheService;
 use Modules\SystemBase\app\Services\ParserService;
 use Modules\WebsiteBase\app\Models\Base\CmsBase;
 use Modules\WebsiteBase\app\Models\CmsContent;
@@ -60,29 +60,23 @@ class CmsService extends BaseService
         }
 
         /** @var CmsContent|CmsBase $cmsModelClass */
-        $ttlDefault = config('system-base.cache.default_ttl', 1);
-        $ttl = config('system-base.cache.object.instance.ttl', $ttlDefault);
+        return app(CacheService::class)->rememberUseConfig($cmsModelClass."_get_{$code}_{$locale}_".($contentOnly ? '1' : '0'), 'system-base.cache.object.instance.ttl', function () use ($cmsModelClass, $code, $locale, $contentOnly) {
 
-        return Cache::remember($cmsModelClass."_get_{$code}_{$locale}_".($contentOnly ? '1' : '0'), $ttl,
-            function () use ($cmsModelClass, $code, $locale, $contentOnly) {
-                /** @var Builder $builder */
-                $builder = $cmsModelClass::with([])
-                    ->currentStoreItems()
-                    ->where('code', $code)
-                    ->where('locale', $locale);
-                /** @var CmsContent|CmsBase $item */
-                if ($item = $builder->first()) {
-                    if ($contentOnly) {
-                        if ($item) {
-                            return $item->content ?? '';
-                        }
-
-                        return ''; // force empty string
+            /** @var Builder $builder */
+            $builder = $cmsModelClass::with([])->currentStoreItems()->where('code', $code)->where('locale', $locale);
+            /** @var CmsContent|CmsBase $item */
+            if ($item = $builder->first()) {
+                if ($contentOnly) {
+                    if ($item) {
+                        return $item->content ?? '';
                     }
-                }
 
-                return $item;
-            });
+                    return ''; // force empty string
+                }
+            }
+
+            return $item;
+        });
     }
 
     /**
@@ -94,21 +88,14 @@ class CmsService extends BaseService
     {
         $locale = config('app.locale', 'en');
 
-        $ttlDefault = config('system-base.cache.default_ttl', 1);
-        $ttl = config('system-base.cache.object.instance.ttl', $ttlDefault);
+        return app(CacheService::class)->rememberUseConfig(CmsPage::class."_routePage_{$routeUri}_{$locale}", 'system-base.cache.object.instance.ttl', function () use ($routeUri, $locale) {
+            /** @var Builder $builder */
+            $builder = CmsPage::with([])->currentStoreItems()->where('web_uri', $routeUri)->where('locale', $locale);
+            /** @var CmsPage $item */
+            $item = $builder->first();
 
-        return Cache::remember(CmsPage::class."_routePage_{$routeUri}_{$locale}", $ttl,
-            function () use ($routeUri, $locale) {
-                /** @var Builder $builder */
-                $builder = CmsPage::with([])
-                    ->currentStoreItems()
-                    ->where('web_uri', $routeUri)
-                    ->where('locale', $locale);
-                /** @var CmsPage $item */
-                $item = $builder->first();
-
-                return $item;
-            });
+            return $item;
+        });
     }
 
 
@@ -217,14 +204,18 @@ class CmsService extends BaseService
             'cms_page'    => [
                 'parameters' => [],
                 'callback'   => function (array $placeholderParameters, array $parameters, array $recursiveData) {
-                    return $this->callbackParserFunctionCmsBase(CmsPage::class, $placeholderParameters, $parameters,
+                    return $this->callbackParserFunctionCmsBase(CmsPage::class,
+                        $placeholderParameters,
+                        $parameters,
                         $recursiveData);
                 },
             ],
             'cms_content' => [
                 'parameters' => [],
                 'callback'   => function (array $placeholderParameters, array $parameters, array $recursiveData) {
-                    return $this->callbackParserFunctionCmsBase(CmsContent::class, $placeholderParameters, $parameters,
+                    return $this->callbackParserFunctionCmsBase(CmsContent::class,
+                        $placeholderParameters,
+                        $parameters,
                         $recursiveData);
                 },
             ],

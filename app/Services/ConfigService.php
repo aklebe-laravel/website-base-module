@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Modules\SystemBase\app\Services\Base\BaseService;
+use Modules\SystemBase\app\Services\CacheService;
 use Modules\WebsiteBase\app\Models\CoreConfig;
 
 /**
@@ -76,7 +77,7 @@ class ConfigService extends BaseService
         }
         //Log::debug(__METHOD__, [$cacheKey, (int) config('website-base.cache.core_config.ttl', 1)]);
 
-        return $this->configContainer[$storeId] = Cache::remember($cacheKey, (int) config('website-base.cache.core_config.ttl', 1), function () use ($storeId) {
+        return $this->configContainer[$storeId] = app(CacheService::class)->rememberUseConfig($cacheKey, 'website-base.cache.core_config.ttl', function () use ($storeId) {
 
             Log::debug(sprintf("Creating new config cache for store: '%s'", $storeId));
 
