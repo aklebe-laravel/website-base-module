@@ -67,7 +67,7 @@ class WebsiteService extends BaseService
     public function getDefaultMiddleware(): array
     {
         // @todo: core config not readable at this point, because even config isn't ready.
-        $publicPortal = false;//$this->websiteBaseConfig->getValue('site.public', false);
+        $publicPortal = true;//$this->websiteBaseConfig->getValue('site.public', false);
 
         //
         $forceAuthMiddleware = [
