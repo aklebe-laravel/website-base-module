@@ -3,6 +3,8 @@
 return [
     'name' => 'WebsiteBase',
 
+    'module_website_public' => env('CACHE_MODULE_WEBSITE_PUBLIC'),
+
     /*
     |--------------------------------------------------------------------------
     | Cache settings

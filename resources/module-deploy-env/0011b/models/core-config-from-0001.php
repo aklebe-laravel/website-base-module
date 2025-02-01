@@ -15,12 +15,6 @@ return [
     'uniques' => ['store_id', 'path'],
     // data rows itself
     'data'    => [
-        [
-            'store_id' => null,
-            'module'   => 'website-base',
-            'path'     => 'site.public',
-            'options'     => [],
-        ],
         // this replaced the old 'site.auth', more data for first insert needed
         [
             'store_id'    => null,

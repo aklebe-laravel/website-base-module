@@ -14,8 +14,7 @@ class CoreConfigTest extends TestCase
     public function test_example()
     {
         $response = $this->get('/');
-        $publicSite = app('website_base_config')->getValue('site.public');
-        $response->assertStatus($publicSite ? 200 : 302);
+        $response->assertStatus(config('website-base.module_website_public', false) ? 200 : 302);
     }
 
     /**

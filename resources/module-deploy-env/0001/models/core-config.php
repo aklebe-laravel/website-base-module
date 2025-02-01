@@ -17,15 +17,6 @@ return [
     'data'                 => [
         [
             'store_id'    => null,
-            'path'        => 'site.public',
-            'value'       => '0',
-            'position'    => 810,
-            'label'       => 'Public site',
-            'form_input'  => 'switch',
-            'description' => 'Site is public (1) or forced to login for everyone (0).',
-        ],
-        [
-            'store_id'    => null,
             'path'        => 'site.auth.enabled',
             'value'       => '1',
             'position'    => 820,

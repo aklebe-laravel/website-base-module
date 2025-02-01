@@ -48,7 +48,7 @@ class WebsiteService extends BaseService
      */
     public function isStoreVisibleForUser(): bool
     {
-        if ($this->websiteBaseConfig->getValue('site.public', false)) {
+        if (config('website-base.module_website_public', false)) {
             return true;
         }
 
@@ -67,7 +67,7 @@ class WebsiteService extends BaseService
     public function getDefaultMiddleware(): array
     {
         // @todo: core config not readable at this point, because even config isn't ready.
-        $publicPortal = false;//$this->websiteBaseConfig->getValue('site.public', false);
+        $publicPortal = config('website-base.module_website_public', false);
 
         //
         $forceAuthMiddleware = [
