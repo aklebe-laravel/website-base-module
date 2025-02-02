@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Services\Base\BaseService;
+use Modules\SystemBase\app\Services\CacheService;
 use Modules\WebsiteBase\app\Http\Middleware\StoreUserValid;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Changelog;
@@ -27,7 +28,7 @@ class WebsiteService extends BaseService
     const string cacheTag = 'website-base.cache.extra_attributes';
 
     /**
-     * @var ConfigService
+     * @var CoreConfigService
      */
     protected mixed $websiteBaseConfig;
 
@@ -155,7 +156,10 @@ class WebsiteService extends BaseService
                         /** @var Model|TraitAttributeAssignment $foundModel */
                         foreach ($modelBuilder::with([])->whereId($attributeAssignmentAsType->model_id)->get() as $foundModel) {
                             $this->debug(sprintf("Found attribute assignment class: '%s' table: '%s' model: '%s' value: '%s'",
-                                get_class($foundModel), $attributeAssignment->attribute_type, $foundModel->getKey(), $attributeAssignmentAsType->value));
+                                get_class($foundModel),
+                                $attributeAssignment->attribute_type,
+                                $foundModel->getKey(),
+                                $attributeAssignmentAsType->value));
 
                             // model callback ...
                             $callbackModel($foundModel, $attributeAssignmentAsType);
@@ -205,8 +209,7 @@ class WebsiteService extends BaseService
             $changeLogCollection->orWhereNotNull('messages');
         }
 
-        $changeLogCollection->orderByDesc('commit_created_at')
-            ->where('commit_created_at', '>', now()->subMonths(12));
+        $changeLogCollection->orderByDesc('commit_created_at')->where('commit_created_at', '>', now()->subMonths(12));
 
         $groupIndex = 0;
         $lastGroupTime = '';
@@ -241,6 +244,87 @@ class WebsiteService extends BaseService
         });
 
         return $resultGroups;
+    }
+
+    /**
+     * Providing message box buttons for javascript by 'php_to_js'.
+     * Using 2-step cache by 1) instance key and 2) getViewCache()
+     *
+     * @param  string|null  $objectKey  like 'user', 'media-item', 'notification-event', ... null for everything
+     * @param  string|null  $category   like  'default', 'form', 'data-table', ... null for everything
+     * @param  string|null  $task       like 'delete', 'rating', 'send-mail', ... null for everything
+     *
+     * @return void
+     */
+    public function provideMessageBoxButtons(?string $objectKey = null, ?string $category = null, ?string $task = null): void
+    {
+        foreach (config('message-boxes', []) as $configL1Key => $configL1Value) {
+
+            if ($objectKey !== null && $objectKey !== $configL1Key) {
+                continue;
+            }
+
+            foreach ($configL1Value as $configL2Key => $configL2Value) {
+
+                if ($category !== null && $category !== $configL2Key) {
+                    continue;
+                }
+
+                foreach ($configL2Value as $configL3Key => $configL3Value) {
+
+                    if ($task !== null && $task !== $configL3Key) {
+                        continue;
+                    }
+
+                    foreach (data_get($configL3Value, 'actions', []) as $action) {
+                        $msgBoxKeyPath = 'messageBoxes.'.$action;
+                        // soft/instance cache array ...
+                        if (app('php_to_js')->has($msgBoxKeyPath)) {
+                            continue;
+                        }
+
+                        $actionParts = explode('::', $action);
+                        if (count($actionParts) === 1) {
+                            $actionParts = ['system-base', $actionParts[0]];
+                        }
+                        if (count($actionParts) === 2) {
+                            $this->debug("mb: ", [$configL1Key, $configL2Key, $configL3Key, $actionParts]);
+
+                            // hard cache view ...
+                            $b = $this->getViewCache('message-box-button-'.$configL1Key.$configL2Key.$configL3Key.$action, $actionParts[0].'::inc.message-box.buttons.'.$actionParts[1]);
+
+                            // set values like messageBoxes['system-base::cancel'] to array ...
+                            app('php_to_js')->addData($msgBoxKeyPath, $b);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  string  $cacheKey
+     * @param  string  $viewPath
+     *
+     * @return string
+     */
+    public function getViewCache(string $cacheKey, string $viewPath): string
+    {
+        $method = __METHOD__;
+
+        // hard cache view ...
+        return app(CacheService::class)->rememberUseConfig($cacheKey, 'system-base.cache.frontend.ttl', function () use ($viewPath, $method) {
+            $path = $viewPath;
+            if (view()->exists($viewPath)) {
+                //$this->debug("caching render view: ", [$path, $method]);
+
+                return view($viewPath)->render();
+            } else {
+                $this->error("Path not found: $viewPath", [$method]);
+            }
+
+            return '';
+        });
     }
 
 }

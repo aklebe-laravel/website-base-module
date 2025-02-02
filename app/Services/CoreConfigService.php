@@ -16,7 +16,7 @@ use Modules\WebsiteBase\app\Models\CoreConfig;
  * store_id null is a fallback for all stores and defines the valid values.
  * module null means available for all modules.
  */
-class ConfigService extends BaseService
+class CoreConfigService extends BaseService
 {
     const int CURRENT_STORE_MARKER = -2;
 

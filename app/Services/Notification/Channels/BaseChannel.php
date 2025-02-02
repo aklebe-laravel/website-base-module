@@ -5,7 +5,7 @@ namespace Modules\WebsiteBase\app\Services\Notification\Channels;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\NotificationConcern as NotificationConcernModel;
 use Modules\WebsiteBase\app\Models\User;
-use Modules\WebsiteBase\app\Services\ConfigService;
+use Modules\WebsiteBase\app\Services\CoreConfigService;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
 use Modules\WebsiteBase\app\Services\WebsiteService;
 
@@ -26,9 +26,9 @@ abstract class BaseChannel extends BaseService
     public int $priority = 1000;
 
     /**
-     * @var ConfigService
+     * @var CoreConfigService
      */
-    protected ConfigService $websiteBaseConfig;
+    protected CoreConfigService $websiteBaseConfig;
 
     /**
      * @var WebsiteService

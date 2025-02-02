@@ -8,8 +8,8 @@ return [
                 'content' => 'ask_delete_user',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'delete-item',
+                    'system-base::cancel',
+                    'system-base::delete-item',
                 ],
             ],
             'claim'      => [
@@ -17,8 +17,8 @@ return [
                 'content' => 'ask_claim_user',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'claim',
+                    'system-base::cancel',
+                    'system-base::claim',
                 ],
             ],
             'send-email' => [
@@ -26,24 +26,11 @@ return [
                 'content' => 'ask_send_email',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'send-email',
+                    'system-base::cancel',
+                    'website-base::send-email',
                 ],
             ],
         ],
-        'default'    => [
-            'rating' => [
-                'title'                => 'Submit User Rating',
-                'message-box-template' => 'forms.user-rating',
-                'fetch-content'        => '/get-form-rating/user',
-                // constant names from defaultActions[] or closure
-                'actions'              => [
-                    'cancel',
-                    'accept-rating',
-                ],
-            ],
-        ],
-
     ],
     'notification-event' => [
         'data-table' => [
@@ -53,8 +40,8 @@ return [
                 'content' => 'ask_delete_event',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'delete-item',
+                    'system-base::cancel',
+                    'system-base::delete-item',
                 ],
             ],
             'launch' => [
@@ -62,8 +49,8 @@ return [
                 'content' => 'ask_launch_event',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'launch',
+                    'system-base::cancel',
+                    'system-base::launch',
                 ],
             ],
         ],
@@ -84,8 +71,8 @@ return [
                 'content' => 'launch_import_description',
                 // constant names from defaultActions[] or closure
                 'actions' => [
-                    'cancel',
-                    'import',
+                    'system-base::cancel',
+                    'website-base::import',
                 ],
             ],
         ],

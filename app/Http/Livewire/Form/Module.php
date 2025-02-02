@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Modules\Form\app\Forms\Base\NativeObjectBase as NativeObjectBaseForm;
 use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 use Modules\SystemBase\app\Models\JsonViewResponse;
-use Modules\WebsiteBase\app\Services\ConfigService;
+use Modules\WebsiteBase\app\Services\CoreConfigService;
 
 class Module extends NativeObjectBase
 {
@@ -33,7 +33,7 @@ class Module extends NativeObjectBase
         $jsonResponse = new JsonViewResponse();
         if ($validatedData = $this->validateForm()) {
 
-            /** @var ConfigService $configService */
+            /** @var CoreConfigService $configService */
             $configService = app('website_base_config');
 
             $configUpdateCount = 0;

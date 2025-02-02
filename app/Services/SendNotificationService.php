@@ -16,9 +16,9 @@ use Modules\WebsiteBase\app\Services\Notification\Channels\BaseChannel;
 class SendNotificationService extends BaseService
 {
     /**
-     * @var ConfigService
+     * @var CoreConfigService
      */
-    protected ConfigService $websiteBaseConfig;
+    protected CoreConfigService $websiteBaseConfig;
 
     /**
      * @var WebsiteService

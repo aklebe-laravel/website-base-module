@@ -213,6 +213,7 @@ export class Website {
      * @returns {boolean}
      */
     isInObject = function (arr, value) {
+        if (arr === null) return false;
         if (Array.isArray(arr)) {
             let index = arr.indexOf(value);
             return index !== -1;

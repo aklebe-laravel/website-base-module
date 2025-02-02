@@ -4,7 +4,7 @@ namespace Modules\WebsiteBase\app\Console;
 
 use Illuminate\Console\Command;
 use Modules\SystemBase\app\Services\ModuleService;
-use Modules\WebsiteBase\app\Services\ConfigService;
+use Modules\WebsiteBase\app\Services\CoreConfigService;
 use Symfony\Component\Console\Command\Command as CommandResult;
 
 class CoreConfig extends Command
@@ -39,7 +39,7 @@ class CoreConfig extends Command
             $module = ModuleService::getSnakeName($module);
         }
 
-        $configService = app(ConfigService::class);
+        $configService = app(CoreConfigService::class);
         $v = $configService->getValue($path, null, $storeId, $module);
 
         $this->output->writeln(sprintf("Path: '%s', Value: '%s'", $path, $v));

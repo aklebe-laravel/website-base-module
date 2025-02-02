@@ -41,8 +41,6 @@ class User extends BaseDataTable
     {
         parent::initBooted();
 
-        $this->addMessageBoxButton('accept-rating', 'website-base');
-
         if ($this->canManage()) {
             $this->rowCommands = [
                 'claim_user' => 'website-base::livewire.js-dt.tables.columns.buttons.claim-user',

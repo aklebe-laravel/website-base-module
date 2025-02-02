@@ -10,7 +10,7 @@ use Livewire\Attributes\On;
 use Modules\Acl\app\Models\AclResource;
 use Modules\KlaraDeployment\app\Jobs\MediaItemImport as MediaItemImportJob;
 use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
-use Modules\WebsiteBase\app\Services\ConfigService;
+use Modules\WebsiteBase\app\Services\CoreConfigService;
 
 class MediaItemImport extends MediaItem
 {
@@ -169,7 +169,7 @@ class MediaItemImport extends MediaItem
             return false;
         }
 
-        /** @var ConfigService $config */
+        /** @var CoreConfigService $config */
         $config = app('website_base_config');
 
         if (!$config->getValue('import.enabled', false)) {
