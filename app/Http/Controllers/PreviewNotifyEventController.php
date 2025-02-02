@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Acl\app\Http\Controllers\Controller;
+use Modules\Acl\app\Models\AclResource;
 use Modules\Acl\app\Services\UserService;
 use Modules\WebsiteBase\app\Models\NotificationEvent;
 use Modules\WebsiteBase\app\Notifications\Emails\NotifyDefault;
@@ -17,7 +18,7 @@ class PreviewNotifyEventController extends Controller
         /** @var UserService $userService */
         $userService = app(UserService::class);
 
-        if ($userService->hasUserResource(Auth::user(), 'manage_design')) {
+        if ($userService->hasUserResource(Auth::user(), AclResource::RES_MANAGE_DESIGN)) {
 
             /** @var NotificationEvent $notifyEvent */
             $notifyEvent = NotificationEvent::with([])->whereId($id)->first();

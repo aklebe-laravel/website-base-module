@@ -55,7 +55,7 @@ class WebsiteService extends BaseService
 
         /** @var UserService $userService */
         $userService = app(UserService::class);
-        if ($userService->hasUserResource(Auth::user(), 'trader')) {
+        if ($userService->hasUserResource(Auth::user(), AclResource::RES_TRADER)) {
             return true;
         }
 
