@@ -7,8 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\WebsiteBase\app\Services\WebsiteService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class StoreUserValid
 {
@@ -19,8 +17,6 @@ class StoreUserValid
      * @param  Closure(Request): (Response|RedirectResponse)  $next
      *
      * @return Response|RedirectResponse
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function handle(Request $request, Closure $next): Response|RedirectResponse
     {

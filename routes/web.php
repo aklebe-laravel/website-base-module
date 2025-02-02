@@ -30,7 +30,7 @@ $defaultMiddleware = $websiteService->getDefaultMiddleware();
 /**
  * In this group we need admin is logged in.
  */
-Route::group(['middleware' => [AdminUserPresent::class]], function () {
+Route::group(['middleware' => ['auth', AdminUserPresent::class]], function () {
 
     Route::get('/admin-panel/{page}', function ($page) {
 
@@ -106,6 +106,7 @@ Route::group(['middleware' => $defaultMiddleware], function () {
     Route::get('/changelog/{filter?}', function ($filter = '') {
 
         $nearestSeconds = 300;
+
         return view('content-pages.changelog', [
             'groupedChangelog' => app(WebsiteService::class)->getChangelogGroupNearest($nearestSeconds, $filter),
             'filter'           => $filter,
