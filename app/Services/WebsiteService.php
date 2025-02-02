@@ -288,8 +288,6 @@ class WebsiteService extends BaseService
                             $actionParts = ['system-base', $actionParts[0]];
                         }
                         if (count($actionParts) === 2) {
-                            $this->debug("mb: ", [$configL1Key, $configL2Key, $configL3Key, $actionParts]);
-
                             // hard cache view ...
                             $b = $this->getViewCache('message-box-button-'.$configL1Key.$configL2Key.$configL3Key.$action, $actionParts[0].'::inc.message-box.buttons.'.$actionParts[1]);
 
