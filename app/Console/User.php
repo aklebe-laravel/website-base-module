@@ -52,7 +52,7 @@ class User extends Command
                         //$this->output->writeln(sprintf("user: %8s : %s : %s", $user->getKey(), $user->name, $channel));
                     } else {
                         $newChannel = null;
-                        if (!$user->hasAclResource(AclResource::RES_TESTER)) { // @todo: some restrictions?
+                        if (true) { // @todo: some restrictions?
                             if ($user->canUseEmail()) {
                                 $newChannel = 'email';
                             } else {
