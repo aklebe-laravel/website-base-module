@@ -41,6 +41,9 @@ class User extends AppUser
      */
     const string MEDIA_OBJECT_TYPE = MediaItem::OBJECT_TYPE_USER_AVATAR;
 
+    /**
+     *
+     */
     const string ATTRIBUTE_MODEL_IDENT = AppUser::class;
 
     /**
@@ -311,7 +314,7 @@ class User extends AppUser
      */
     public function getPreferredNotificationChannels(): array
     {
-        if ($preferredChannels = $this->getExtraAttribute('preferred_notification_channels', [])) {
+        if ($preferredChannels = $this->getExtraAttribute(self::ATTR_NOTIFICATION_CHANNELS, [])) {
             if (is_array($preferredChannels)) {
                 return $preferredChannels;
             }
@@ -398,6 +401,16 @@ class User extends AppUser
         }
 
         return false;
+    }
+
+    /**
+     * True is user has a valid email.
+     *
+     * @return bool
+     */
+    public function canUseEmail(): bool
+    {
+        return !!$this->email && !$this->hasFakeEmail();
     }
 
     /**

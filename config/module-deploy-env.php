@@ -167,45 +167,45 @@ return [
                 'sources' => [
                     'preferred_notification_channel' => function (string $cmd, string $functionKey) {
 
-                        /**
-                         * 1) Move all 'preferred_notification_channel' values into 'preferred_notification_channels'
-                         * 2) Remove 'preferred_notification_channel' values
-                         * 3) Remove 'preferred_notification_channel' assignments
-                         */
-
-                        $websiteService = app(WebsiteService::class);
-                        $oldAttributeName = 'preferred_notification_channel';
-
-                        //\Illuminate\Support\Facades\Log::debug("In function: $cmd - $functionKey");
-                        $websiteService->runAllExtraAttributes('preferred_notification_channel',
-                            function (Model $foundModel, $attributeAssignmentAsType) use ($websiteService, $oldAttributeName) {
-
-                            $newAttributeName = 'preferred_notification_channels';
-                            /** @var Model|TraitAttributeAssignment $foundModel */
-                            if ($attributeAssignmentAsType->value) {
-                                if ($newAttribute = $foundModel->getExtraAttribute($newAttributeName)) {
-                                    if (!in_array($attributeAssignmentAsType->value, $newAttribute)) {
-                                        $newAttribute = \Illuminate\Support\Arr::prepend($newAttribute, $attributeAssignmentAsType->value);
-                                    }
-                                } else {
-                                    $newAttribute = [$attributeAssignmentAsType->value];
-                                }
-
-                                // save the new one
-                                $foundModel->saveModelAttributeTypeValue($newAttributeName, $newAttribute);
-
-                            }
-
-                            // delete the old one (also if empty)
-                            $foundModel->deleteModelAttributeTypeValue($oldAttributeName);
-
-                        }, function(ModelAttributeAssignment $attributeAssignment) use ($oldAttributeName) {
-                                // delete $oldAttributeName assignments ...
-                                $attributeAssignment->delete();
-                        });
-
-                        // clear extra attribute specific cache
-                        $websiteService->getExtraAttributeCache()->flush();
+                        ///**
+                        // * 1) Move all 'preferred_notification_channel' values into 'preferred_notification_channels'
+                        // * 2) Remove 'preferred_notification_channel' values
+                        // * 3) Remove 'preferred_notification_channel' assignments
+                        // */
+                        //
+                        //$websiteService = app(WebsiteService::class);
+                        //$oldAttributeName = 'preferred_notification_channel';
+                        //
+                        ////\Illuminate\Support\Facades\Log::debug("In function: $cmd - $functionKey");
+                        //$websiteService->runAllExtraAttributes('preferred_notification_channel',
+                        //    function (Model $foundModel, $attributeAssignmentAsType) use ($websiteService, $oldAttributeName) {
+                        //
+                        //    $newAttributeName = 'preferred_notification_channels';
+                        //    /** @var Model|TraitAttributeAssignment $foundModel */
+                        //    if ($attributeAssignmentAsType->value) {
+                        //        if ($newAttribute = $foundModel->getExtraAttribute($newAttributeName)) {
+                        //            if (!in_array($attributeAssignmentAsType->value, $newAttribute)) {
+                        //                $newAttribute = \Illuminate\Support\Arr::prepend($newAttribute, $attributeAssignmentAsType->value);
+                        //            }
+                        //        } else {
+                        //            $newAttribute = [$attributeAssignmentAsType->value];
+                        //        }
+                        //
+                        //        // save the new one
+                        //        $foundModel->saveModelAttributeTypeValue($newAttributeName, $newAttribute);
+                        //
+                        //    }
+                        //
+                        //    // delete the old one (also if empty)
+                        //    $foundModel->deleteModelAttributeTypeValue($oldAttributeName);
+                        //
+                        //}, function(ModelAttributeAssignment $attributeAssignment) use ($oldAttributeName) {
+                        //        // delete $oldAttributeName assignments ...
+                        //        $attributeAssignment->delete();
+                        //});
+                        //
+                        //// clear extra attribute specific cache
+                        //$websiteService->getExtraAttributeCache()->flush();
 
                     },
                 ],

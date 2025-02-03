@@ -2,6 +2,7 @@
 
 use Modules\WebsiteBase\app\Models\ModelAttribute;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
+use Modules\WebsiteBase\app\Models\User as UserModel;
 
 return [
     // class of eloquent model
@@ -15,7 +16,7 @@ return [
         [
             'model'              => 'App\Models\User',
             'model_attribute_id' => ModelAttribute::with([])
-                                                  ->where('code', '=', 'preferred_notification_channels')
+                                                  ->where('code', '=', UserModel::ATTR_NOTIFICATION_CHANNELS)
                                                   ->first()
                                                   ->getKey(),
             'attribute_type'     => 'array',

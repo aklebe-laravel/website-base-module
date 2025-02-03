@@ -8,8 +8,6 @@ use Modules\WebsiteBase\app\Models\NotificationEvent;
 use Modules\WebsiteBase\app\Models\User;
 use Modules\WebsiteBase\app\Services\NotificationEventService;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class SendNotificationTest extends TestCase
 {
@@ -26,9 +24,11 @@ class SendNotificationTest extends TestCase
         }
 
         if ($users = app(User::class)->frontendItems()->inRandomOrder()->limit(100)->first()) {
+            /** @var User $user */
             foreach ($users->get() as $user) {
-                if (!$user->hasFakeEmail()) {
+                if ($user->canUseEmail()) {
                     $this->emailUser = $user;
+
                     return true;
                 }
             }
@@ -43,8 +43,6 @@ class SendNotificationTest extends TestCase
      * 2) Send event concern to this user
      *
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function test_send_email()
     {
@@ -56,7 +54,8 @@ class SendNotificationTest extends TestCase
         /** @var SendNotificationService $sendNotificationService */
         $sendNotificationService = app(SendNotificationService::class);
         $result = $sendNotificationService->sendNotificationConcern('remember_user_login_data',
-            $validatedData['user'], ['contactData' => $validatedData]);
+            $validatedData['user'],
+            ['contactData' => $validatedData]);
 
         // Mail::assertSent(NotificationConcernEmail::class); // works together with Mail::fake() only
 

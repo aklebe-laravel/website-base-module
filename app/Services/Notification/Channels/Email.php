@@ -46,7 +46,7 @@ class Email extends BaseChannel
     public function canNotifyUser(User $user): bool
     {
         //return $user->canLogin() && !!$user->email && !$user->hasFakeEmail();
-        return !!$user->email && !$user->hasFakeEmail();
+        return $user->canUseEmail();
     }
 
     /**

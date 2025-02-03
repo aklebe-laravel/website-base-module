@@ -1,6 +1,7 @@
 <?php
 
 use Modules\WebsiteBase\app\Models\ModelAttribute;
+use Modules\WebsiteBase\app\Models\User as UserModel;
 
 return [
     // class of eloquent model
@@ -13,7 +14,7 @@ return [
     'data'    => [
         [
             'module'      => 'website-base',
-            'code'        => 'preferred_notification_channels',
+            'code'        => UserModel::ATTR_NOTIFICATION_CHANNELS,
             'description' => 'Preferred notification channels',
         ],
     ],

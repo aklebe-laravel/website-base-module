@@ -44,6 +44,11 @@ trait TraitAttributeAssignment
     protected bool $extraAttributesLoaded = false;
 
     /**
+     *
+     */
+    const string ATTR_NOTIFICATION_CHANNELS = 'preferred_notification_channels';
+
+    /**
      * General boot...() info: Static Setup for this object like events
      * General initialize...() info: executed for every new instance
      *

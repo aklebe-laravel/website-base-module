@@ -91,6 +91,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
             AttributeCleanups::class,
             CoreConfig::class,
             ChangeLog::class,
+            \Modules\WebsiteBase\app\Console\User::class,
         ]);
     }
 

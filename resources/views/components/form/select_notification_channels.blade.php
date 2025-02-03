@@ -1,5 +1,7 @@
 @php
-    use Illuminate\Http\Resources\Json\JsonResource;use Modules\Form\app\Forms\Base\ModelBase;
+    use Illuminate\Http\Resources\Json\JsonResource;
+    use Modules\Form\app\Forms\Base\ModelBase;
+    use Modules\WebsiteBase\app\Models\User;
     use Modules\WebsiteBase\app\Services\SendNotificationService;
     use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
 
@@ -29,7 +31,7 @@
      */
 
     $systemService = app('system_base');
-    $sortedChannels = $object->getExtraAttribute('preferred_notification_channels', []) ?? [];
+    $sortedChannels = $object->getExtraAttribute(User::ATTR_NOTIFICATION_CHANNELS, []) ?? [];
     $registeredChannels = app(SendNotificationService::class)->getRegisteredChannelNames();
     $sortedChannels = array_merge($sortedChannels, $registeredChannels);
 @endphp
