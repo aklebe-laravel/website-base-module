@@ -6,24 +6,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
-use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
+use Modules\WebsiteBase\app\Http\Livewire\Form\Base\AuthBase;
 
-class AuthRegister extends ModelBase
+class AuthRegister extends AuthBase
 {
-    /**
-     * This form is opened by default.
-     *
-     * @var bool
-     */
-    public bool $isFormOpen = true;
-
-    /**
-     * Decides form can send by key ENTER
-     *
-     * @var bool
-     */
-    public bool $canKeyEnterSendForm = true;
-
     /**
      * @var array|string[]
      */

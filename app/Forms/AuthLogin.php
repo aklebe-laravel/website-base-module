@@ -50,8 +50,8 @@ class AuthLogin extends ModelBaseExtraAttributes
                 'email'    => [
                     'html_element' => 'email',
                     'id'           => 'email',
-                    'label'        => __('Email'),
-                    'validator'    => ['required', 'string', 'email', 'max:255'],
+                    'label'        => __('EmailOrUsername'),
+                    'validator'    => ['required', 'string', 'max:255'],
                     'css_group'    => 'col-12',
                 ],
                 'password' => [

@@ -101,6 +101,8 @@
     "Payment Method": "Payment Method",
     "Phone": "Phone",
     "Preferred Notification Channel": "Preferred Notification Channel",
+    "Preferred Notification Channels": "Preferred Notification Channels",
+    "Preferred Notification Channels Description": "Notification Channels like email or telegram or something like that. Multi selection possible. List items can be sorted by dragging.",
     "Preview": "Preview",
     "Price": "Price",
     "Provider": "Provider",

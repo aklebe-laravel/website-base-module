@@ -100,7 +100,9 @@
     "Page :page of :total": "Seite :page von :total",
     "Payment Method": "Zahlungsmethode",
     "Phone": "Telefon",
-    "Preferred Notification Channel": "Bevorzugter Benachrichtigungskanal.",
+    "Preferred Notification Channel": "Bevorzugter Benachrichtigungskanal",
+    "Preferred Notification Channels": "Bevorzugte Benachrichtigungskanäle",
+    "Preferred Notification Channels Description": "Bevorzugte Benachrichtigungskanäle wie Email oder Telegram oder ähnliches. Mehrfachauswahl möglich. Listeneinträge können mit ziehen sortiert werden.",
     "Preview": "Vorschau",
     "Price": "Preis",
     "Provider": "Anbieter",
@@ -223,6 +225,6 @@
     "user_deleted_step_2": "Benutzer ':name' wurde zum Entfernen markiert.",
     "user_deleted_step_3": "Benutzer ':name' wurde unwiderruflich gelöscht.",
     "validation.failed": "Validierung fehlgeschlagen.",
-    "validation.unique": "Diese Identität wird bereits benutzt oder kann nicht benutzt werden",
+    "validation.unique": "Diese Identität wird bereits benutzt oder kann nicht verwendet werden",
     "zzz": "zzz"
 }

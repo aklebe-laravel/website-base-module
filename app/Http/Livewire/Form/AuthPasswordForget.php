@@ -4,29 +4,14 @@ namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\On;
-use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Http\Livewire\Form\Base\AuthBase;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
-class AuthPasswordForget extends ModelBase
+class AuthPasswordForget extends AuthBase
 {
-    /**
-     * This form is opened by default.
-     *
-     * @var bool
-     */
-    public bool $isFormOpen = true;
-
-    /**
-     * Decides form can send by key ENTER
-     *
-     * @var bool
-     */
-    public bool $canKeyEnterSendForm = true;
-
     /**
      * @var array|string[]
      */
@@ -48,9 +33,8 @@ class AuthPasswordForget extends ModelBase
 
     /**
      * @param  mixed  $livewireId
+     *
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     #[On('password-forget')]
     public function passwordForget(mixed $livewireId): void
@@ -59,44 +43,52 @@ class AuthPasswordForget extends ModelBase
             return;
         }
 
+        if (!$this->ensureIsNotRateLimited()) {
+            $this->addErrorMessage(__('Too many tries.'));
+            Log::error("Send user password failed. Rate Limiter.", [__METHOD__]);
+
+            return;
+        }
+
         if (!($validatedData = $this->validateForm())) {
             // (Errors already set)
             // Open this form again (with errors)!
             $this->reopenFormIfNeeded();
+
             return;
         }
 
         $requestedEmail = data_get($this->dataTransfer, 'email', '');
         /** @var \Modules\WebsiteBase\app\Models\User $user */
-        if ($user = \Modules\WebsiteBase\app\Models\User::getBuilderFrontendItems()
-            ->where('email', $requestedEmail)
-            ->first()) {
-
-            // Create a new Login Token with at least 10 minutes expiration if non exists
-            $minutes = 10;
-            $expire = Carbon::now()->addMinutes($minutes)->format(SystemService::dateIsoFormat8601);
-            $newExpire = Carbon::now()->addMinutes($minutes + 5)->format(SystemService::dateIsoFormat8601);
-            $token = $user->getOrCreateWebsiteToken(minExpire: $expire, newExpire: $newExpire);
-
-            /** @var SendNotificationService $sendNotificationService */
-            $sendNotificationService = app(SendNotificationService::class);
-            if (!$sendNotificationService->sendNotificationConcern('remember_user_login_data', $user)) {
-                $this->addErrorMessages($sendNotificationService->getErrors());
-                // Open this form again (with errors)!
-                $this->reopenFormIfNeeded();
-                return;
-            }
-
-        } else {
+        $user = \Modules\WebsiteBase\app\Models\User::getBuilderFrontendItems()->where('email', $requestedEmail)->orWhere('name', $requestedEmail)->first();
+        if (!$user || !$user->canLogin()) {
+            RateLimiter::hit($this->throttleKey());
             // no user found, but no error message wanted
             Log::error('User not found: ', [$requestedEmail, __METHOD__]);
+
+            return;
         }
 
-        $this->addSuccessMessage(__('maybe_email_sent'));
+        // Create a new Login Token with at least 10 minutes expiration if non exists
+        $minutes = 10;
+        $expire = Carbon::now()->addMinutes($minutes)->format(SystemService::dateIsoFormat8601);
+        $newExpire = Carbon::now()->addMinutes($minutes + 5)->format(SystemService::dateIsoFormat8601);
+        $token = $user->getOrCreateWebsiteToken(minExpire: $expire, newExpire: $newExpire);
 
-        // open form again ...
-        // $this->openForm(null, true);
-        // ... or redirect to log in
+        /** @var SendNotificationService $sendNotificationService */
+        $sendNotificationService = app(SendNotificationService::class);
+        if (!$sendNotificationService->sendNotificationConcern('remember_user_login_data', $user)) {
+            $this->addErrorMessages($sendNotificationService->getErrors());
+            // Open this form again (with errors)!
+            $this->reopenFormIfNeeded();
+
+            return;
+        }
+
+        // use session this time because we redirect to another route
+        $this->addSuccessMessage(__('maybe_email_sent'), true);
+
+        // redirect to login page
         $this->redirectRoute('login');
     }
 
