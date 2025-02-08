@@ -19,12 +19,14 @@ class Token extends ModelBase
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'Token';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Tokens';
@@ -88,14 +90,14 @@ class Token extends ModelBase
                                         'label'        => 'ID',
                                         'validator'    => [
                                             'nullable',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'user_id'     => [
                                         'html_element' => 'hidden',
                                         'validator'    => [
                                             'required',
-                                            'integer'
+                                            'integer',
                                         ],
                                     ],
                                     'purpose'     => [
@@ -106,12 +108,12 @@ class Token extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-md-8',
                                     ],
-                                    'user'        => [
-                                        'html_element' => 'user_info',
+                                    'user.avatar' => [
+                                        'html_element' => 'image',
                                         'label'        => __('Owner'),
                                         'description'  => __('Owner'),
                                         'css_group'    => 'col-12 col-md-4',
@@ -123,7 +125,7 @@ class Token extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12 col-lg-8',
                                     ],
@@ -141,7 +143,7 @@ class Token extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:30000'
+                                            'Max:30000',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
@@ -152,7 +154,7 @@ class Token extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:30000'
+                                            'Max:30000',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],

@@ -8,6 +8,14 @@ use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 class User extends ModelBase
 {
     /**
+     * @return void
+     */
+    protected function initLiveFilters(): void
+    {
+        $this->addViewModeFilter();
+    }
+
+    /**
      * @param  mixed  $livewireId
      * @param  mixed  $itemId
      *
@@ -32,6 +40,7 @@ class User extends ModelBase
         }
 
         $this->closeFormAndRefreshDatatable();
+
         return true;
     }
 }

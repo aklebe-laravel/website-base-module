@@ -42,6 +42,7 @@ class UserProfile extends User
         }
 
         Redirect::route('login')->with('message', 'Operation Successful!'); // maybe message never shown this way
+
         return true;
     }
 

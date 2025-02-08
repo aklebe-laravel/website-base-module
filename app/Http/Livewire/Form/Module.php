@@ -4,20 +4,21 @@ namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
 use Illuminate\Support\Arr;
 use Modules\Form\app\Forms\Base\NativeObjectBase as NativeObjectBaseForm;
-use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 use Modules\SystemBase\app\Models\JsonViewResponse;
+use Modules\WebsiteBase\app\Http\Livewire\Form\Base\WebsiteNativeBase;
 use Modules\WebsiteBase\app\Services\CoreConfigService;
 
-class Module extends NativeObjectBase
+class Module extends WebsiteNativeBase
 {
     /**
-     * @var array|string[]
+     * @return void
      */
-    public array $liveUpdate = [
-        'core_config' => [
-            'store_id' => 0,
-        ],
-    ];
+    protected function initLiveFilters(): void
+    {
+        parent::initLiveFilters();
+
+        $this->addStoreFilter();
+    }
 
     /**
      * Called by save() or other high level calls.
@@ -39,7 +40,7 @@ class Module extends NativeObjectBase
             $configUpdateCount = 0;
             $allModulesConfigData = data_get($validatedData, 'core_config.module', []);
             foreach ($allModulesConfigData as $moduleSnakeName => $moduleConfigData) { // there should be only one
-                $storeId = (int)data_get($validatedData, 'core_config.store_id');
+                $storeId = (int) data_get($validatedData, 'core_config.store_id');
                 if ($storeId < 1) {
                     $storeId = null;
                 }

@@ -24,13 +24,6 @@ return [
     // data rows itself
     'data'      => [
         [
-            'label'      => 'Home',
-            'code'       => 'Home-Menu-L1',
-            'route'      => 'home',
-            'icon_class' => 'bi bi-house',
-            'position'   => 900,
-        ],
-        [
             'label'         => 'Admin',
             'code'          => 'Admin-Menu-L1',
             'acl_resources' => [AclResource::RES_STAFF],

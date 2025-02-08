@@ -73,13 +73,12 @@ class CoreConfigService extends BaseService
             //throw new Exception(__('website-base cache not found'));
 
             Log::error(sprintf("Cache key not found for store: '%s'", $storeId));
+
             return [];
         }
-        //Log::debug(__METHOD__, [$cacheKey, (int) config('website-base.cache.core_config.ttl', 1)]);
+
 
         return $this->configContainer[$storeId] = app(CacheService::class)->rememberUseConfig($cacheKey, 'website-base.cache.core_config.ttl', function () use ($storeId) {
-
-            Log::debug(sprintf("Creating new config cache for store: '%s'", $storeId));
 
             $r['stores'] = [];
             $r['store_modules'] = [];

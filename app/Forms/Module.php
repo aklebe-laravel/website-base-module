@@ -47,18 +47,6 @@ class Module extends NativeObjectBase
     protected string $moduleDescription = '';
 
     /**
-     * @return array
-     */
-    public function makeObjectInstanceDefaultValues(): array
-    {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'core_config' => [
-                'store_id' => app('website_base_settings')->getStoreId(),
-            ],
-        ]);
-    }
-
-    /**
      * @param  mixed|null  $id
      *
      * @return JsonResource
@@ -73,7 +61,7 @@ class Module extends NativeObjectBase
             /** @var SystemService $sys */
             $sys = app('system_base');
             // store id by form store id, default from settings
-            $storeId = (int) data_get($this->formLivewire->liveUpdate, 'core_config.store_id', app('system_base')::selectValueNoChoice);
+            $storeId = (int) data_get($this->formLivewire->liveFilters, 'core_config.store_id', app('system_base')::selectValueNoChoice);
             // if first time, use default store (which is the current store)
             if ($storeId === app('system_base')::selectValueNoChoice) {
                 $storeId = (int) data_get($this->formLivewire->objectInstanceDefaultValues, 'core_config.store_id');
@@ -235,6 +223,7 @@ class Module extends NativeObjectBase
         $result = [
             'core_config.store_id' => [
                 'html_element'      => 'website-base::select_store',
+                'livewire'          => 'liveFilters',
                 'livewire_live'     => true,
                 'livewire_debounce' => 300,
                 'label'             => __('Choose store.'),
@@ -255,13 +244,10 @@ class Module extends NativeObjectBase
         // Preload collection of configs used by module.
         // No sort needed, config itself is sorted we run through.
         // @todo: maybe inaccurate row for label and description in this way ...
-        $coreConfigModelCollection = CoreConfigModel::with([])
-            ->where('module', $moduleSnakeName)
-            ->where(function ($b) use ($storeId) {
-                $b->where('store_id', $storeId);
-                $b->orWhereNull('store_id');
-            })
-            ->get();
+        $coreConfigModelCollection = CoreConfigModel::with([])->where('module', $moduleSnakeName)->where(function ($b) use ($storeId) {
+            $b->where('store_id', $storeId);
+            $b->orWhereNull('store_id');
+        })->get();
 
         // get prepared config by getJsonResource()
         // config is sorted by position, path
@@ -271,32 +257,32 @@ class Module extends NativeObjectBase
         app('system_base')->runThroughArray($config,
             function (string $key, mixed $value, string $currentRoot, int $currentDeep) use ($moduleSnakeName, $coreConfigModelCollection, &$result, &$configElementCount, &$config, &$prevCount) {
 
-                $configPath = ($currentRoot ? $currentRoot.'.' : '').$key;
-                $name = $this->getConfigElementName($configPath, $moduleSnakeName);
-                if ($c = $coreConfigModelCollection->where('path', $configPath)->first()) {
-                    if (data_get($c, 'options.form.new_group', false)) {
-                        $index = uuid_create();
-                        $result['__'.$index] = [
-                            'html_element' => 'hr',
-                            'css_group'    => 'col-12',
-                        ];
-                    }
-                    $newRow = data_get($c, 'options.form.full_row', false);
-                    $result[$name] = [
-                        'html_element' => $c->form_input ?? 'text',
-                        'label'        => __($c->label),
-                        'description'  => __($c->description).'<br />'.'<span class="small text-primary">'.__($c->path).'</span>',
-                        'validator'    => [
-                            'nullable',
-                            //'bool',
-                        ],
-                        'css_group'    => 'col-12 col-md-6'.($newRow ? ' col-md-12 col-lg-12 ' : ' ').($c->css_classes ?? ''),
+            $configPath = ($currentRoot ? $currentRoot.'.' : '').$key;
+            $name = $this->getConfigElementName($configPath, $moduleSnakeName);
+            if ($c = $coreConfigModelCollection->where('path', $configPath)->first()) {
+                if (data_get($c, 'options.form.new_group', false)) {
+                    $index = uuid_create();
+                    $result['__'.$index] = [
+                        'html_element' => 'hr',
+                        'css_group'    => 'col-12',
                     ];
-                    $configElementCount++;
-                    $prevCount++;
                 }
-            }, callbackEveryNode: function (string $key, mixed $value, string $currentRoot, int $currentDeep) use (&$result) {
-            });
+                $newRow = data_get($c, 'options.form.full_row', false);
+                $result[$name] = [
+                    'html_element' => $c->form_input ?? 'text',
+                    'label'        => __($c->label),
+                    'description'  => __($c->description).'<br />'.'<span class="small text-primary">'.__($c->path).'</span>',
+                    'validator'    => [
+                        'nullable',
+                        //'bool',
+                    ],
+                    'css_group'    => 'col-12 col-md-6'.($newRow ? ' col-md-12 col-lg-12 ' : ' ').($c->css_classes ?? ''),
+                ];
+                $configElementCount++;
+                $prevCount++;
+            }
+        }, callbackEveryNode: function (string $key, mixed $value, string $currentRoot, int $currentDeep) use (&$result) {
+        });
 
         $description = '';
         if (!$configElementCount) {

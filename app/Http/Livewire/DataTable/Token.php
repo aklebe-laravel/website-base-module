@@ -42,20 +42,21 @@ class Token extends BaseDataTable
                 'name'       => 'id',
                 'label'      => 'ID',
                 'format'     => 'number',
-                'css_all'    => 'text-muted font-monospace text-end w-5',
+                'css_all'    => 'hide-mobile-show-md text-muted font-monospace text-end w-5',
                 'searchable' => true,
                 'sortable'   => true,
             ],
             [
                 'name'     => 'user_id',
                 'label'    => 'User',
+                'css_all'  => 'hide-mobile-show-lg w-10',
                 'sortable' => true,
                 'view'     => 'data-table::livewire.js-dt.tables.columns.user',
             ],
             [
                 'name'       => 'purpose',
                 'label'      => __('Purpose'),
-                'css_all'    => 'w-10',
+                'css_all'    => 'hide-mobile-show-md w-10',
                 'searchable' => true,
                 'sortable'   => true,
             ],
@@ -69,7 +70,7 @@ class Token extends BaseDataTable
             [
                 'name'       => 'values',
                 'label'      => 'Json Values',
-                'css_all'    => 'w-10',
+                'css_all'    => 'hide-mobile-show-lg w-25',
                 'searchable' => true,
                 'sortable'   => true,
                 'view'       => 'data-table::livewire.js-dt.tables.columns.count',
@@ -77,6 +78,7 @@ class Token extends BaseDataTable
             [
                 'name'       => 'expires_at',
                 'label'      => 'Expired',
+                'css_all'    => 'hide-mobile-show-lg w-10',
                 'searchable' => true,
                 'sortable'   => true,
                 'view'       => 'data-table::livewire.js-dt.tables.columns.datetime-since',
@@ -84,6 +86,7 @@ class Token extends BaseDataTable
             [
                 'name'       => 'updated_at',
                 'label'      => 'Updated',
+                'css_all'    => 'w-10',
                 'searchable' => true,
                 'sortable'   => true,
                 'view'       => 'data-table::livewire.js-dt.tables.columns.datetime-since',

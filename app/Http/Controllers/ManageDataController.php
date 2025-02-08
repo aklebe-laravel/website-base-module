@@ -171,6 +171,9 @@ class ManageDataController extends Controller
         if ($id === null) {
             $id = Auth::user()->shared_id;
         }
+
+        $livewireForm = app('system_base')->findLivewire('UserProfile', 'livewire-forms');
+
         /** @var User $user */
         if ($user = app(User::class)->with([])->frontendItems()->loadByFrontend($id, 'shared_id')->first()) {
             if ($user->canLogin()) {
@@ -179,7 +182,7 @@ class ManageDataController extends Controller
                     'contentView'                 => 'components.user-profile',
                     'modelName'                   => 'User',
                     'formObjectId'                => $user->getKey(),
-                    'livewireForm'                => 'website-base::form.user-profile',
+                    'livewireForm'                => $livewireForm,
                     'objectInstanceDefaultValues' => [
                         'user_id' => $user->getKey(),
                     ],

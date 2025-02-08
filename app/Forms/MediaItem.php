@@ -165,7 +165,7 @@ class MediaItem extends ModelBase
                                     ],
                                     'meta_description'  => [
                                         'html_element' => 'textarea',
-                                        'label'        => __('Meta Description'),
+                                        'label'        => __('Meta description'),
                                         'description'  => __('Meta description of the media item'),
                                         'validator'    => ['nullable', 'string', 'Max:255'],
                                         'css_group'    => 'col-12',

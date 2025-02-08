@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Form\app\Forms\Base\ModelBase;
 use Modules\SystemBase\app\Models\JsonViewResponse;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
+use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
 
 class ModelBaseExtraAttributes extends ModelBase
 {
@@ -23,26 +24,7 @@ class ModelBaseExtraAttributes extends ModelBase
 
         if ($dataSource) {
             foreach ($dataSource->getModelAttributeAssigmentCollection() as $extraAttribute) {
-
-                $description = $extraAttribute->description ?: $extraAttribute->modelAttribute->description;
-                $description = __($description);
-
-                $attributeInputData = $this->getElementModuleInfo($extraAttribute->attribute_input);
-                $attributeInputModule = $attributeInputData['module'];
-                $attributeInput = $attributeInputData['element'];
-
-                $formElementsExtraAttributes['extra_attributes_'.$extraAttribute->modelAttribute->code] = [
-                    'name'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
-                    //'property'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
-                    'html_element' => $attributeInputModule ? ($attributeInputModule.'::'.$attributeInput) : $attributeInput,
-                    'label'        => $description,
-                    'description'  => $description.' (Extra Attribute)',
-                    // @todo: decide dynamic
-                    'validator'    => ['nullable'],
-                    // @todo: decide dynamic
-                    // 'css_group'           => 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
-                    'css_group'    => $extraAttribute->form_css ? $extraAttribute->form_css : 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
-                ];
+                $formElementsExtraAttributes['extra_attributes_'.$extraAttribute->modelAttribute->code] = $this->getExtraAttributeElement($extraAttribute);
             }
         }
 
@@ -57,6 +39,38 @@ class ModelBaseExtraAttributes extends ModelBase
         ];
 
         return $tab;
+    }
+
+    /**
+     * @param  ModelAttributeAssignment|null  $extraAttribute
+     *
+     * @return array
+     */
+    protected function getExtraAttributeElement(?ModelAttributeAssignment $extraAttribute): array
+    {
+        if (!$extraAttribute) {
+            return [];
+        }
+
+        $description = $extraAttribute->description ?: $extraAttribute->modelAttribute->description;
+        $description = __($description);
+
+        $attributeInputData = $this->getElementModuleInfo($extraAttribute->attribute_input);
+        $attributeInputModule = $attributeInputData['module'];
+        $attributeInput = $attributeInputData['element'];
+
+        return [
+            'name'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
+            //'property'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
+            'html_element' => $attributeInputModule ? ($attributeInputModule.'::'.$attributeInput) : $attributeInput,
+            'label'        => $description,
+            'description'  => $description.' (Extra Attribute)',
+            // @todo: decide dynamic
+            'validator'    => ['nullable'],
+            // @todo: decide dynamic
+            // 'css_group'           => 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
+            'css_group'    => $extraAttribute->form_css ? $extraAttribute->form_css : 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
+        ];
     }
 
     /**
