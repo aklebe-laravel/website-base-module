@@ -93,9 +93,6 @@ class ManageDataController extends Controller
             }
         }
 
-        // @todo: set here depend on model?
-        $relevantUserId = Auth::id();
-
         $contentView = [];
         if (isset($this->viewBeforeDataTable[$modelName])) {
             $contentView[] = $this->viewBeforeDataTable[$modelName];
@@ -110,7 +107,8 @@ class ManageDataController extends Controller
         }
 
         $pageData = [
-            'title'                       => __(($showOnly ? 'Show' : 'Manage')).' '.Str::plural($modelName),
+            //'title'                       => __(($showOnly ? 'Show' : 'Manage')).' '.Str::plural($modelName),
+            'title'                       => __('Show :name', ['name' => __(Str::plural($modelName))]),
             'contentView'                 => $contentView,
             // modelName is needed for form js x-data="getNewForm('User') ... otherwise console error
             'moduleName'                  => $forceModuleName,
@@ -122,9 +120,7 @@ class ManageDataController extends Controller
             ],
             'formObjectId'                => $showOnly ? null : $modelId,
             'isFormOpen'                  => !$showOnly && ($modelId !== null),
-            'objectInstanceDefaultValues' => [
-                'user_id' => $relevantUserId,
-            ],
+            'objectInstanceDefaultValues' => [],
 
         ];
 

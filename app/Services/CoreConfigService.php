@@ -88,8 +88,8 @@ class CoreConfigService extends BaseService
                 // make sure null store is also filled up ...
                 $r2 = $this->getConfigTree();
 
-                app('system_base')::arrayMergeRecursiveDistinct($r['stores'], $r2['stores']);
-                app('system_base')::arrayMergeRecursiveDistinct($r['store_modules'], $r2['store_modules']);
+                $r['stores'] = app('system_base')::arrayMergeRecursiveDistinct($r['stores'], $r2['stores']);
+                $r['store_modules'] = app('system_base')::arrayMergeRecursiveDistinct($r['store_modules'], $r2['store_modules']);
             }
 
             try {

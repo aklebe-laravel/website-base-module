@@ -13,9 +13,9 @@ class Module extends WebsiteNativeBase
     /**
      * @return void
      */
-    protected function initLiveFilters(): void
+    protected function initLiveCommands(): void
     {
-        parent::initLiveFilters();
+        parent::initLiveCommands();
 
         $this->addStoreFilter();
     }

@@ -12,9 +12,11 @@ class WebsiteNativeBase extends ModelBase
     protected function addStoreFilter(): void
     {
         $key = 'core_config.store_id';
-        // Use session if exists. Otherwise, use a default.
-        $v = (int) $this->getLiveFiltersSession($key, 0);
-        $this->setLiveFilter($key, $v, true);
+        $config = [
+            'reload'  => false,
+            'default' => 0,
+        ];
+        $this->initLiveCommand($key, $config);
     }
 
 }

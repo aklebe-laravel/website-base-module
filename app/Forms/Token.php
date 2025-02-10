@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Forms;
 
 use Illuminate\Support\Facades\Auth;
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\WebsiteBase\app\Models\Token as TokenModel;
 
 class Token extends ModelBase
 {
@@ -56,9 +57,9 @@ class Token extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'purpose' => \Modules\WebsiteBase\app\Models\Token::PURPOSE_LOGIN,
+            'purpose' => TokenModel::PURPOSE_LOGIN,
             'token'   => uniqid('tkf-', true),
-            'user_id' => $this->getOwnerUserId(),
+            'user_id' => $this->getOwnerUserId() ?: Auth::id(),
         ]);
     }
 
@@ -102,7 +103,7 @@ class Token extends ModelBase
                                     ],
                                     'purpose'     => [
                                         'html_element' => 'select',
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\Token::PURPOSE_LIST),
+                                        'options'      => app('system_base')->toHtmlSelectOptions(TokenModel::PURPOSE_LIST),
                                         'label'        => __('Purpose'),
                                         'description'  => __('Purpose'),
                                         'validator'    => [

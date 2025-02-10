@@ -10,9 +10,9 @@ class User extends ModelBase
     /**
      * @return void
      */
-    protected function initLiveFilters(): void
+    protected function initLiveCommands(): void
     {
-        $this->addViewModeFilter();
+        $this->addViewModeCommand(self::viewModeExtended);
     }
 
     /**

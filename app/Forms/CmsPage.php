@@ -31,6 +31,16 @@ class CmsPage extends ModelBase
     protected string $objectsFrontendLabel = 'Cms Pages';
 
     /**
+     * @return array
+     */
+    public function makeObjectInstanceDefaultValues(): array
+    {
+        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+            'is_enabled' => false,
+        ]);
+    }
+
+    /**
      *
      * @return array
      */
@@ -122,7 +132,9 @@ class CmsPage extends ModelBase
                                             'ASC')->get(), [
                                             'id',
                                             'name',
-                                        ], 'id', app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
+                                        ],
+                                            'id',
+                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'description'  => __('Parent Page'),
                                         'validator'    => [
                                             'nullable',
@@ -137,7 +149,9 @@ class CmsPage extends ModelBase
                                             'ASC')->get(), [
                                             'id',
                                             'code',
-                                        ], 'id', app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
+                                        ],
+                                            'id',
+                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
                                         'description'  => __('The Store assigned to this page'),
                                         'validator'    => [
                                             'nullable',

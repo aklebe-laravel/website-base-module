@@ -61,7 +61,7 @@ class Module extends NativeObjectBase
             /** @var SystemService $sys */
             $sys = app('system_base');
             // store id by form store id, default from settings
-            $storeId = (int) data_get($this->formLivewire->liveFilters, 'core_config.store_id', app('system_base')::selectValueNoChoice);
+            $storeId = (int) data_get($this->formLivewire->liveCommands, 'core_config.store_id', app('system_base')::selectValueNoChoice);
             // if first time, use default store (which is the current store)
             if ($storeId === app('system_base')::selectValueNoChoice) {
                 $storeId = (int) data_get($this->formLivewire->objectInstanceDefaultValues, 'core_config.store_id');
@@ -223,7 +223,7 @@ class Module extends NativeObjectBase
         $result = [
             'core_config.store_id' => [
                 'html_element'      => 'website-base::select_store',
-                'livewire'          => 'liveFilters',
+                'livewire'          => 'liveCommands',
                 'livewire_live'     => true,
                 'livewire_debounce' => 300,
                 'label'             => __('Choose store.'),

@@ -18,12 +18,14 @@ class Address extends ModelBase
 
     /**
      * Singular
+     *
      * @var string
      */
     protected string $objectFrontendLabel = 'Address';
 
     /**
      * Plural
+     *
      * @var string
      */
     protected string $objectsFrontendLabel = 'Addresses';
@@ -84,13 +86,21 @@ class Address extends ModelBase
                                     'email'            => [
                                         'html_element' => 'email',
                                         'label'        => __('Email'),
-                                        'validator'    => ['string', 'Max:255'],
+                                        'validator'    => [
+                                            'nullable',
+                                            'string',
+                                            'Max:255',
+                                        ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'phone'            => [
                                         'html_element' => 'text',
                                         'label'        => __('Phone'),
-                                        'validator'    => ['string', 'Max:50'],
+                                        'validator'    => [
+                                            'nullable',
+                                            'string',
+                                            'Max:50',
+                                        ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'street'           => [
@@ -114,7 +124,11 @@ class Address extends ModelBase
                                     'region'           => [
                                         'html_element' => 'text',
                                         'label'        => __('Region'),
-                                        'validator'    => ['string', 'Max:50'],
+                                        'validator'    => [
+                                            'nullable',
+                                            'string',
+                                            'Max:50',
+                                        ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
                                     'country_iso'      => [
