@@ -29,14 +29,14 @@ trait BaseWebsiteBaseDataTable
         return [
             ... app('system_base')->selectOptionsCompact[app('system_base')::selectValueNoChoice],
             'images'    => [
-                'label'   => 'With Images',
+                'label'   => __('With Images'),
                 'builder' => function (Builder $builder, string $filterElementKey, string $filterValue) {
                     $builder->whereHas('images');
                     //Log::debug("Builder added to product filter '$filterElementKey' to '$filterValue'");
                 },
             ],
             'no_images' => [
-                'label'   => 'Without Images',
+                'label'   => __('Without Images'),
                 'builder' => function (Builder $builder, string $filterElementKey, string $filterValue) {
                     $builder->whereDoesntHave('images');
                     //Log::debug("Builder added to product filter '$filterElementKey' to '$filterValue'");

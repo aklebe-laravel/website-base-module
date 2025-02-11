@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Http\Controllers;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Http\Controllers\Controller;
@@ -20,23 +21,39 @@ class SearchController extends Controller
     /**
      * @param  Request  $request
      *
-     * @return Application|Factory|View|\Illuminate\Foundation\Application
+     * @return RedirectResponse
      */
-    public function find(Request $request): Factory|View|\Illuminate\Foundation\Application|Application
+    public function find(Request $request): RedirectResponse
     {
-        $searchString = $request->post('search');
+        if (($searchString = $request->post('search')) !== null) {
+            if (strlen($searchString) < 2) {
+                $searchString = '';
+            }
 
-        if (strlen($searchString) < 2) {
-            $searchString = '';
+            $searchStringLike = '%'.$searchString.'%';
+
+            Log::info("Search Request: ", [
+                $searchString,
+                $searchStringLike,
+                __METHOD__,
+            ]);
+
+            session()->put('searchString', $searchString);
+            session()->put('searchStringLike', $searchStringLike);
         }
 
-        $searchStringLike = '%'.$searchString.'%';
+        return redirect()->route('search-results');
+    }
 
-        Log::info("Search Request: ", [
-            $searchString,
-            $searchStringLike,
-            __METHOD__,
-        ]);
+    /**
+     * @param  Request  $request
+     *
+     * @return Application|Factory|View|\Illuminate\Foundation\Application
+     */
+    public function searchResults(Request $request): Factory|View|\Illuminate\Foundation\Application|Application
+    {
+        $searchString = session('searchString');
+        $searchStringLike = session('searchStringLike');
 
         return view('website-base::page', [
             'title'                => __('Search Results'),

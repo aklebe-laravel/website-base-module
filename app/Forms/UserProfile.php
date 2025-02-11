@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Illuminate\Support\Facades\Auth;
+use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 use Modules\WebsiteBase\app\Forms\Base\ModelBaseExtraAttributes;
 
 class UserProfile extends ModelBaseExtraAttributes
@@ -196,6 +197,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'avatars'       => [
+                            'visible'  => $defaultSettings['can_edit'] && $this->formLivewire->viewModeAtLeast(),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Avatars'),
@@ -225,7 +227,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'addresses'     => [
-                            'visible'  => $defaultSettings['can_edit'],
+                            'visible'  => $defaultSettings['can_edit'] && $this->formLivewire->viewModeAtLeast(),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Addresses'),
@@ -241,9 +243,10 @@ class UserProfile extends ModelBaseExtraAttributes
                                             'form_options'  => [],
                                             'table'         => 'website-base::data-table.address',
                                             'table_options' => [
-                                                'hasCommands' => $defaultSettings['can_manage'],
-                                                'editable'    => $defaultSettings['can_manage'],
-                                                'canAddRow'   => $defaultSettings['can_manage'],
+                                                'hasCommands' => $defaultSettings['can_edit'],
+                                                'editable'    => $defaultSettings['can_edit'],
+                                                'canAddRow'   => $defaultSettings['can_edit'],
+                                                'removable'   => $defaultSettings['can_edit'],
                                             ],
                                         ],
                                         'validator'    => [
@@ -255,7 +258,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'images'        => [
-                            'visible'  => app('website_base_config')->getValue('users.profiles.media.enabled', false),
+                            'visible'  => app('website_base_config')->getValue('users.profiles.media.enabled', false) && $this->formLivewire->viewModeAtLeast(NativeObjectBase::viewModeExtended),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Images'),
@@ -271,9 +274,10 @@ class UserProfile extends ModelBaseExtraAttributes
                                             'form'          => 'website-base::form.media-item',
                                             'table'         => 'website-base::data-table.media-item-image-user-avatar',
                                             'table_options' => [
-                                                'hasCommands' => $defaultSettings['can_manage'],
-                                                'editable'    => $defaultSettings['can_manage'],
-                                                'canAddRow'   => $defaultSettings['can_manage'],
+                                                'hasCommands' => $defaultSettings['can_edit'],
+                                                'editable'    => $defaultSettings['can_edit'],
+                                                'canAddRow'   => $defaultSettings['can_edit'],
+                                                'removable'   => $defaultSettings['can_edit'],
                                             ],
                                         ],
                                         'validator'    => [
@@ -285,7 +289,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'acl_groups'    => [
-                            'visible'  => $defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclGroups->count() > 0),
+                            'visible'  => ($defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclGroups->count() > 0)) && $this->formLivewire->viewModeAtLeast(NativeObjectBase::viewModeExtended),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Groups'),
@@ -311,7 +315,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'acl_resources' => [
-                            'visible'  => $defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclResources->count() > 0),
+                            'visible'  => ($defaultSettings['can_manage'] || ($defaultSettings['can_edit'] && $this->getDataSource()->aclResources->count() > 0)) && $this->formLivewire->viewModeAtLeast(),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Acl Resources'),
@@ -327,7 +331,7 @@ class UserProfile extends ModelBaseExtraAttributes
                                             'form'          => 'acl::form.acl-resource',
                                             'table'         => 'acl::data-table.acl-resource',
                                             'table_options' => [
-                                                'description'         => 'All acl resources find of all groups by this user.',
+                                                'description'         => __('All acl resources found for all groups by this user.'),
                                                 'filterByParentOwner' => false,
                                             ],
                                         ],
@@ -340,7 +344,7 @@ class UserProfile extends ModelBaseExtraAttributes
                             ],
                         ],
                         'tokens'        => [
-                            'visible'  => $defaultSettings['can_edit'],
+                            'visible'  => $defaultSettings['can_edit'] && $this->formLivewire->viewModeAtLeast(NativeObjectBase::viewModeExtended),
                             'disabled' => !$this->getDataSource()->getKey(),
                             'tab'      => [
                                 'label' => __('Tokens'),
