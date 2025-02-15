@@ -3,6 +3,8 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Services\FormService;
+use Modules\SystemBase\app\Services\SystemService;
 
 class CmsPage extends ModelBase
 {
@@ -36,7 +38,7 @@ class CmsPage extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled' => false,
+            'is_enabled' => 0,
         ]);
     }
 
@@ -47,6 +49,11 @@ class CmsPage extends ModelBase
     public function getFormElements(): array
     {
         $parentFormData = parent::getFormElements();
+
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
+        /** @var SystemService $systemService */
+        $systemService = app('system_base');
 
         $defaultSettings = $this->getDefaultFormSettingsByPermission();
 
@@ -128,13 +135,14 @@ class CmsPage extends ModelBase
                                     'parent_id'     => [
                                         'html_element' => 'select',
                                         'label'        => __('Parent'),
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\CmsPage::orderBy('code',
-                                            'ASC')->get(), [
+                                        'options'      => $systemService->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\CmsPage::orderBy('code',
+                                            'ASC')->get(),
+                                            [
+                                                'id',
+                                                'name',
+                                            ],
                                             'id',
-                                            'name',
-                                        ],
-                                            'id',
-                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
+                                            $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]),
                                         'description'  => __('Parent Page'),
                                         'validator'    => [
                                             'nullable',
@@ -142,31 +150,18 @@ class CmsPage extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
-                                    'store_id'      => [
-                                        'html_element' => 'select',
-                                        'label'        => __('Store'),
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\Store::orderBy('code',
-                                            'ASC')->get(), [
-                                            'id',
-                                            'code',
-                                        ],
-                                            'id',
-                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
-                                        'description'  => __('The Store assigned to this page'),
-                                        'validator'    => [
-                                            'nullable',
-                                            'integer',
-                                        ],
-                                        'css_group'    => 'col-12 col-lg-6',
-                                    ],
+                                    'store_id'      => $formService->getFormElement('store', [
+                                        'description' => __('The Store assigned to this page'),
+                                        'css_group'   => 'col-12 col-lg-6',
+                                    ]),
                                     'format'        => [
                                         'html_element' => 'select',
                                         'label'        => __('Format'),
-                                        'options'      => app('system_base')->toHtmlSelectOptions([
+                                        'options'      => $systemService->toHtmlSelectOptions([
                                             'html',
                                             'plain',
                                             'markdown',
-                                        ], first: app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
+                                        ], first: $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]),
                                         'description'  => __('Format and behaviour of content calculation.'),
                                         'validator'    => [
                                             'nullable',
@@ -174,13 +169,10 @@ class CmsPage extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
-                                    'locale'        => [
-                                        'html_element' => 'website-base::select_country',
-                                        'label'        => __('Language'),
-                                        'description'  => __('Language'),
-                                        'validator'    => ['string', 'Max:6'],
-                                        'css_group'    => 'col-12 col-lg-6',
-                                    ],
+                                    'locale'        => $formService->getFormElement('country', [
+                                        'label'       => __('Language'),
+                                        'description' => __('Language'),
+                                    ]),
                                     'content'       => [
                                         'html_element' => 'textarea',
                                         'options'      => ['rows' => 10],

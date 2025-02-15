@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Services\FormService;
 
 class ViewTemplate extends ModelBase
 {
@@ -28,7 +29,7 @@ class ViewTemplate extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled'        => true,
+            'is_enabled'        => 1,
             'parameter_variant' => \Modules\WebsiteBase\app\Models\ViewTemplate::PARAMETER_VARIANT_DEFAULT,
         ]);
     }
@@ -40,6 +41,9 @@ class ViewTemplate extends ModelBase
     public function getFormElements(): array
     {
         $parentFormData = parent::getFormElements();
+
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
 
         return [
             ... $parentFormData,
@@ -64,7 +68,7 @@ class ViewTemplate extends ModelBase
                                         'description'  => __('Enabled or disabled for listings.'),
                                         'validator'    => [
                                             'nullable',
-                                            'bool'
+                                            'bool',
                                         ],
                                         'css_group'    => 'col-6 col-md-3',
                                     ],
@@ -76,7 +80,7 @@ class ViewTemplate extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-6 col-md-9',
                                     ],
@@ -87,27 +91,16 @@ class ViewTemplate extends ModelBase
                                         'validator'    => [
                                             'required',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],
-                                    'view_file'         => [
-                                        'html_element' => 'select_theme_files_in_folder',
-                                        'options'      => [
-                                            'path'            => 'views/notifications/emails',
-                                            'directory_deep'  => 1,
-                                            'regex_blacklist' => ['views/notifications/emails/inc'],
-                                            'add_delimiters'  => '#',
-                                        ],
-                                        'label'        => __('View File'),
-                                        'description'  => __("Force this content if set."),
-                                        'validator'    => [
-                                            'nullable',
-                                            'string',
-                                            'Max:255'
-                                        ],
-                                        'css_group'    => 'col-12',
-                                    ],
+                                    'view_file'         => $formService::getFormElementFormThemeFile([
+                                        'path'            => 'views/notifications',
+                                        'directory_deep'  => 2,
+                                        'regex_blacklist' => ['views/notifications/.*?/inc'],
+                                        'add_delimiters'  => '#',
+                                    ]),
                                     'content'           => [
                                         'html_element' => 'textarea',
                                         'label'        => __('Content'),
@@ -128,7 +121,7 @@ class ViewTemplate extends ModelBase
                                         'validator'    => [
                                             'nullable',
                                             'string',
-                                            'Max:255'
+                                            'Max:255',
                                         ],
                                         'css_group'    => 'col-12',
                                     ],

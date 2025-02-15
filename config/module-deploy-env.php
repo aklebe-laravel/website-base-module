@@ -219,6 +219,15 @@ return [
                 ],
             ],
         ],
+        '0016'  => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'model-attribute-assignments.php',
+                    'core-config.php',
+                ],
+            ],
+        ],
     ],
 
 ];

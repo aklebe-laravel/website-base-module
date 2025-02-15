@@ -64,8 +64,8 @@ class MediaItem extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled'  => true,
-            'is_public'   => false,
+            'is_enabled'  => 1,
+            'is_public'   => 0,
             'user_id'     => $this->getOwnerUserId(),
             'store_id'    => app('website_base_settings')->getStoreId(),
             'media_type'  => $this->fixedMediaType ?: $this->defaultMediaType,

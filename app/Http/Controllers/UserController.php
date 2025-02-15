@@ -31,7 +31,7 @@ class UserController extends Controller
             $responseData = $users->first()->toArray();
             $jsonResponse->setData($responseData);
         } else {
-            $jsonResponse->setErrorMessage('User not found.');
+            $jsonResponse->setErrorMessage(__('User not found.'));
         }
 
         return $jsonResponse;

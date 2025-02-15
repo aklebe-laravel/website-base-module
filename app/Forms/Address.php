@@ -3,6 +3,7 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Services\FormService;
 
 class Address extends ModelBase
 {
@@ -49,6 +50,9 @@ class Address extends ModelBase
     public function getFormElements(): array
     {
         $parentFormData = parent::getFormElements();
+
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
 
         return [
             ... $parentFormData,
@@ -131,14 +135,7 @@ class Address extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
-                                    'country_iso'      => [
-                                        'html_element' => 'website-base::select_country',
-                                        'label'        => __('Country'),
-                                        'description'  => __('Country'),
-                                        //                                        'validator'    => ['nullable', 'integer'],
-                                        'validator'    => ['string', 'Max:80'],
-                                        'css_group'    => 'col-12 col-md-6',
-                                    ],
+                                    'country_iso'      => $formService->getFormElement('country'),
                                     'user_description' => [
                                         'html_element' => 'textarea',
                                         'label'        => __('UserDescription'),

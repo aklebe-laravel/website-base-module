@@ -5,10 +5,12 @@ namespace Modules\WebsiteBase\app\Forms;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Log;
 use Modules\Form\app\Forms\Base\NativeObjectBase;
+use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Forms\Base\ModuleCoreConfigBase;
 use Modules\SystemBase\app\Services\ModuleService;
 use Modules\SystemBase\app\Services\SystemService;
 use Modules\WebsiteBase\app\Models\CoreConfig as CoreConfigModel;
+use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class Module extends NativeObjectBase
 {
@@ -57,13 +59,14 @@ class Module extends NativeObjectBase
             return $this->getDataSource();
         }
 
+        /** @var SystemService $systemService */
+        $systemService = app('system_base');
+
         if ($id) {
-            /** @var SystemService $sys */
-            $sys = app('system_base');
             // store id by form store id, default from settings
-            $storeId = (int) data_get($this->formLivewire->liveCommands, 'core_config.store_id', app('system_base')::selectValueNoChoice);
+            $storeId = (int) data_get($this->formLivewire->liveCommands, 'core_config.store_id', $systemService::selectValueNoChoice);
             // if first time, use default store (which is the current store)
-            if ($storeId === app('system_base')::selectValueNoChoice) {
+            if ($storeId === $systemService::selectValueNoChoice) {
                 $storeId = (int) data_get($this->formLivewire->objectInstanceDefaultValues, 'core_config.store_id');
             }
             // any invalid values = back to null store ...
@@ -99,7 +102,7 @@ class Module extends NativeObjectBase
                     $this->setDataSource(new JsonResource($module));
 
                     // prepare module specific form data if exists ...
-                    if ($moduleConfigFormClass = $sys->findModuleClass('ModuleCoreConfig', 'model-forms', false, $module['studly_name'])) {
+                    if ($moduleConfigFormClass = $systemService->findModuleClass('ModuleCoreConfig', 'model-forms', false, $module['studly_name'])) {
                         $this->moduleConfigFormClass = new $moduleConfigFormClass();
                         // extend data for extra tab pages for the specific module
                         $this->moduleConfigFormClass->extendDataSource($this->getDataSource());
@@ -219,10 +222,16 @@ class Module extends NativeObjectBase
      */
     protected function getTabCoreConfig(?string $moduleSnakeName = null, ?string $moduleStudlyName = null, ?string $configPathPattern = null): array
     {
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
+        /** @var WebsiteBaseFormService $websiteBaseFormService */
+        $websiteBaseFormService = app(WebsiteBaseFormService::class);
 
         $result = [
             'core_config.store_id' => [
-                'html_element'      => 'website-base::select_store',
+                'html_element'      => 'select',
+                'options'           => $websiteBaseFormService::getFormElementStoreOptions(),
+                //'cmpCi'             => true,
                 'livewire'          => 'liveCommands',
                 'livewire_live'     => true,
                 'livewire_debounce' => 300,
@@ -254,12 +263,20 @@ class Module extends NativeObjectBase
         $config = data_get($this->getDataSource(), 'core_config.module.'.$moduleSnakeName, []);
         $configElementCount = 0;
         $prevCount = 0;
-        app('system_base')->runThroughArray($config,
-            function (string $key, mixed $value, string $currentRoot, int $currentDeep) use ($moduleSnakeName, $coreConfigModelCollection, &$result, &$configElementCount, &$config, &$prevCount) {
+        app('system_base')->runThroughArray($config, function (string $key, mixed $value, string $currentRoot, int $currentDeep) use (
+            $formService,
+            $moduleSnakeName,
+            $coreConfigModelCollection,
+            &$result,
+            &$configElementCount,
+            &$config,
+            &$prevCount
+        ) {
 
             $configPath = ($currentRoot ? $currentRoot.'.' : '').$key;
             $name = $this->getConfigElementName($configPath, $moduleSnakeName);
             if ($c = $coreConfigModelCollection->where('path', $configPath)->first()) {
+                // layout/design: add new row?
                 if (data_get($c, 'options.form.new_group', false)) {
                     $index = uuid_create();
                     $result['__'.$index] = [
@@ -267,7 +284,11 @@ class Module extends NativeObjectBase
                         'css_group'    => 'col-12',
                     ];
                 }
+
+                // layout/design: use full row?
                 $newRow = data_get($c, 'options.form.full_row', false);
+
+                // prepare the form element
                 $result[$name] = [
                     'html_element' => $c->form_input ?? 'text',
                     'label'        => __($c->label),
@@ -278,6 +299,10 @@ class Module extends NativeObjectBase
                     ],
                     'css_group'    => 'col-12 col-md-6'.($newRow ? ' col-md-12 col-lg-12 ' : ' ').($c->css_classes ?? ''),
                 ];
+
+                // form element data
+                $result[$name] = $formService->getFormElement($c->path, $result[$name]);
+
                 $configElementCount++;
                 $prevCount++;
             }

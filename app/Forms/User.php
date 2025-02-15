@@ -49,11 +49,19 @@ class User extends ModelBaseExtraAttributes
      */
     protected string $objectsFrontendLabel = 'Users';
 
-    public function getOwnerUserId(): mixed
+    /**
+     * @param  bool  $canAuthId
+     *
+     * @return mixed
+     */
+    public function getOwnerUserId(bool $canAuthId = true): mixed
     {
         return $this->getDataSource()->getKey();
     }
 
+    /**
+     * @return bool
+     */
     public function isOwnUser(): bool
     {
         return $this->getDataSource() && ($this->getOwnerUserId() == Auth::id());
@@ -65,8 +73,8 @@ class User extends ModelBaseExtraAttributes
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled' => false,
-            'is_deleted' => false,
+            'is_enabled' => 0,
+            'is_deleted' => 0,
             'shared_id'  => uniqid('js_suid_'),
         ]);
     }

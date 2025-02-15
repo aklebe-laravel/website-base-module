@@ -14,6 +14,7 @@ use Modules\WebsiteBase\app\Models\User;
 use Modules\WebsiteBase\app\Services\CmsService;
 use Modules\WebsiteBase\app\Services\CoreConfigService;
 use Modules\WebsiteBase\app\Services\CreateChangeLogService;
+use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 use Modules\WebsiteBase\app\Services\MediaService;
 use Modules\WebsiteBase\app\Services\Notification\Channels\Email;
 use Modules\WebsiteBase\app\Services\Notification\Channels\Portal;
@@ -59,6 +60,7 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
         $this->app->singleton(CreateChangeLogService::class);
         $this->app->singleton(CmsService::class);
         $this->app->singleton(UserService::class);
+        $this->app->singleton(WebsiteBaseFormService::class);
         $this->app->singleton(Email::class);
         $this->app->singleton(Portal::class);
 

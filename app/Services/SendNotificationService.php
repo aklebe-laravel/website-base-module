@@ -74,26 +74,19 @@ class SendNotificationService extends BaseService
 
             if (!($channel = $user->calculatedNotificationChannel())) {
                 $this->error("Invalid Notification Channel!", [$channel, $user->name, __METHOD__]);
+
                 return false;
             }
 
             $this->debug(sprintf("Calculated channel: '%s' for user '%s' .", $channel, $user->name));
 
-            if (!($notificationConcern = NotificationConcernModel::with([])
-                ->validItems()
-                ->where('reason_code', '=', $notificationConcernCode)
-                ->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
-                    $b2->where('notification_channel', $channel);
-                })
-                ->first())
+            if (!($notificationConcern = NotificationConcernModel::with([])->validItems()->where('reason_code', '=', $notificationConcernCode)->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
+                $b2->where('notification_channel', $channel);
+            })->first())
             ) {
-                if (!($notificationConcern = NotificationConcernModel::with([])
-                    ->validItems()
-                    ->where('reason_code', '=', $notificationConcernCode)
-                    ->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
-                        $b2->whereNull('notification_channel');
-                    })
-                    ->first())
+                if (!($notificationConcern = NotificationConcernModel::with([])->validItems()->where('reason_code', '=', $notificationConcernCode)->whereHas('notificationTemplate', function (Builder $b2) use ($channel) {
+                    $b2->whereNull('notification_channel');
+                })->first())
                 ) {
                     $this->error(__('Missing or invalid notification concern: :reason, channel: :channel',
                         ['reason' => $notificationConcernCode, 'channel' => $channel]));
@@ -188,10 +181,15 @@ class SendNotificationService extends BaseService
      */
     public function getEmailAddressByEmailConcernOrDefaultSender(NotificationConcern $notificationConcern): ?Address
     {
-        //
-        $fromName = $notificationConcern->sender;
-        $fromEmail = $notificationConcern->sender;
-        if (!$fromEmail) {
+        $fromEmail = '';
+        $fromName = '';
+
+        /** @var ?WebsiteBaseUser $sender */
+        $sender = $notificationConcern->sender;
+        if ($sender && $sender->canUseEmail()) {
+            $fromName = $sender->name;
+            $fromEmail = $sender->email;
+        } else {
             if ($fromUser = $this->getSender()) {
                 $fromName = $fromUser->name;
                 $fromEmail = $fromUser->email;

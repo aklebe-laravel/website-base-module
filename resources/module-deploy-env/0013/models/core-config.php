@@ -53,9 +53,9 @@ return [
             'path'        => 'notification.user.sender',
             'value'       => User::with([])->where('name', 'NoReplyNotificationUser')->first()?->getKey(),
             'position'    => 1610,
-            'label'       => 'Admin Notifications',
+            'label'       => 'Sender Email',
             'form_input'  => 'website-base::select_puppet_user',
-            'description' => 'identity to send notifies',
+            'description' => 'identity to send notifies from',
         ],
     ],
 ];

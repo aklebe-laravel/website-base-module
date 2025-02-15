@@ -3,6 +3,9 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Services\FormService;
+use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class NotificationConcern extends ModelBase
 {
@@ -28,7 +31,7 @@ class NotificationConcern extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled' => true,
+            'is_enabled' => 1,
             'store_id'   => app('website_base_settings')->getStoreId(),
         ]);
     }
@@ -40,6 +43,13 @@ class NotificationConcern extends ModelBase
     public function getFormElements(): array
     {
         $parentFormData = parent::getFormElements();
+
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
+        /** @var WebsiteBaseFormService $websiteBaseFormService */
+        $websiteBaseFormService = app(WebsiteBaseFormService::class);
+        /** @var SystemService $systemService */
+        $systemService = app('system_base');
 
         return [
             ... $parentFormData,
@@ -71,21 +81,15 @@ class NotificationConcern extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-md-4',
                                     ],
-                                    'store_id'                 => [
-                                        'html_element' => 'website-base::store',
-                                        'label'        => __('Store'),
-                                        'description'  => __('Store'),
-                                        'validator'    => [
-                                            'nullable',
-                                            'integer',
-                                        ],
-                                        'css_group'    => 'col-12 col-md-4',
-                                    ],
+                                    //'store_id'                 => $websiteBaseFormService::getFormElementStore(),
+                                    'store_id'                 => $formService->getFormElement('store'),
                                     'notification_template_id' => [
                                         'html_element' => 'select',
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationTemplate::orderBy('code',
-                                            'ASC')->get(), ['code', 'notification_channel', 'id'], 'id',
-                                            app('system_base')->selectOptionsSimple[app('system_base')::selectValueNoChoice]),
+                                        'options'      => $systemService->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationTemplate::orderBy('code',
+                                            'ASC')->get(),
+                                            ['code', 'notification_channel', 'id'],
+                                            'id',
+                                            $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]),
                                         'label'        => __('Notification Template'),
                                         'description'  => __('Notification template used as content.'),
                                         'validator'    => [
@@ -103,19 +107,12 @@ class NotificationConcern extends ModelBase
                                             'string',
                                             'Max:255',
                                         ],
-                                        'css_group'    => 'col-12',
+                                        'css_group'    => 'col-12 col-md-6',
                                     ],
-                                    'sender'                   => [
-                                        'html_element' => 'website-base::system_emails',
-                                        'label'        => __('Sender'),
-                                        'description'  => __('Sender (Addresses of SiteOwner)'),
-                                        'validator'    => [
-                                            'nullable',
-                                            'email',
-                                            'Max:255',
-                                        ],
-                                        'css_group'    => 'col-12',
-                                    ],
+                                    'sender_id'                => $websiteBaseFormService::getFormElementPuppetUser([
+                                        'label'       => __('Sender'),
+                                        'description' => __('Sender Identity'),
+                                    ]),
                                     'description'              => [
                                         'html_element' => 'textarea',
                                         'label'        => __('Description'),

@@ -58,6 +58,15 @@ class NotificationConcern extends Model
     /**
      * @return BelongsTo
      */
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(static::$userClassName, 'sender_id');
+    }
+
+
+    /**
+     * @return BelongsTo
+     */
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
@@ -123,10 +132,9 @@ class NotificationConcern extends Model
                 $b1->where('store_id', app('website_base_settings')->getStoreId());
             });
             $q->where(function (Builder $b1) {
-                $b1->whereDoesntHave('notificationTemplate')
-                   ->orWhereHas('notificationTemplate', function (Builder $b2) {
-                       $b2->validItems();
-                   });
+                $b1->whereDoesntHave('notificationTemplate')->orWhereHas('notificationTemplate', function (Builder $b2) {
+                        $b2->validItems();
+                    });
             });
 
         });

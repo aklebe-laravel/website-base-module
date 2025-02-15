@@ -51,9 +51,11 @@ class UserProfile extends ModelBaseExtraAttributes
     protected string $objectsFrontendLabel = 'User Profiles';
 
     /**
+     * @param  bool  $canAuthId  *
+     *
      * @return mixed
      */
-    public function getOwnerUserId(): mixed
+    public function getOwnerUserId(bool $canAuthId = true): mixed
     {
         return $this->getDataSource()->getKey();
     }

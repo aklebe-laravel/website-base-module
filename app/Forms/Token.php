@@ -59,7 +59,7 @@ class Token extends ModelBase
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
             'purpose' => TokenModel::PURPOSE_LOGIN,
             'token'   => uniqid('tkf-', true),
-            'user_id' => $this->getOwnerUserId() ?: Auth::id(),
+            'user_id' => $this->getOwnerUserId(),
         ]);
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
+use Modules\Form\app\Events\InitFormElements;
 use Modules\WebsiteBase\app\Events\InitNavigation;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleted;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesDeleting;
@@ -50,6 +51,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ValidNotificationChannel::class    => [
             \Modules\WebsiteBase\app\Listeners\ValidNotificationChannel::class,
+        ],
+        InitFormElements::class            => [
+            \Modules\WebsiteBase\app\Listeners\InitFormElements::class,
         ],
     ];
 

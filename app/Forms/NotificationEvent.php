@@ -3,6 +3,8 @@
 namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class NotificationEvent extends ModelBase
 {
@@ -40,8 +42,8 @@ class NotificationEvent extends ModelBase
     public function makeObjectInstanceDefaultValues(): array
     {
         return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'is_enabled'    => true,
-            'repeat_count'  => false,
+            'is_enabled'    => 1,
+            'repeat_count'  => 0,
             'event_code'    => \Modules\WebsiteBase\app\Models\NotificationEvent::EVENT_CODE_NOTIFY_USERS,
             'event_trigger' => \Modules\WebsiteBase\app\Models\NotificationEvent::EVENT_TRIGGER_MANUALLY,
         ]);
@@ -54,6 +56,11 @@ class NotificationEvent extends ModelBase
     public function getFormElements(): array
     {
         $parentFormData = parent::getFormElements();
+
+        /** @var WebsiteBaseFormService $formService */
+        $formService = app(WebsiteBaseFormService::class);
+        /** @var SystemService $systemService */
+        $systemService = app('system_base');
 
         $defaultSettings = $this->getDefaultFormSettingsByPermission();
 
@@ -89,7 +96,7 @@ class NotificationEvent extends ModelBase
                                     ],
                                     'event_trigger' => [
                                         'html_element' => 'select',
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationEvent::VALID_EVENT_TRIGGERS),
+                                        'options'      => $systemService->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationEvent::VALID_EVENT_TRIGGERS),
                                         'label'        => __('Trigger'),
                                         'description'  => __('Event Trigger'),
                                         'validator'    => [
@@ -112,7 +119,7 @@ class NotificationEvent extends ModelBase
                                     ],
                                     'event_code'    => [
                                         'html_element' => 'select',
-                                        'options'      => app('system_base')->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationEvent::VALID_EVENT_CODES),
+                                        'options'      => $systemService->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationEvent::VALID_EVENT_CODES),
                                         'label'        => __('Event Code'),
                                         'description'  => __('Specific logic depends on this code'),
                                         'validator'    => [
@@ -122,17 +129,7 @@ class NotificationEvent extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
-                                    'force_channel' => [
-                                        'html_element' => 'website-base::select_notification_channel',
-                                        'label'        => __('Force Notification Channel'),
-                                        'description'  => __('If not empty: Always use this channel. If user cannot use or don\'t preferred this channel , this message will not send to him.'),
-                                        'validator'    => [
-                                            'nullable',
-                                            'string',
-                                            'Max:255',
-                                        ],
-                                        'css_group'    => 'col-12 col-md-6',
-                                    ],
+                                    'force_channel' => $formService::getFormElementNotificationChannel(),
                                     'subject'       => [
                                         'html_element' => 'text',
                                         'label'        => __('Subject'),

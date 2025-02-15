@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Forms\Base;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Models\JsonViewResponse;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
@@ -59,7 +60,7 @@ class ModelBaseExtraAttributes extends ModelBase
         $attributeInputModule = $attributeInputData['module'];
         $attributeInput = $attributeInputData['element'];
 
-        return [
+        $elementData = [
             'name'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
             //'property'         => 'extra_attributes.'.$extraAttribute->modelAttribute->code,
             'html_element' => $attributeInputModule ? ($attributeInputModule.'::'.$attributeInput) : $attributeInput,
@@ -67,10 +68,13 @@ class ModelBaseExtraAttributes extends ModelBase
             'description'  => $description.' (Extra Attribute)',
             // @todo: decide dynamic
             'validator'    => ['nullable'],
-            // @todo: decide dynamic
-            // 'css_group'           => 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
             'css_group'    => $extraAttribute->form_css ? $extraAttribute->form_css : 'col-12 '.(($extraAttribute->attribute_input !== 'textarea') ? 'col-md-6' : ''),
         ];
+
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
+
+        return $formService->getFormElement($extraAttribute->modelAttribute->code, $elementData);
     }
 
     /**

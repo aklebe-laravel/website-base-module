@@ -3,10 +3,10 @@
 namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
-use Modules\SystemBase\app\Services\CacheService;
-use Modules\WebsiteBase\app\Models\Store;
+use Modules\Form\app\Services\FormService;
+use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class WebsiteBase extends BaseDataTable
 {
@@ -15,19 +15,14 @@ class WebsiteBase extends BaseDataTable
      */
     protected function addStoreFilter(): void
     {
+        /** @var FormService $formService */
+        $formService = app(FormService::class);
+        /** @var WebsiteBaseFormService $websiteBaseFormService */
+        $websiteBaseFormService = app(WebsiteBaseFormService::class);
+        $formService->registerFormElement('store', fn($x) => $websiteBaseFormService::getFormElementStore($x));
+
+        /** @var SystemService $systemService */
         $systemService = app('system_base');
-        $options = app(CacheService::class)->remember('dt_filter_element.select_store.options', 2, function () use ($systemService) {
-            $o = $systemService->toHtmlSelectOptions(
-                Store::orderBy('code', 'ASC')->get(),
-                ['code', 'id'],
-                'id',
-            );
-
-            $o = Arr::prepend($o, $systemService->allSelectOptionsRaw[$systemService::selectValueAll], $systemService::selectValueAll);
-            $o = Arr::prepend($o, $systemService->allSelectOptionsRaw[$systemService::selectValueNoChoice], $systemService::selectValueNoChoice);
-
-            return $o;
-        });
 
         $this->addFilterElement('select-store', [
             'label'      => 'Module',
@@ -36,7 +31,7 @@ class WebsiteBase extends BaseDataTable
             'soft_reset' => true,
             'css_group'  => 'col-12 col-md-3 text-start',
             'css_item'   => '',
-            'options'    => $options,
+            'options'    => $websiteBaseFormService::getFormElementStoreOptions(),
             'builder'    => function (Builder $builder, string $filterElementKey, string|int $filterValue) use ($systemService) {
 
                 if ($filterValue != $systemService::selectValueAll) {
