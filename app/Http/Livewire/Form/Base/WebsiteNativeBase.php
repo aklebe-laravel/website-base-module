@@ -2,9 +2,9 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\Form\Base;
 
-use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
+use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 
-class WebsiteNativeBase extends ModelBase
+class WebsiteNativeBase extends NativeObjectBase
 {
     /**
      * @return void

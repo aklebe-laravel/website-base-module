@@ -102,7 +102,7 @@ class Module extends NativeObjectBase
                     $this->setDataSource(new JsonResource($module));
 
                     // prepare module specific form data if exists ...
-                    if ($moduleConfigFormClass = $systemService->findModuleClass('ModuleCoreConfig', 'model-forms', false, $module['studly_name'])) {
+                    if ($moduleConfigFormClass = $systemService->findModuleClass('ModuleCoreConfig', 'app-forms', false, $module['studly_name'])) {
                         $this->moduleConfigFormClass = new $moduleConfigFormClass();
                         // extend data for extra tab pages for the specific module
                         $this->moduleConfigFormClass->extendDataSource($this->getDataSource());
