@@ -1,5 +1,6 @@
 <?php
 
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Models\ModelAttribute;
 
 return [
@@ -73,7 +74,7 @@ return [
         ],
         [
             'module'      => 'website-base',
-            'code'        => 'currency',
+            'code'        => ExtraAttributeModel::ATTR_CURRENCY,
             'description' => 'Currency',
         ],
         [
@@ -88,7 +89,7 @@ return [
         ],
         [
             'module'      => 'website-base',
-            'code'        => 'address',
+            'code'        => ExtraAttributeModel::ATTR_ADDRESS,
             'description' => 'Address',
         ],
         [

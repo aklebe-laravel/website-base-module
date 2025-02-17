@@ -37,7 +37,7 @@ return [
             'reason_code'                               => NotificationConcern::REASON_CODE_AUTH_REGISTER_SUCCESS,
             'notificationTemplate.code'                 => NotificationConcern::REASON_CODE_AUTH_REGISTER_SUCCESS,
             'notificationTemplate.notification_channel' => Email::name,
-            'sender'                                    => '',
+            'sender_id'                                 => null,
             'description'                               => 'User registered successfully.',
             'tags'                                      => [
                 'user',
@@ -59,7 +59,7 @@ return [
             'reason_code'                               => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             'notificationTemplate.code'                 => NotificationConcern::REASON_CODE_AUTH_FORGET_PASSWORD,
             'notificationTemplate.notification_channel' => Email::name,
-            'sender'                                    => '',
+            'sender_id'                                 => null,
             'description'                               => 'User forgot password.',
             'tags'                                      => [
                 'user',
@@ -82,7 +82,7 @@ return [
             'reason_code'                               => NotificationConcern::REASON_CODE_AUTH_USER_LOGIN_DATA,
             'notificationTemplate.code'                 => 'user_login_info',
             'notificationTemplate.notification_channel' => Email::name,
-            'sender'                                    => '',
+            'sender_id'                                 => null,
             'description'                               => 'Send user login data.',
             'tags'                                      => [
                 'user',
@@ -105,7 +105,7 @@ return [
             'reason_code'                               => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             'notificationTemplate.code'                 => NotificationConcern::REASON_CODE_SYSTEM_INFO,
             'notificationTemplate.notification_channel' => Email::name,
-            'sender'                                    => '',
+            'sender_id'                                 => null,
             'description'                               => 'Send system info.',
             'tags'                                      => [
                 'system',
@@ -126,7 +126,7 @@ return [
             'reason_code'                               => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             'notificationTemplate.code'                 => NotificationConcern::REASON_CODE_CONTACT_REQUEST_MESSAGE,
             'notificationTemplate.notification_channel' => Email::name,
-            'sender'                                    => '',
+            'sender_id'                                 => null,
             'description'                               => 'Contact request.',
             'tags'                                      => [
                 'user',

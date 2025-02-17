@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Models\AclResource;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Models\User as UserModel;
 use Symfony\Component\Console\Command\Command as CommandResult;
 
@@ -62,7 +63,7 @@ class User extends Command
 
                         if ($newChannel) {
                             if ($repair) {
-                                $user->setExtraAttribute(UserModel::ATTR_NOTIFICATION_CHANNELS, [$newChannel]);
+                                $user->setExtraAttribute(ExtraAttributeModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS, [$newChannel]);
                                 if ($user->save()) {
                                     $msg = sprintf("user: %8s : %s : 'NEW CHANNEL' : %s", $user->getKey(), $user->name, $newChannel);
                                     $this->output->writeln($msg);

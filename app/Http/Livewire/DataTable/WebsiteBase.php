@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
 use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class WebsiteBase extends BaseDataTable
@@ -19,7 +20,7 @@ class WebsiteBase extends BaseDataTable
         $formService = app(FormService::class);
         /** @var WebsiteBaseFormService $websiteBaseFormService */
         $websiteBaseFormService = app(WebsiteBaseFormService::class);
-        $formService->registerFormElement('store', fn($x) => $websiteBaseFormService::getFormElementStore($x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_STORE, fn($x) => $websiteBaseFormService::getFormElementStore($x));
 
         /** @var SystemService $systemService */
         $systemService = app('system_base');

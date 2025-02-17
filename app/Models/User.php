@@ -314,7 +314,7 @@ class User extends AppUser
      */
     public function getPreferredNotificationChannels(): array
     {
-        if ($preferredChannels = $this->getExtraAttribute(self::ATTR_NOTIFICATION_CHANNELS, [])) {
+        if ($preferredChannels = $this->getExtraAttribute(static::ATTR_PREFERRED_NOTIFICATION_CHANNELS, [])) {
             if (is_array($preferredChannels)) {
                 return $preferredChannels;
             }

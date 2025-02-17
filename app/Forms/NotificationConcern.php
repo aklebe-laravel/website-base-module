@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Forms;
 use Modules\Form\app\Forms\Base\ModelBase;
 use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class NotificationConcern extends ModelBase
@@ -82,7 +83,7 @@ class NotificationConcern extends ModelBase
                                         'css_group'    => 'col-12 col-md-4',
                                     ],
                                     //'store_id'                 => $websiteBaseFormService::getFormElementStore(),
-                                    'store_id'                 => $formService->getFormElement('store'),
+                                    'store_id'                 => $formService->getFormElement(ExtraAttributeModel::ATTR_STORE),
                                     'notification_template_id' => [
                                         'html_element' => 'select',
                                         'options'      => $systemService->toHtmlSelectOptions(\Modules\WebsiteBase\app\Models\NotificationTemplate::orderBy('code',

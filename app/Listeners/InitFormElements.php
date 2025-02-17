@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Listeners;
 
 use Modules\Form\app\Events\InitFormElements as InitFormElementsEvent;
 use Modules\Form\app\Services\FormService;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Services\WebsiteBaseFormService;
 
 class InitFormElements
@@ -21,12 +22,12 @@ class InitFormElements
         $websiteBaseFormService = app(WebsiteBaseFormService::class);
 
         // attribute codes
-        $formService->registerFormElement('store', fn($x) => $websiteBaseFormService::getFormElementStore($x));
-        $formService->registerFormElement('country', fn($x) => $websiteBaseFormService::getFormElementCountry($x));
-        $formService->registerFormElement('currency', fn($x) => $websiteBaseFormService::getFormElementCurrency($x));
-        $formService->registerFormElement('address', fn($x) => $websiteBaseFormService::getFormElementAddress($event->form->getOwnerUserId(), $x));
-        $formService->registerFormElement('notification_channel', fn($x) => $websiteBaseFormService::getFormElementNotificationChannel($x));
-        $formService->registerFormElement('preferred_notification_channels', fn($x) => $websiteBaseFormService::getFormElementNotificationChannels($event->form->getDataSource(), $x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_STORE, fn($x) => $websiteBaseFormService::getFormElementStore($x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_COUNTRY, fn($x) => $websiteBaseFormService::getFormElementCountry($x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_CURRENCY, fn($x) => $websiteBaseFormService::getFormElementCurrency($x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_ADDRESS, fn($x) => $websiteBaseFormService::getFormElementAddress($event->form->getOwnerUserId(), $x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_NOTIFICATION_CHANNEL, fn($x) => $websiteBaseFormService::getFormElementNotificationChannel($x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS, fn($x) => $websiteBaseFormService::getFormElementNotificationChannels($event->form->getDataSource(), $x));
 
         // core config
         $formService->registerFormElement('notification.acl_group.staff', fn($x) => $websiteBaseFormService::getFormElementAclGroup($x));

@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Forms;
 
 use Modules\Form\app\Forms\Base\ModelBase;
 use Modules\Form\app\Services\FormService;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 
 class Address extends ModelBase
 {
@@ -135,7 +136,7 @@ class Address extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-md-6',
                                     ],
-                                    'country_iso'      => $formService->getFormElement('country'),
+                                    'country_iso'      => $formService->getFormElement(ExtraAttributeModel::ATTR_COUNTRY),
                                     'user_description' => [
                                         'html_element' => 'textarea',
                                         'label'        => __('UserDescription'),

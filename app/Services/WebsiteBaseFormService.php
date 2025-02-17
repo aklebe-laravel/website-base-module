@@ -9,6 +9,7 @@ use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\SystemBase\app\Services\CacheService;
 use Modules\SystemBase\app\Services\SystemService;
 use Modules\WebsiteBase\app\Models\Address;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Country;
 use Modules\WebsiteBase\app\Models\Store;
@@ -116,8 +117,8 @@ class WebsiteBaseFormService extends BaseService
             'html_element' => 'select',
             'options'      => static::getFormElementCurrencyOptions(),
             'cmpCi'        => true,
-            'label'        => __('Country'),
-            'description'  => __('Country'),
+            'label'        => __('Currency'),
+            'description'  => __('Currency'),
             'validator'    => [
                 'nullable',
                 'string',
@@ -171,7 +172,7 @@ class WebsiteBaseFormService extends BaseService
     {
         return app(CacheService::class)->rememberForever('form_element.select_notification_channels.options', function () use ($object) {
             $systemService = app('system_base');
-            $sortedChannels = $object->getExtraAttribute(User::ATTR_NOTIFICATION_CHANNELS, []) ?? [];
+            $sortedChannels = $object->getExtraAttribute(ExtraAttributeModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS, []) ?? [];
             $registeredChannels = app(SendNotificationService::class)->getRegisteredChannelNames();
             $sortedChannels = array_merge($sortedChannels, $registeredChannels);
 
@@ -190,12 +191,11 @@ class WebsiteBaseFormService extends BaseService
         return app('system_base')->arrayMergeRecursiveDistinct([
             'html_element' => 'sortable_multi_select',
             'options'      => static::getFormElementNotificationChannelsOptions($object),
-            'label'        => __('Notification Channel'),
-            'description'  => __('Notification Channel Description'),
+            'label'        => __('Preferred Notification Channels'),
+            'description'  => __('Preferred Notification Channels Description'),
             'validator'    => [
                 'nullable',
-                'string',
-                'Max:255',
+                'array',
             ],
             'css_group'    => 'col-12 col-md-6',
         ], $mergeData);

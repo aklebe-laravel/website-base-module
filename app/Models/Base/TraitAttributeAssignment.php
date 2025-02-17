@@ -19,6 +19,13 @@ use Modules\WebsiteBase\app\Services\WebsiteService;
 
 trait TraitAttributeAssignment
 {
+    const string ATTR_STORE = 'store';
+    const string ATTR_COUNTRY = 'country';
+    const string ATTR_CURRENCY = 'currency';
+    const string ATTR_ADDRESS = 'address';
+    const string ATTR_NOTIFICATION_CHANNEL = 'notification_channel';
+    const string ATTR_PREFERRED_NOTIFICATION_CHANNELS = 'preferred_notification_channels';
+
     /**
      * It's just the bag for mutator extra_attributes!
      * From outside, we use the mutator extra_attributes.
@@ -42,11 +49,6 @@ trait TraitAttributeAssignment
      * @todo: How to disable the whole created collection?
      */
     protected bool $extraAttributesLoaded = false;
-
-    /**
-     *
-     */
-    const string ATTR_NOTIFICATION_CHANNELS = 'preferred_notification_channels';
 
     /**
      * General boot...() info: Static Setup for this object like events

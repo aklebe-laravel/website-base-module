@@ -15,12 +15,12 @@ return [
     'data'    => [
         [
             'model'              => 'App\Models\User',
-            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', 'address')->first()->getKey(),
+            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', UserModel::ATTR_ADDRESS)->first()->getKey(),
             'attribute_input'    => 'select',
         ],
         [
             'model'              => 'App\Models\User',
-            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', UserModel::ATTR_NOTIFICATION_CHANNELS)->first()->getKey(),
+            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', UserModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS)->first()->getKey(),
             'attribute_input'    => 'sortable_multi_select',
         ],
     ],

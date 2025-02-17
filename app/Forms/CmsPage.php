@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Forms;
 use Modules\Form\app\Forms\Base\ModelBase;
 use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Services\SystemService;
+use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 
 class CmsPage extends ModelBase
 {
@@ -150,7 +151,7 @@ class CmsPage extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
-                                    'store_id'      => $formService->getFormElement('store', [
+                                    'store_id'      => $formService->getFormElement(ExtraAttributeModel::ATTR_STORE, [
                                         'description' => __('The Store assigned to this page'),
                                         'css_group'   => 'col-12 col-lg-6',
                                     ]),
@@ -169,7 +170,7 @@ class CmsPage extends ModelBase
                                         ],
                                         'css_group'    => 'col-12 col-lg-6',
                                     ],
-                                    'locale'        => $formService->getFormElement('country', [
+                                    'locale'        => $formService->getFormElement(ExtraAttributeModel::ATTR_COUNTRY, [
                                         'label'       => __('Language'),
                                         'description' => __('Language'),
                                     ]),

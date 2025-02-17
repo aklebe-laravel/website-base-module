@@ -15,7 +15,7 @@ return [
     'data'    => [
         [
             'model'              => 'App\Models\User',
-            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', UserModel::ATTR_NOTIFICATION_CHANNELS)->first()->getKey(),
+            'model_attribute_id' => ModelAttribute::with([])->where('code', '=', UserModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS)->first()->getKey(),
             'attribute_type'     => 'array',
             'attribute_input'    => 'website-base::select_notification_channels',
             'description'        => 'Preferred Notification Channels Description',
