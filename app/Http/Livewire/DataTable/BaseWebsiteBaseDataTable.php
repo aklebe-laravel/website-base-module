@@ -3,9 +3,21 @@
 namespace Modules\WebsiteBase\app\Http\Livewire\DataTable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Modules\WebsiteBase\app\Services\WebsiteService;
 
 trait BaseWebsiteBaseDataTable
 {
+    /**
+     * Add messagebox buttons and call it in initBooted()
+     *
+     * @return void
+     */
+    protected function addBaseWebsiteMessageBoxes(): void
+    {
+        // @todo: 'data-table' is messed ... more performant is to let similar dts decide
+        app(WebsiteService::class)->provideMessageBoxButtons(category: 'data-table');
+    }
+
     /**
      * @return array[]
      */
@@ -16,7 +28,7 @@ trait BaseWebsiteBaseDataTable
                 if (!$filterValue || $filterValue === self::FILTER_NOTIFICATION_CHANNEL_ALL) {
                     return;
                 }
-                $builder->whereHas('user_id', '>', 0);
+                $builder->where('user_id', '>', 0);
             },
         ];
     }

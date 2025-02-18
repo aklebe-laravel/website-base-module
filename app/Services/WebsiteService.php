@@ -312,9 +312,8 @@ class WebsiteService extends BaseService
 
         // hard cache view ...
         return app(CacheService::class)->rememberUseConfig($cacheKey, 'system-base.cache.frontend.ttl', function () use ($viewPath, $method) {
-            $path = $viewPath;
             if (view()->exists($viewPath)) {
-                //$this->debug("caching render view: ", [$path, $method]);
+                //$this->debug("caching render view: ", [$viewPath, $method]);
 
                 return view($viewPath)->render();
             } else {
