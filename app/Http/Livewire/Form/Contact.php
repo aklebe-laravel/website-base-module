@@ -2,16 +2,29 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 use Modules\WebsiteBase\app\Services\SendNotificationService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class Contact extends NativeObjectBase
 {
+    /**
+     * Singular
+     *
+     * @var string
+     */
+    protected string $objectFrontendLabel = 'Contact Message';
+
+    /**
+     * Plural
+     *
+     * @var string
+     */
+    protected string $objectsFrontendLabel = 'Contact Messages';
+
     /**
      * This form is opened by default.
      *
@@ -34,6 +47,50 @@ class Contact extends NativeObjectBase
     ];
 
     /**
+     * @param  mixed|null  $id
+     *
+     * @return JsonResource
+     */
+    public function initDataSource(mixed $id = null): JsonResource
+    {
+        $object = [
+            'content' => '',
+        ];
+
+        $this->setDataSource(new JsonResource($object));
+
+        return $this->getDataSource();
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getFormElements(): array
+    {
+        $parentFormData = parent::getFormElements();
+
+        return [
+            ... $parentFormData,
+            'title'         => __(''),
+            'form_elements' => [
+                'content' => [
+                    'html_element' => 'textarea',
+                    'label'        => __('Content'),
+                    'description'  => __('Content of your concern'),
+                    'validator'    => [
+                        'nullable',
+                        'string',
+                        'min:3',
+                    ],
+                    'css_group'    => 'col-12',
+                ],
+            ],
+
+        ];
+    }
+
+    /**
      * Overwrite this to set up the default Call if Enter pressed in Form
      *
      * @return string
@@ -47,8 +104,6 @@ class Contact extends NativeObjectBase
      * @param  mixed  $livewireId
      *
      * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     #[On('send')]
     public function send(mixed $livewireId): void

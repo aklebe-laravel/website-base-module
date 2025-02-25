@@ -31,6 +31,18 @@ return [
                 ],
             ],
         ],
+        'form' => [
+            // delete box
+            'cancel-account'    => [
+                'title'   => 'Cancel Account',
+                'content' => 'ask_cancel_account',
+                // constant names from defaultActions[] or closure
+                'actions' => [
+                    'system-base::cancel',
+                    'website-base::cancel-account',
+                ],
+            ],
+        ],
     ],
     'notification-event' => [
         'data-table' => [

@@ -13,6 +13,37 @@ use Modules\WebsiteBase\app\Models\User as WebsiteUser;
 class AuthLogin extends AuthBase
 {
     /**
+     * @var string|null
+     */
+    protected ?string $objectEloquentModelName = WebsiteUser::class;
+
+    /**
+     * Relations for using in with().
+     * Don't add fake relations or relations should not be updated!
+     *
+     * Will be used as:
+     * - Blacklist of properties, to save the plain model
+     * - onAfterUpdateItem() to sync() the relations
+     *
+     * @var array[]
+     */
+    public array $objectRelations = [];
+
+    /**
+     * Singular
+     *
+     * @var string
+     */
+    protected string $objectFrontendLabel = 'User';
+
+    /**
+     * Plural
+     *
+     * @var string
+     */
+    protected string $objectsFrontendLabel = 'Users';
+
+    /**
      * @var array|string[]
      */
     public array $formActionButtons = [
@@ -62,7 +93,7 @@ class AuthLogin extends AuthBase
     {
         if (!$this->ensureIsNotRateLimited()) {
             $this->addErrorMessage(__('auth.failed2'));
-            Log::error(sprintf("User Login failed. Rate Limiter."), [__METHOD__]);
+            Log::error("User Login failed. Rate Limiter.", [__METHOD__]);
 
             return false;
         }
@@ -108,6 +139,38 @@ class AuthLogin extends AuthBase
         RateLimiter::clear($this->throttleKey());
 
         return true;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getFormElements(): array
+    {
+        $parentFormData = parent::getFormElements();
+
+        // Remove "special" description for empty objects!
+        $parentFormData['description'] = '';
+
+        return [
+            ... $parentFormData,
+            'title'         => __('Login'),
+            'form_elements' => [
+                'email'    => [
+                    'html_element' => 'email',
+                    'id'           => 'email',
+                    'label'        => __('EmailOrUsername'),
+                    'validator'    => ['required', 'string', 'max:255'],
+                    'css_group'    => 'col-12',
+                ],
+                'password' => [
+                    'html_element' => 'password',
+                    'label'        => __('Password'),
+                    'validator'    => ['required', 'string', 'min:3',],
+                    'css_group'    => 'col-12',
+                ],
+            ],
+        ];
     }
 
 }

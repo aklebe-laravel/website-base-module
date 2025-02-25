@@ -26,6 +26,8 @@ class CmsBase extends Model
     }
 
     /**
+     * same like currentStoreItems() but also must be enabled
+     *
      * @param  Builder  $query
      * @return Builder
      */

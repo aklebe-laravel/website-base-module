@@ -1,6 +1,5 @@
 @php
     use Illuminate\Http\Resources\Json\JsonResource;
-    use Modules\Form\app\Forms\Base\ModelBase;
     use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
 
     /**
@@ -18,7 +17,6 @@
      * @var mixed $validator
      * @var string $css_group
      * @var JsonResource $object
-     * @var ModelBase $form_instance
      * @var NativeObjectBaseLivewire $form_livewire
      */
 
@@ -39,8 +37,6 @@
         $css_group .= ' alert alert-success';
         $_formattedValue .= __('Valid');
     }
-    // $_formattedValue = print_r($validator, true);
-    // dump($object->resource->toArray(), true);
 @endphp
 
 <div class="form-group form-label-group {{ $css_group }}">

@@ -26,8 +26,7 @@ class CmsPageController extends Controller
         /** @var CmsService $cmsService */
         $cmsService = app(CmsService::class);
 
-        if ($page = $cmsService->getRoutePage($uri)) {
-
+        if (($page = $cmsService->getRoutePage($uri)) && ($page->is_enabled)) {
             $title = $cmsService->getCalculated($page, $page->title);
             $content = $cmsService->getCalculated($page, $page->content);
 

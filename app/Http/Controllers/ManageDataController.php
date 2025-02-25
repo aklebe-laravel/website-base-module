@@ -2,7 +2,6 @@
 
 namespace Modules\WebsiteBase\app\Http\Controllers;
 
-use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -13,7 +12,7 @@ use Illuminate\Support\Str;
 use Livewire;
 use Modules\Acl\app\Http\Controllers\Controller;
 use Modules\DataTable\app\Http\Livewire\DataTable\Base\BaseDataTable;
-use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
+use Modules\WebsiteBase\app\Models\User;
 
 class ManageDataController extends Controller
 {

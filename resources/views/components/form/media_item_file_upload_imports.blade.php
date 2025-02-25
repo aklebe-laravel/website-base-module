@@ -1,10 +1,9 @@
 @php
     use Illuminate\Http\Resources\Json\JsonResource;
-    use Modules\Form\app\Forms\Base\ModelBase;
     use Modules\SystemBase\app\Services\LivewireService;
-    use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
-    use Modules\WebsiteBase\app\Forms\MediaItem as MediaItemForm;
     use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
+    use Modules\WebsiteBase\app\Http\Livewire\Form\MediaItem;
+    use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
 
     /**
      * @var bool $visible maybe always true because we are here
@@ -25,20 +24,19 @@
      * @var array $x_data
      * @var int $element_index
      * @var JsonResource $object
-     * @var ModelBase $form_instance
      * @var NativeObjectBaseLivewire $form_livewire
      */
 
     $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');
     $objectModelId = (int)($object->id ?? 0);
     $mediaItemId = 0;
-    if ($form_instance instanceof MediaItemForm) {
+    if ($form_livewire instanceof MediaItem) {
         $mediaItemId = $objectModelId;
     }
     if ($object->imageMaker ?? null) {
         $mediaItemId = (int)($object->imageMaker->id ?? 0);
     }
-    if ($userId = $form_instance->getOwnerUserId()) {
+    if ($userId = $form_livewire->getOwnerUserId()) {
 
     }
     $livewireKey = LivewireService::getKey('upload');
@@ -54,10 +52,9 @@
             'objectModelId' => $objectModelId,
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
-            'parentFormClass' => $form_instance::class,
+            'parentFormClass' => $form_livewire::class,
             'parentFormLivewireClass' => $form_livewire::class,
-            'parentFormLivewireId' => $form_livewire->getId(),
-            'parentModelClass' => $form_instance->getObjectEloquentModelName(),
+            'parentModelClass' => $form_livewire->getObjectEloquentModelName(),
             'forceMediaType' => MediaItemModel::MEDIA_TYPE_IMPORT,
             ], key($livewireKey))
         @else

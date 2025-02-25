@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\WebsiteBase\app\Forms\Base;
+namespace Modules\WebsiteBase\app\Http\Livewire\Form\Base;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 use Modules\Form\app\Services\FormService;
 use Modules\SystemBase\app\Models\JsonViewResponse;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;

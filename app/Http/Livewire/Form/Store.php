@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\WebsiteBase\app\Forms;
+namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
-use Modules\Form\app\Forms\Base\ModelBase;
+use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 
 class Store extends ModelBase
 {
@@ -14,7 +14,7 @@ class Store extends ModelBase
      *
      * @var array[]
      */
-    protected array $objectRelations = [];
+    public array $objectRelations = [];
 
     /**
      * Singular

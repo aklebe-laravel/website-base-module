@@ -5,9 +5,8 @@ namespace Modules\WebsiteBase\app\Http\Livewire\Form\Base;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
-use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 
-class AuthBase extends ModelBase
+class AuthBase extends ModelBaseExtraAttributes
 {
     /**
      * This form is opened by default.

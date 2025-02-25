@@ -25,7 +25,7 @@ class InitFormElements
         $formService->registerFormElement(ExtraAttributeModel::ATTR_STORE, fn($x) => $websiteBaseFormService::getFormElementStore($x));
         $formService->registerFormElement(ExtraAttributeModel::ATTR_COUNTRY, fn($x) => $websiteBaseFormService::getFormElementCountry($x));
         $formService->registerFormElement(ExtraAttributeModel::ATTR_CURRENCY, fn($x) => $websiteBaseFormService::getFormElementCurrency($x));
-        $formService->registerFormElement(ExtraAttributeModel::ATTR_ADDRESS, fn($x) => $websiteBaseFormService::getFormElementAddress($event->form->getOwnerUserId(), $x));
+        $formService->registerFormElement(ExtraAttributeModel::ATTR_ADDRESS, fn($x) => $websiteBaseFormService::getFormElementAddress($event->form->getOwnerUserId() ?? 0, $x));
         $formService->registerFormElement(ExtraAttributeModel::ATTR_NOTIFICATION_CHANNEL, fn($x) => $websiteBaseFormService::getFormElementNotificationChannel($x));
         $formService->registerFormElement(ExtraAttributeModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS, fn($x) => $websiteBaseFormService::getFormElementNotificationChannels($event->form->getDataSource(), $x));
 

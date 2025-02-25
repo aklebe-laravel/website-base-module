@@ -427,14 +427,14 @@ class User extends AppUser
             'success' => false,
             'message' => __('Failed to delete User. Please try it later again.'),
         ];
-        // Is user already marked as deleted, so hard delete.
+        // (3) Is user already marked as deleted, so hard delete.
         if ($this->is_deleted) {
             if ($this->delete()) {
                 $result['message'] = __("user_deleted_step_3", ['name' => $this->name]);
                 $result['success'] = true;
             }
         } else {
-            // Is user already marked as order_to_delete_at, so soft delete.
+            // (2) Is user already marked as order_to_delete_at, so soft delete.
             if ($this->order_to_delete_at) {
                 // if ($this->updateTimestamps()->update(['is_enabled' => false, 'is_deleted' => true])) {
                 if ($this->updateTimestamps()->update(['is_deleted' => true])) {
@@ -444,7 +444,7 @@ class User extends AppUser
                 }
 
             } else {
-                // otherwise, set deletion timer
+                // (1) otherwise, set deletion timer
                 // if ($this->updateTimestamps()->update(['is_enabled' => false, 'order_to_delete_at' => time()])) {
                 if ($this->updateTimestamps()->update(['order_to_delete_at' => time()])) {
                     $result['message'] = __("user_deleted_step_1", ['name' => $this->name]);

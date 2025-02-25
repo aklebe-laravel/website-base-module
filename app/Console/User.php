@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Models\AclResource;
 use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Models\User as UserModel;
+use Modules\WebsiteBase\app\Services\Notification\Channels\Email;
+use Modules\WebsiteBase\app\Services\Notification\Channels\Portal;
 use Symfony\Component\Console\Command\Command as CommandResult;
 
 class User extends Command
@@ -55,9 +57,9 @@ class User extends Command
                         $newChannel = null;
                         if (true) { // @todo: some restrictions?
                             if ($user->canUseEmail()) {
-                                $newChannel = 'email';
+                                $newChannel = Email::name;
                             } else {
-                                $newChannel = 'portal';
+                                $newChannel = Portal::name;
                             }
                         }
 

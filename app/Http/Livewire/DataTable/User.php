@@ -243,6 +243,11 @@ class User extends BaseDataTable
             return false;
         }
 
+        if (!$this->canManage()) {
+            $this->addErrorMessage('Permission denied');
+            return false;
+        }
+
         /** @var UserModel $user */
         if ($user = app(\App\Models\User::class)->with([])->find($itemId)) {
             $result = $user->deleteIn3Steps();

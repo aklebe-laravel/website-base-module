@@ -63,7 +63,7 @@ class CmsService extends BaseService
         return app(CacheService::class)->rememberUseConfig($cmsModelClass."_get_{$code}_{$locale}_".($contentOnly ? '1' : '0'), 'system-base.cache.object.instance.ttl', function () use ($cmsModelClass, $code, $locale, $contentOnly) {
 
             /** @var Builder $builder */
-            $builder = $cmsModelClass::with([])->currentStoreItems()->where('code', $code)->where('locale', $locale);
+            $builder = $cmsModelClass::with([])->frontendItems()->where('code', $code)->where('locale', $locale);
             /** @var CmsContent|CmsBase $item */
             if ($item = $builder->first()) {
                 if ($contentOnly) {
@@ -90,7 +90,7 @@ class CmsService extends BaseService
 
         return app(CacheService::class)->rememberUseConfig(CmsPage::class."_routePage_{$routeUri}_{$locale}", 'system-base.cache.object.instance.ttl', function () use ($routeUri, $locale) {
             /** @var Builder $builder */
-            $builder = CmsPage::with([])->currentStoreItems()->where('web_uri', $routeUri)->where('locale', $locale);
+            $builder = CmsPage::with([])->frontendItems()->where('web_uri', $routeUri)->where('locale', $locale);
             /** @var CmsPage $item */
             $item = $builder->first();
 
@@ -104,15 +104,18 @@ class CmsService extends BaseService
      * 2) run own parser
      * 3) run blade parser
      *
-     * @param  CmsBase  $item
-     * @param  string   $raw
+     * @param  CmsBase      $item
+     * @param  string|null  $raw
      *
      * @return string
      */
-    public function getCalculated(CmsBase $item, string $raw): string
+    public function getCalculated(CmsBase $item, ?string $raw): string
     {
-        $result = $raw;
+        if (!$raw) {
+            return '';
+        }
 
+        $result = $raw;
         if ($this->isAlreadyParsed($item)) {
             $error = sprintf('[[[RECURSION DETECTED class: "%s", code: "%s"]]]', get_class($item), $item->code);
             $this->error($error, [$item, __METHOD__]);
@@ -243,7 +246,7 @@ class CmsService extends BaseService
             if (isset($item->$property)) {
                 $result = $this->getCalculated($item, $item->$property);
 
-                // i user can manage, add the edit button
+                // if user can manage, add the edit button
                 if ($this->currentUserCanManageCms) {
                     $result .= view('content-pages.inc.cms-edit-button', [
                         'cmsModel'     => $item,
