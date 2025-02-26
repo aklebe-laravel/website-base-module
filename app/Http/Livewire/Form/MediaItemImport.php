@@ -3,13 +3,10 @@
 namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 
 use Livewire\Attributes\On;
-use Modules\WebsiteBase\app\Http\Livewire\DataTable\BaseWebsiteBaseDataTable;
 use Modules\WebsiteBase\app\Models\MediaItem as WebsiteMediaItemModel;
 
 class MediaItemImport extends MediaItem
 {
-    use BaseWebsiteBaseDataTable;
-
     /**
      * @var string
      */
@@ -19,6 +16,8 @@ class MediaItemImport extends MediaItem
      * @var string
      */
     protected string $defaultObjectType = WebsiteMediaItemModel::OBJECT_TYPE_IMPORT_PRODUCT;
+
+    protected ?string $objectEloquentModelName = WebsiteMediaItemModel::class;
 
     /**
      *
@@ -42,18 +41,6 @@ class MediaItemImport extends MediaItem
         $parentFormData['description'] = __('import_description')."\n\n".$parentFormData['description'];
 
         return $parentFormData;
-    }
-
-    /**
-     * Runs on every request, after the component is mounted or hydrated, but before any update methods are called
-     *
-     * @return void
-     */
-    protected function initBooted(): void
-    {
-        parent::initBooted();
-
-        $this->addBaseWebsiteMessageBoxes();
     }
 
     /**

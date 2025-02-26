@@ -71,9 +71,9 @@ class User extends AppUser
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at'  => 'datetime',
-        'last_visited_at'    => 'datetime',
-        'order_to_delete_at' => 'datetime',
+        'email_verified_at'  => 'datetime:Y-m-d H:i:s',
+        'last_visited_at'    => 'datetime:Y-m-d H:i:s',
+        'order_to_delete_at' => 'datetime:Y-m-d H:i:s',
         'password'           => 'hashed',
         'options'            => 'array',
     ];
@@ -445,8 +445,7 @@ class User extends AppUser
 
             } else {
                 // (1) otherwise, set deletion timer
-                // if ($this->updateTimestamps()->update(['is_enabled' => false, 'order_to_delete_at' => time()])) {
-                if ($this->updateTimestamps()->update(['order_to_delete_at' => time()])) {
+                if ($this->updateTimestamps()->update(['order_to_delete_at' => Carbon::now()->format(SystemService::dateIsoFormat8601)])) {
                     $result['message'] = __("user_deleted_step_1", ['name' => $this->name]);
                     $result['success'] = true;
                 }

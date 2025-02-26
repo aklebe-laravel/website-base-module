@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * @todo: dissolve - move to WebsiteBase?
+ *
  */
 trait TraitBaseModel
 {

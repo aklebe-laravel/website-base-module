@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Listeners;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Services\UserService;
@@ -43,7 +44,7 @@ class UserOnline
             // avoid update too much (every api/async call)
             if ((!$user->last_visited_at) || ($user->last_visited_at->diffInRealSeconds('NOW') > 4)) {
                 // quick first level update only, no extra attributes, no events
-                $user->updateWithoutEvents(['last_visited_at' => time()]);
+                $user->updateWithoutEvents(['last_visited_at' => Carbon::now()->format(SystemService::dateIsoFormat8601)]);
                 // $user->refresh();
             }
         }
