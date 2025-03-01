@@ -15,7 +15,7 @@
     }
 @endphp
 <a class="btn btn-sm btn-outline-secondary mr-2 {{ data_get($this->mobileCssClasses, 'button', '') }}"
-   href="{{ route('preview-notify-event', data_get($item, 'id')) }}" target="_blank"
+   href="{{ route('preview-notify-event', data_get($item, 'id')) }}"
    title="{{ __('Preview') }}">
     <span class="bi bi-eyeglasses"></span>
 </a>

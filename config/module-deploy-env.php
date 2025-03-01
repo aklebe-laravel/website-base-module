@@ -228,6 +228,14 @@ return [
                 ],
             ],
         ],
+        '0017'  => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    'users.php',
+                ],
+            ],
+        ],
     ],
 
 ];

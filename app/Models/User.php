@@ -472,4 +472,24 @@ class User extends AppUser
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getFrontendLink(): ?string
+    {
+        if (!$this->shared_id) {
+            return null;
+        }
+
+        return route('user-profile', ['id' => $this->shared_id]);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUserProfileLink(): ?string
+    {
+        return $this->getFrontendLink();
+    }
+
 }
