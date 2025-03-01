@@ -65,12 +65,18 @@ class CmsContent extends BaseDataTable
                 'label'      => __('Code'),
                 'searchable' => true,
                 'sortable'   => true,
+                'options'    => [
+                    'has_open_link' => $this->canEdit(),
+                    'str_limit'     => 30,
+                ],
+                'css_all'    => 'w-50',
             ],
             [
                 'name'       => 'locale',
                 'label'      => __('Locale'),
                 'searchable' => true,
                 'sortable'   => true,
+                'css_all'    => 'w-5',
             ],
             [
                 'name'       => 'updated_at',
@@ -78,6 +84,7 @@ class CmsContent extends BaseDataTable
                 'searchable' => true,
                 'sortable'   => true,
                 'view'       => 'data-table::livewire.js-dt.tables.columns.datetime-since',
+                'css_all'    => 'w-5',
             ],
         ];
     }

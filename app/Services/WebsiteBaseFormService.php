@@ -34,7 +34,10 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(Store::orderBy('code', 'ASC')->get(), ['id', 'code'], 'id', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(Store::orderBy('code', 'ASC')->get(),
+                fn($x) => sprintf("%s (%s)", $x->code, $x->getKey()),
+                'id',
+                $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 
