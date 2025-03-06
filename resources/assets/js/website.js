@@ -113,6 +113,7 @@ export class Website {
     };
 
     /**
+     * get value using dot notation
      *
      * @param t
      * @param path
@@ -259,7 +260,5 @@ export class Website {
             el2.innerHTML = JSON.stringify(data, null, 2);
         }
     };
-
-
 
 } // no ; at the end of class declaration

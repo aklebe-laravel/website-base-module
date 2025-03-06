@@ -1,49 +1,33 @@
 @php
-    use Illuminate\Http\Resources\Json\JsonResource;
     use Modules\SystemBase\app\Services\LivewireService;
-    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
     use Modules\WebsiteBase\app\Http\Livewire\Form\MediaItem;
-    use Modules\WebsiteBase\app\Models\MediaItem as MediaItemModel;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
+    use Illuminate\Http\Resources\Json\JsonResource;
 
     /**
-     * @var bool $visible maybe always true because we are here
-     * @var bool $disabled enabled or disabled
-     * @var bool $read_only disallow edit
-     * @var bool $auto_complete auto fill user inputs
-     * @var string $name name attribute
-     * @var string $label label of this element
-     * @var mixed $value value attribute
-     * @var mixed $default default value
-     * @var bool $read_only
-     * @var string $description
-     * @var string $css_classes
-     * @var string $css_group
-     * @var string $x_model optional for alpine.js
-     * @var string $livewire
-     * @var array $html_data data attributes
-     * @var array $x_data
-     * @var int $element_index
-     * @var JsonResource $object
-     * @var NativeObjectBaseLivewire $form_livewire
+     * @var NativeObjectBase $form_instance
+     * @var array $data
      */
 
-    $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');
+    /* @var JsonResource $object */
+    $object = $form_instance->getDataSource();
+
     $objectModelId = (int)($object->id ?? 0);
     $mediaItemId = 0;
-    if ($form_livewire instanceof MediaItem) {
+    if ($form_instance instanceof MediaItem) {
         $mediaItemId = $objectModelId;
     }
     if ($object->imageMaker ?? null) {
         $mediaItemId = (int)($object->imageMaker->id ?? 0);
     }
-    if ($userId = $form_livewire->getOwnerUserId()) {
+    if ($userId = $form_instance->getOwnerUserId()) {
 
     }
     $livewireKey = LivewireService::getKey('upload');
 @endphp
-<div class="form-group form-label-group {{ $css_group }} bg-warning">
-    @unless(empty($label))
-        <label>{{ $label }}</label>
+<div class="form-group form-label-group {{ $data['css_group'] }} bg-warning">
+    @unless(empty($data['label']))
+        <label>{{ $data['label'] }}</label>
     @endunless
 
     <div>
@@ -52,9 +36,9 @@
             'objectModelId' => $objectModelId,
             'mediaItemId' => $mediaItemId,
             'userId' => $userId,
-            'parentFormClass' => $form_livewire::class,
-            'parentFormLivewireClass' => $form_livewire::class,
-            'parentModelClass' => $form_livewire->getObjectEloquentModelName(),
+            'parentFormClass' => $form_instance::class,
+            'parentFormLivewireClass' => $form_instance::class,
+            'parentModelClass' => $form_instance->getObjectEloquentModelName(),
             //'forceMediaType' => MediaItemModel::MEDIA_TYPE_..., // do not force here
             ], key($livewireKey))
         @else
@@ -65,7 +49,7 @@
     </div>
 
 
-    @unless(empty($description))
-        <div class="form-text decent">{{ $description }}</div>
+    @unless(empty($data['description']))
+        <div class="form-text decent">{{ $data['description'] }}</div>
     @endunless
 </div>

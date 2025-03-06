@@ -1,26 +1,15 @@
 @php
     use Illuminate\Http\Resources\Json\JsonResource;
-    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase as NativeObjectBaseLivewire;
+    use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
 
     /**
-     *
-     * @var string $name
-     * @var string $label
-     * @var mixed $value
-     * @var bool $read_only
-     * @var string $description
-     * @var string $css_classes
-     * @var string $x_model
-     * @var string $xModelName
-     * @var array $html_data
-     * @var array $x_data
-     * @var mixed $validator
-     * @var string $css_group
-     * @var JsonResource $object
-     * @var NativeObjectBaseLivewire $form_livewire
+     * @var NativeObjectBase $form_instance
+     * @var array $data
      */
 
-    $xModelName = (($x_model) ? ($x_model . '.' . $name) : '');
+    /* @var JsonResource $object */
+    $object = $form_instance->getDataSource();
+
     $_formattedValue = '';
     if (!$object->resource->canLogin()) {
         if (!$object->is_enabled) {
@@ -32,26 +21,20 @@
         } elseif ($object->order_to_delete_at) {
             $_formattedValue .= ' ('. __('Prepared to delete') . ')';
         }
-        $css_group .= ' alert alert-danger';
+        $data['css_group'] .= ' alert alert-danger';
     } else {
-        $css_group .= ' alert alert-success';
+        $data['css_group'] .= ' alert alert-success';
         $_formattedValue .= __('Valid');
     }
 @endphp
 
-<div class="form-group form-label-group {{ $css_group }}">
-    <div class="form-control-info {{ $css_classes }}"
-         class="form-control {{ $css_classes }}"
-         @if($xModelName) x-model="{{ $xModelName }}" @endif
-         @if($disabled) disabled="disabled" @endif
-         @if($read_only) read_only @endif
-         @foreach($html_data as $k => $v) data-{{ $k }}="{{ $v }}" @endforeach
-         @foreach($x_data as $k => $v) x-{{ $k }}="{{ $v }}" @endforeach
-
+<div class="form-group form-label-group {{ $data['css_group'] }}">
+    <div class="form-control-info {{ $data['css_classes'] }}"
+         class="form-control {{ $data['css_classes'] }}"
     >
         {!! $_formattedValue !!}
     </div>
-    @unless(empty($description))
-        <div class="form-text decent">{{ $description }}</div>
+    @unless(empty($data['description']))
+        <div class="form-text decent">{{ $data['description'] }}</div>
     @endunless
 </div>

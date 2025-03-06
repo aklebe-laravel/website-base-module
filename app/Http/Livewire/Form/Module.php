@@ -66,12 +66,13 @@ class Module extends WebsiteNativeBase
 
         if ($id) {
             // store id by form store id, default from settings
-            $storeId = (int) data_get($this->liveCommands, 'core_config.store_id', $systemService::selectValueNoChoice);
+            $storeId = data_get($this->liveCommands, 'controls_store_id', $systemService::selectValueNoChoice);
             // if first time, use default store (which is the current store)
             if ($storeId === $systemService::selectValueNoChoice) {
                 $storeId = (int) data_get($this->objectInstanceDefaultValues, 'core_config.store_id');
             }
             // any invalid values = back to null store ...
+            $storeId = (int) $storeId;
             if ($storeId < 1) {
                 $storeId = null;
             }
@@ -117,6 +118,15 @@ class Module extends WebsiteNativeBase
 
         return $this->getDataSource();
     }
+
+    /**
+     * @return array
+     */
+    public function makeObjectInstanceDefaultValues(): array
+    {
+        return array_merge(parent::makeObjectInstanceDefaultValues(), []);
+    }
+
 
     /**
      *
@@ -229,27 +239,15 @@ class Module extends WebsiteNativeBase
         /** @var WebsiteBaseFormService $websiteBaseFormService */
         $websiteBaseFormService = app(WebsiteBaseFormService::class);
 
-        $result = [
-            'core_config.store_id' => [
-                'html_element'      => 'select',
-                'options'           => $websiteBaseFormService::getFormElementStoreOptions(),
-                //'cmpCi'             => true,
-                'livewire'          => 'liveCommands',
-                'livewire_live'     => true,
-                'livewire_debounce' => 300,
-                'label'             => __('Choose store.'),
-                'description'       => __('Choose store.'),
-                'validator'         => [
-                    'nullable',
-                    'integer',
-                ],
-                'css_group'         => 'col-12',
-            ],
-            '__'.uuid_create()     => [
-                'html_element' => 'hr',
-                'css_group'    => 'col-12',
-            ],
-        ];
+        $e = $formService->getFormElement('store', [
+            'livewire'          => 'liveCommands',
+            'livewire_live'     => true,
+            'livewire_debounce' => 300,
+            'css_group'         => 'col-12',
+        ]);
+
+        $result = [];
+
         $storeId = data_get($this->getDataSource(), 'core_config.store_id');
 
         // Preload collection of configs used by module.
@@ -260,6 +258,8 @@ class Module extends WebsiteNativeBase
             $b->orWhereNull('store_id');
         })->get();
 
+        $coreDefaultConfigModelCollection = CoreConfigModel::with([])->where('module', $moduleSnakeName)->orWhereNull('store_id')->get();
+
         // get prepared config by getJsonResource()
         // config is sorted by position, path
         $config = data_get($this->getDataSource(), 'core_config.module.'.$moduleSnakeName, []);
@@ -269,6 +269,7 @@ class Module extends WebsiteNativeBase
             $formService,
             $moduleSnakeName,
             $coreConfigModelCollection,
+            $coreDefaultConfigModelCollection,
             &$result,
             &$configElementCount,
             &$config,
@@ -278,6 +279,7 @@ class Module extends WebsiteNativeBase
             $configPath = ($currentRoot ? $currentRoot.'.' : '').$key;
             $name = $this->getConfigElementName($configPath, $moduleSnakeName);
             if ($c = $coreConfigModelCollection->where('path', $configPath)->first()) {
+
                 // layout/design: add new row?
                 if (data_get($c, 'options.form.new_group', false)) {
                     $index = uuid_create();
@@ -300,6 +302,8 @@ class Module extends WebsiteNativeBase
                         //'bool',
                     ],
                     'css_group'    => 'col-12 col-md-6'.($newRow ? ' col-md-12 col-lg-12 ' : ' ').($c->css_classes ?? ''),
+                    //'default'      => $c->value, // default by this store
+                    'default'      => $coreDefaultConfigModelCollection->where('path', $configPath)->first()?->value ?? null,
                 ];
 
                 // form element data
@@ -344,9 +348,11 @@ class Module extends WebsiteNativeBase
      */
     protected function initLiveCommands(): void
     {
-        parent::initLiveCommands();
+        //parent::initLiveCommands();
 
-        $this->addStoreFilter();
+        $this->addStoreCommand();
+
+        $this->addReloadCommand();
     }
 
     /**
@@ -359,13 +365,14 @@ class Module extends WebsiteNativeBase
         $jsonResponse = new JsonViewResponse();
         if ($validatedData = $this->validateForm()) {
 
+            $storeId = (int) data_get($this->liveCommands, 'controls_store_id');
+
             /** @var CoreConfigService $configService */
             $configService = app('website_base_config');
 
             $configUpdateCount = 0;
             $allModulesConfigData = data_get($validatedData, 'core_config.module', []);
             foreach ($allModulesConfigData as $moduleSnakeName => $moduleConfigData) { // there should be only one
-                $storeId = (int) data_get($validatedData, 'core_config.store_id');
                 if ($storeId < 1) {
                     $storeId = null;
                 }

@@ -30,7 +30,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementStoreOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_store.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_store.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
@@ -66,7 +66,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementCountryOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_country.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_country.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
@@ -101,7 +101,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementCurrencyOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_currency.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_currency.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
@@ -136,7 +136,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementNotificationChannelOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_notification_channel.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_notification_channel.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
             $registeredChannels = $systemService->assignArrayKeysByValue(app(SendNotificationService::class)->getRegisteredChannelNames());
@@ -173,7 +173,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementNotificationChannelsOptions(mixed $object): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_notification_channels.options', function () use ($object) {
+        return app(CacheService::class)->rememberFrontend('form_element.select_notification_channels.options', function () use ($object) {
             $systemService = app('system_base');
             $sortedChannels = $object->getExtraAttribute(ExtraAttributeModel::ATTR_PREFERRED_NOTIFICATION_CHANNELS, []) ?? [];
             $registeredChannels = app(SendNotificationService::class)->getRegisteredChannelNames();
@@ -209,7 +209,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementAclGroupOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_acl_group.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_acl_group.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
@@ -245,7 +245,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementAddressOptions(int $userId): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_address.options', function () use ($userId) {
+        return app(CacheService::class)->rememberFrontend('form_element.select_address.options', function () use ($userId) {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
@@ -297,7 +297,7 @@ class WebsiteBaseFormService extends BaseService
      */
     public static function getFormElementPuppetUserOptions(): array
     {
-        return app(CacheService::class)->rememberForever('form_element.select_puppet_user.options', function () {
+        return app(CacheService::class)->rememberFrontend('form_element.select_puppet_user.options', function () {
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
