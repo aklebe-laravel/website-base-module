@@ -114,7 +114,7 @@ class AuthRegister extends AuthBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'shared_id' => uniqid('js_suid_'),
         ]);
     }

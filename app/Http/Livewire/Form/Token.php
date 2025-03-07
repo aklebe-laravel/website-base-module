@@ -56,7 +56,7 @@ class Token extends ModelBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'purpose' => TokenModel::PURPOSE_LOGIN,
             'token'   => uniqid('tkf-', true),
             'user_id' => $this->getOwnerUserId(),

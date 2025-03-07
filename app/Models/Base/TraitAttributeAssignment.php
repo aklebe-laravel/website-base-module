@@ -21,6 +21,7 @@ trait TraitAttributeAssignment
 {
     const string ATTR_STORE = 'store';
     const string ATTR_COUNTRY = 'country';
+    const string ATTR_PRICE = 'price';
     const string ATTR_CURRENCY = 'currency';
     const string ATTR_ADDRESS = 'address';
     const string ATTR_NOTIFICATION_CHANNEL = 'notification_channel';

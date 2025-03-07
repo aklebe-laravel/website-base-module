@@ -124,7 +124,7 @@ class Module extends WebsiteNativeBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), []);
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), []);
     }
 
 

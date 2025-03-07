@@ -73,10 +73,16 @@ class User extends ModelBaseExtraAttributes
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        $settings = app('market_settings');
+
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled' => 0,
             'is_deleted' => 0,
             'shared_id'  => uniqid('js_suid_'),
+            'extra_attributes' => [
+                'payment_method'  => $settings->getDefaultPaymentMethod()->getKey(),
+                'shipping_method' => $settings->getDefaultShippingMethod()->getKey(),
+            ],
         ]);
     }
 

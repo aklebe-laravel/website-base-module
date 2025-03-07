@@ -12,6 +12,7 @@ use Modules\WebsiteBase\app\Models\Address;
 use Modules\WebsiteBase\app\Models\Base\ExtraAttributeModel;
 use Modules\WebsiteBase\app\Models\Base\TraitAttributeAssignment;
 use Modules\WebsiteBase\app\Models\Country;
+use Modules\WebsiteBase\app\Models\Currency;
 use Modules\WebsiteBase\app\Models\Store;
 use Modules\WebsiteBase\app\Models\User;
 
@@ -105,7 +106,7 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(Country::orderBy('nice_name', 'ASC')->selectRaw('*, LOWER(iso) as iso')->get(), ['nice_name', 'iso'], 'iso', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(Currency::orderBy('name', 'ASC')->get(), fn($v) => sprintf("%s (%s)", $v->name, $v->code), 'code', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 

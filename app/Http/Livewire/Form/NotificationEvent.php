@@ -41,7 +41,7 @@ class NotificationEvent extends ModelBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled'    => 1,
             'repeat_count'  => 0,
             'event_code'    => \Modules\WebsiteBase\app\Models\NotificationEvent::EVENT_CODE_NOTIFY_USERS,

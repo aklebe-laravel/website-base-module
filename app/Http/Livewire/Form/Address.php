@@ -37,7 +37,7 @@ class Address extends ModelBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'user_id'     => $this->getOwnerUserId(),
             'country_iso' => 'DE',
             'city'        => 'Berlin',

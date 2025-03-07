@@ -31,7 +31,7 @@ class NotificationConcern extends ModelBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled' => 1,
             'store_id'   => app('website_base_settings')->getStoreId(),
         ]);

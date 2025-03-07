@@ -5,6 +5,7 @@ namespace Modules\WebsiteBase\app\Http\Livewire\Form;
 use App\Models\User as AppUser;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Attributes\On;
 use Modules\Form\app\Http\Livewire\Form\Base\NativeObjectBase;
@@ -105,8 +106,9 @@ class UserProfile extends User
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
-            'shared_id' => uniqid('js_suid_'),
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
+            'shared_id'        => uniqid('js_suid_'),
+            //],
         ]);
     }
 
@@ -428,6 +430,7 @@ class UserProfile extends User
 
         if (!$this->canEdit()) {
             $this->addErrorMessage('Permission denied');
+
             return false;
         }
 

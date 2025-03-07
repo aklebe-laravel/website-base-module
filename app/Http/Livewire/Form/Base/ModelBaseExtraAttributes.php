@@ -2,6 +2,7 @@
 
 namespace Modules\WebsiteBase\app\Http\Livewire\Form\Base;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Form\app\Http\Livewire\Form\Base\ModelBase;
 use Modules\Form\app\Services\FormService;
@@ -129,5 +130,24 @@ class ModelBaseExtraAttributes extends ModelBase
 
         return $result;
     }
+
+    /**
+     * @param  array  $data
+     *
+     * @return Model
+     */
+    public function makeObjectModelInstance(array $data = []): Model
+    {
+        /** @var Model|TraitAttributeAssignment $x */
+        $x = parent::makeObjectModelInstance($data);
+
+        // special part for ExtraAttributes
+        if ($tmp2 = data_get($this->objectInstanceDefaultValues, 'extra_attributes')) {
+            $x->setExtraAttributes($tmp2);
+        }
+
+        return $x;
+    }
+
 
 }

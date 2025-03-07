@@ -38,7 +38,7 @@ class CmsPage extends ModelBase
      */
     public function makeObjectInstanceDefaultValues(): array
     {
-        return array_merge(parent::makeObjectInstanceDefaultValues(), [
+        return app('system_base')->arrayMergeRecursiveDistinct(parent::makeObjectInstanceDefaultValues(), [
             'is_enabled' => 0,
             'locale'     => config('app.locale', 'en'),
             'store_id'   => app('website_base_settings')->getStoreId(),

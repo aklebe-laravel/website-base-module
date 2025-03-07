@@ -19,7 +19,7 @@ return [
             'attribute_type'     => 'array',
             'attribute_input'    => 'website-base::select_notification_channels',
             'description'        => 'Preferred Notification Channels Description',
-            'form_position'      => '992',
+            'form_position'      => '997',
             'form_css'           => 'col-12 col-md-6',
         ],
     ],
