@@ -132,11 +132,13 @@ class ModelBaseExtraAttributes extends ModelBase
     }
 
     /**
+     *
      * @param  array  $data
+     * @param  bool   $addDefaults  *
      *
      * @return Model
      */
-    public function makeObjectModelInstance(array $data = []): Model
+    public function makeObjectModelInstance(array $data = [], bool $addDefaults = true): Model
     {
         /** @var Model|TraitAttributeAssignment $x */
         $x = parent::makeObjectModelInstance($data);
