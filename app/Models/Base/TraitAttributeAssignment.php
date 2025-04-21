@@ -16,6 +16,7 @@ use Modules\WebsiteBase\app\Events\ModelWithAttributesLoaded;
 use Modules\WebsiteBase\app\Events\ModelWithAttributesSaved;
 use Modules\WebsiteBase\app\Models\ModelAttributeAssignment;
 use Modules\WebsiteBase\app\Services\WebsiteService;
+use Throwable;
 
 trait TraitAttributeAssignment
 {
@@ -365,6 +366,7 @@ trait TraitAttributeAssignment
      * @param  mixed   $value
      *
      * @return bool
+     * @throws Exception
      */
     public function saveModelAttributeTypeValue(string $attributeCode, mixed $value): bool
     {
@@ -401,18 +403,29 @@ trait TraitAttributeAssignment
                 }
             }
 
-            // if not already exist, create a new one ...
-            DB::table(static::getAttributeTypeTableName($attribute->attribute_type))->insert([
-                'model_id'                      => $this->id,
-                'model_attribute_assignment_id' => $attribute->id,
-                'value'                         => $value,
-                'updated_at'                    => Date::now(),
-                'created_at'                    => Date::now(),
-            ]);
+            try {
 
-            // We are clearing the cache if we delete all with saveModelAttributeTypeValues()
-            // $this->clearCacheParametersExtraAttributeEntity();
-            return true;
+                // if not already exist, create a new one ...
+                DB::table(static::getAttributeTypeTableName($attribute->attribute_type))->insert([
+                    'model_id'                      => $this->id,
+                    'model_attribute_assignment_id' => $attribute->id,
+                    'value'                         => $value,
+                    'updated_at'                    => Date::now(),
+                    'created_at'                    => Date::now(),
+                ]);
+
+                // We are clearing the cache if we delete all with saveModelAttributeTypeValues()
+                // $this->clearCacheParametersExtraAttributeEntity();
+
+                return true;
+
+            } catch (Throwable $exception) {
+
+                $error = "Ex ".__METHOD__." -  Attribute-Type: {$attribute->attribute_type}, Attribute-Value: $value, Message: " . $exception->getMessage();
+                Log::error($error);
+                throw new Exception($error);
+
+            }
         }
 
         return false;
