@@ -166,6 +166,11 @@ class Setting
     protected function addNavigationItem(Navigation|Section $navigation, NavigationModel $navigationModel): void
     {
         if ($navigationModel->route) {
+            if (!\Route::has($navigationModel->route)) {
+                Log::warning("Missing Route: ", [$navigationModel->route, $navigationModel->route_params]);
+
+                return;
+            }
             $url = route($navigationModel->route, $navigationModel->route_params);
         } else {
             $url = $navigationModel->uri;
