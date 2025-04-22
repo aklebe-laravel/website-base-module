@@ -351,14 +351,14 @@ trait TraitAttributeAssignment
     }
 
     /**
-     * @param  string  $attributeType
+     * @param  string|null  $attributeType
      *
      * @return string
      */
-    public static function getAttributeTypeTableName(string $attributeType): string
+    public static function getAttributeTypeTableName(?string $attributeType): string
     {
         return ModelAttributeAssignment::ATTRIBUTE_ASSIGNMENT_TYPE_TABLE_PREFIX.Arr::get(ModelAttributeAssignment::ATTRIBUTE_TYPE_MAP,
-                $attributeType.'.table_suffix');
+                ($attributeType ?? 'string').'.table_suffix');
     }
 
     /**
