@@ -91,7 +91,10 @@ class MediaService extends BaseService
 
                     // canvas only once
                     if ($loopIndex === 0) {
-                        $img->resizeCanvas($width, $height, 'center', false,
+                        $img->resizeCanvas($width,
+                            $height,
+                            'center',
+                            false,
                             'f8f8f8'); // fit to $width and $height using background color
                     }
 
@@ -258,17 +261,22 @@ class MediaService extends BaseService
         }
 
         $path = app('system_base_file')->getValidPath($path.'/'.$fileName);
-        $img->save($path, $quality);
+        if (touch($path) && is_writable($path)) {
+            $img->save($path, $quality);
 
-        if ($generate) {
-            $mediaModel->update([
-                'file_name'     => $fileName,
-                'relative_path' => $relativePath,
-                'extern_url'    => $originalMediaFile, // remember origin to avoid generate duplicates and waste disk space
-            ]);
+            if ($generate) {
+                $mediaModel->update([
+                    'file_name'     => $fileName,
+                    'relative_path' => $relativePath,
+                    'extern_url'    => $originalMediaFile, // remember origin to avoid generate duplicates and waste disk space
+                ]);
+            }
+
+            return true;
         }
 
-        return true;
+        Log::error("Unable to save: $path");
+        return false;
     }
 
     /**
@@ -387,10 +395,6 @@ class MediaService extends BaseService
      */
     public function findUserImageByOrigin(int $userId, string $externUrl): ?MediaItem
     {
-        return MediaItem::with([])
-            ->images()
-            ->where('extern_url', $externUrl)
-            ->where('user_id', $userId)
-            ->first();
+        return MediaItem::with([])->images()->where('extern_url', $externUrl)->where('user_id', $userId)->first();
     }
 }
