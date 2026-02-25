@@ -42,11 +42,13 @@ class User extends BaseDataTable
         parent::initBooted();
 
         if ($this->canManage()) {
-            $this->rowCommands = [
-                'claim_user' => 'website-base::livewire.js-dt.tables.columns.buttons.claim-user',
-                'rate_user'  => 'market::livewire.js-dt.tables.columns.buttons.rate-user',
-                ...$this->rowCommands,
-            ];
+            $this->rowCommands = [];
+            $moduleService = app('system_base_module');
+            $this->rowCommands['claim_user'] = 'website-base::livewire.js-dt.tables.columns.buttons.claim-user';
+            if ($moduleService->moduleExists('Market')) {
+                $this->rowCommands['rate_user'] = 'market::livewire.js-dt.tables.columns.buttons.rate-user';
+            }
+            $this->rowCommands += $this->rowCommands;
         } else {
             $this->rowCommands = [];
         }
@@ -245,6 +247,7 @@ class User extends BaseDataTable
 
         if (!$this->canManage()) {
             $this->addErrorMessage('Permission denied');
+
             return false;
         }
 
