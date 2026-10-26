@@ -1,0 +1,30 @@
+{
+  "name": "aklebe-laravel/website-base-module",
+  "type": "laravel-module",
+  "description": "Website module with a bunch of functionalities for a multi store website.",
+  "authors": [
+    {
+      "name": "Andreas Klebe",
+      "email": "a.klebe.work@gmail.com"
+    }
+  ],
+  "extra": {
+    "laravel": {
+      "providers": [],
+      "aliases": {
+      }
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Modules\\WebsiteBase\\": "",
+      "Modules\\WebsiteBase\\database\\factories\\": "database/factories/",
+      "Modules\\WebsiteBase\\database\\seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Modules\\WebsiteBase\\tests\\": "tests/"
+    }
+  }
+}

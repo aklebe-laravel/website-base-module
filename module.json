@@ -1,0 +1,16 @@
+{
+    "name": "WebsiteBase",
+    "alias": "website-base",
+    "description": "Website module with a bunch of functionalities for a multi store website.",
+    "keywords": [],
+    "priority": 3000,
+    "providers": [
+        "Modules\\WebsiteBase\\app\\Providers\\WebsiteBaseServiceProvider"
+    ],
+    "migration": {
+        "seeds": [
+            "Modules\\WebsiteBase\\database\\seeders\\DatabaseSeeder"
+        ]
+    },
+    "files": []
+}

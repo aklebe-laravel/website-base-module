@@ -1,0 +1,56 @@
+<?php
+
+use Modules\WebsiteBase\app\Models\ViewTemplate;
+
+return [
+    'version'    => '2.0',
+    // class of eloquent model
+    'model'      => ViewTemplate::class,
+    // create data if not exists (default true)
+    'can_create' => true,
+    // can update data if exists and data differ (default false)
+    'can_update' => true,
+    // columns to check if data already exists (AND WHERE)
+    'uniques'    => ['code'],
+    // relations to update/create
+    'relations'  => [],
+    // data rows itself
+    'data'       => [
+        [
+            'is_enabled'        => true,
+            'code'              => 'email_auth_register_success',
+            'content'           => 'Hello {{ $user->name }}<br>You registered successfully!',
+            'view_file'         => 'notifications.emails.welcome',
+            'parameter_variant' => ViewTemplate::PARAMETER_VARIANT_DEFAULT,
+            'description'       => 'User registered successfully.',
+        ],
+        [
+            'is_enabled'        => true,
+            'code'              => 'email_auth_forget_password',
+            'view_file'         => 'notifications.emails.forget-password',
+            'parameter_variant' => ViewTemplate::PARAMETER_VARIANT_DEFAULT,
+            'description'       => 'User forgot password.',
+        ],
+        [
+            'is_enabled'        => true,
+            'code'              => 'email_user_login_info',
+            'view_file'         => 'notifications.emails.user_login_data',
+            'parameter_variant' => ViewTemplate::PARAMETER_VARIANT_DEFAULT,
+            'description'       => 'Send user login data.',
+        ],
+        [
+            'is_enabled'        => true,
+            'code'              => 'email_system_info',
+            'view_file'         => 'notifications.emails.system-info',
+            'parameter_variant' => ViewTemplate::PARAMETER_VARIANT_DEFAULT,
+            'description'       => 'Send system info.',
+        ],
+        [
+            'is_enabled'        => true,
+            'code'              => 'email_contact_request_message',
+            'view_file'         => 'notifications.emails.contact-request',
+            'parameter_variant' => ViewTemplate::PARAMETER_VARIANT_DEFAULT,
+            'description'       => 'Contact request.',
+        ],
+    ],
+];
