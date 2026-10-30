@@ -1,4 +1,4 @@
-## WebsiteBase Module
+# WebsiteBase Module
 
 A module for the [Mercy Scaffold](https://github.com/aklebe-laravel/mercy-scaffold).
 
@@ -7,7 +7,9 @@ Eloquent models (data tables and forms) and notifications. Uses the modules `Acl
 
 ## Installation
 
-Add the module to `requires` in the project's `setup.yaml`, see
+Part of the Mercy base: every project gets it automatically in a released version (`base_requires` of the
+[Mercy defaults](https://github.com/aklebe-laravel/mercy-php-deployment/blob/master/resources/defaults/setup.yaml)).
+List it in the project's `requires` only to use another version or branch, see
 [Require modules and themes](https://github.com/aklebe-laravel/deploy-env-module#require-modules-and-themes).
 
 ## Configuration
@@ -62,7 +64,7 @@ Http/Livewire/Form/xxx.php
 Http/Livewire/DataTable/xxx.php
 ```
 
-`php artisan form:make` (Form module) creates them.
+`php artisan form:make` (Form module) or `php artisan deploy-env:former MyModule --classes=xxx` (DeployEnv) creates them.
 
 ## Notifications
 
