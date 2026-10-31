@@ -4,6 +4,7 @@ namespace Modules\WebsiteBase\app\Services;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Image;
+use RuntimeException;
 use Modules\SystemBase\app\Services\Base\BaseService;
 use Modules\WebsiteBase\app\Models\MediaItem;
 
@@ -51,6 +52,19 @@ class MediaService extends BaseService
     ];
 
     /**
+     * Animated GIFs above this size (frames * width * height) are saved as still JPG (first frame),
+     * because GD keeps all frames in memory while processing (about 4 bytes per pixel).
+     */
+    const int MAX_ANIMATED_GIF_PIXELS = 50_000_000;
+
+    /**
+     * Creates the media files (original and thumbs) of a media item from a source file.
+     *
+     * Images are never upscaled:
+     * - original: fitted into the configured box with background f8f8f8 (the box shrinks if the image is smaller)
+     * - thumbs: scaled down only
+     * Animated GIFs stay animated GIFs (scaled down only, no background), everything else becomes JPG.
+     *
      * @param  MediaItem  $mediaModel
      * @param  string     $originalMediaFile
      *
@@ -62,34 +76,51 @@ class MediaService extends BaseService
 
         switch ($mediaModel->media_type) {
             case MediaItem::MEDIA_TYPE_IMAGE:
-                // Laravel 13 nativer Einstiegspunkt
-                $img = Image::fromPath($originalMediaFile);
-                $loopIndex = 0;
+                $sourceFile = $originalMediaFile;
+                $stillImageFile = null;
+                $animated = $this->isAnimatedGif($originalMediaFile);
+                if ($animated && !$this->canProcessAnimatedGif($originalMediaFile)) {
+                    // too big for GD: continue with the first frame only
+                    $this->warning('Animated GIF too big, saving the first frame only', [$originalMediaFile]);
+                    $stillImageFile = $sourceFile = $this->createStillImageFromGif($originalMediaFile);
+                    $animated = false;
+                }
+                $format = $animated ? 'gif' : 'jpg';
 
-                foreach (self::availableThumbs as $thumbName => $data) {
-                    $configKeyWidth = data_get($data, 'config.width');
-                    $configKeyWidthDefault = (int) data_get($data, 'config.width_default');
-                    $configKeyHeight = data_get($data, 'config.height');
-                    $configKeyHeightDefault = (int) data_get($data, 'config.height_default');
-                    $configKeyQuality = data_get($data, 'config.quality');
-                    $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
+                try {
+                    $img = Image::fromPath($sourceFile);
+                    $imageWidth = $img->width();
+                    $imageHeight = $img->height();
+                    $loopIndex = 0;
 
-                    $width = (int) $config->getValue($configKeyWidth, $configKeyWidthDefault);
-                    $height = (int) $config->getValue($configKeyHeight, $configKeyHeightDefault);
-                    $quality = (int) $config->getValue($configKeyQuality, $configKeyQualityDefault);
+                    foreach (self::availableThumbs as $thumbName => $data) {
+                        $configKeyWidth = data_get($data, 'config.width');
+                        $configKeyWidthDefault = (int) data_get($data, 'config.width_default');
+                        $configKeyHeight = data_get($data, 'config.height');
+                        $configKeyHeightDefault = (int) data_get($data, 'config.height_default');
+                        $configKeyQuality = data_get($data, 'config.quality');
+                        $configKeyQualityDefault = (int) data_get($data, 'config.quality_default');
 
-                    if ($loopIndex === 0) {
-                        // KORREKTUR: "contain" ersetzt das alte resize + resizeCanvas.
-                        // Es passt das Bild proportional ein und füllt den Rest mit der Farbe f8f8f8.
-                        // Wichtig: Da Laravel immutable ist, fangen wir das Ergebnis ab!
-                        $processedImage = $img->contain(width: $width, height: $height, background: 'f8f8f8');
-                    } else {
-                        // REFACTOR: scale() ersetzt resize() mit AspectRatio-Constraint automatisiert
-                        $processedImage = $img->scale(width: $width, height: $height);
+                        $width = (int) $config->getValue($configKeyWidth, $configKeyWidthDefault);
+                        $height = (int) $config->getValue($configKeyHeight, $configKeyHeightDefault);
+                        $quality = (int) $config->getValue($configKeyQuality, $configKeyQualityDefault);
+
+                        if ($loopIndex === 0 && !$animated) {
+                            // fit into the box and fill the rest with f8f8f8 (images are immutable, use the result)
+                            [$boxWidth, $boxHeight] = $this->getBoxWithoutUpscaling($imageWidth, $imageHeight, $width, $height);
+                            $processedImage = $img->contain(width: $boxWidth, height: $boxHeight, background: 'f8f8f8');
+                        } else {
+                            // keeps the aspect ratio, never upscales
+                            $processedImage = $img->scale(width: $width, height: $height);
+                        }
+
+                        $this->saveImageToMedia($processedImage, $mediaModel, $originalMediaFile, $quality, $thumbName, ($loopIndex === 0), $format);
+                        $loopIndex++;
                     }
-
-                    $this->saveImageToMedia($processedImage, $mediaModel, $originalMediaFile, $quality, $thumbName, ($loopIndex === 0));
-                    $loopIndex++;
+                } finally {
+                    if ($stillImageFile && is_file($stillImageFile)) {
+                        @unlink($stillImageFile);
+                    }
                 }
                 break;
 
@@ -100,16 +131,111 @@ class MediaService extends BaseService
     }
 
     /**
-     * @param  \Illuminate\Image\Image  $img  // Korrekter Laravel 13 Image Type-Hint
+     * Size of the box for contain() without upscaling.
+     * If the image is smaller than the box, the box shrinks by the same factor (keeping its aspect ratio),
+     * so the image keeps its size and only gets the background around it.
+     *
+     * @param  int  $imageWidth
+     * @param  int  $imageHeight
+     * @param  int  $boxWidth
+     * @param  int  $boxHeight
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function getBoxWithoutUpscaling(int $imageWidth, int $imageHeight, int $boxWidth, int $boxHeight): array
+    {
+        if ($imageWidth <= 0 || $imageHeight <= 0) {
+            return [$boxWidth, $boxHeight];
+        }
+
+        // factor contain() would scale the image with
+        $factor = min($boxWidth / $imageWidth, $boxHeight / $imageHeight);
+        if ($factor <= 1) {
+            return [$boxWidth, $boxHeight];
+        }
+
+        return [max(1, (int) round($boxWidth / $factor)), max(1, (int) round($boxHeight / $factor))];
+    }
+
+    /**
+     * Number of frames of a GIF (0 if the file is no GIF).
+     *
+     * @param  string  $file
+     *
+     * @return int
+     */
+    public function countGifFrames(string $file): int
+    {
+        if (!is_file($file) || ($contents = file_get_contents($file)) === false || !str_starts_with($contents, 'GIF8')) {
+            return 0;
+        }
+
+        // every frame starts with a graphic control extension followed by an image descriptor (or another extension)
+        return max(1, (int) preg_match_all('#\x00\x21\xF9\x04.{4}\x00(?:\x2C|\x21)#s', $contents));
+    }
+
+    /**
+     * @param  string  $file
+     *
+     * @return bool
+     */
+    public function isAnimatedGif(string $file): bool
+    {
+        return $this->countGifFrames($file) > 1;
+    }
+
+    /**
+     * True if all frames of the animated GIF fit into MAX_ANIMATED_GIF_PIXELS.
+     *
+     * @param  string  $file
+     *
+     * @return bool
+     */
+    public function canProcessAnimatedGif(string $file): bool
+    {
+        $size = @getimagesize($file);
+        if (!$size) {
+            return false;
+        }
+
+        return ($this->countGifFrames($file) * $size[0] * $size[1]) <= static::MAX_ANIMATED_GIF_PIXELS;
+    }
+
+    /**
+     * Writes the first frame of a GIF as PNG into a temp file (GD reads the first frame only).
+     *
+     * @param  string  $file
+     *
+     * @return string  the temp file, delete it after use
+     * @throws RuntimeException
+     */
+    protected function createStillImageFromGif(string $file): string
+    {
+        $gd = @imagecreatefromgif($file);
+        if ($gd === false) {
+            throw new RuntimeException("Unable to read GIF: $file");
+        }
+
+        $stillImageFile = sys_get_temp_dir().'/media-still-'.uniqid().'.png';
+        if (!imagepng($gd, $stillImageFile)) {
+            throw new RuntimeException("Unable to write: $stillImageFile");
+        }
+
+        return $stillImageFile;
+    }
+
+    /**
+     * @param  \Illuminate\Image\Image  $img
      * @param  MediaItem                $mediaModel
      * @param  string                   $originalMediaFile
      * @param  int                      $quality
      * @param  string                   $thumbPath
      * @param  bool                     $generate
+     * @param  string                   $format  'jpg' or 'gif' (keeps animations, $quality is not used)
      *
      * @return bool
      */
-    public function saveImageToMedia(\Illuminate\Image\Image $img, MediaItem $mediaModel, string $originalMediaFile, int $quality = 90, string $thumbPath = '', bool $generate = false): bool
+    public function saveImageToMedia(\Illuminate\Image\Image $img, MediaItem $mediaModel, string $originalMediaFile, int $quality = 90, string $thumbPath = '', bool $generate = false, string $format = 'jpg'): bool
     {
         $relativePath = $mediaModel->relative_path ?? '';
         $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $mediaModel->id);
@@ -129,14 +255,18 @@ class MediaService extends BaseService
         $fileName = $mediaModel->file_name;
         if ($generate) {
             $uniqueId = uniqid();
-            $fileName = $fileNamePrefix.$uniqueId.'.jpg';
+            $fileName = $fileNamePrefix.$uniqueId.'.'.$format;
         }
 
         $path = app('system_base_file')->getValidPath($path.'/'.$fileName);
 
-        // REFACTOR: Da $img keine lokale save()-Methode hat, extrahieren wir die manipulierten
-        // JPEG-Bytes inklusive Qualität und schreiben sie klassisch in die Datei.
-        $imageBytes = $img->toJpeg()->quality($quality)->toBytes();
+        // the image has no save(), so write the encoded bytes
+        $imageBytes = ($format === 'gif')
+            ? $img->toGif()
+                ->toBytes()
+            : $img->toJpeg()
+                ->quality($quality)
+                ->toBytes();
 
         if (file_put_contents($path, $imageBytes) !== false) {
 
@@ -335,7 +465,9 @@ class MediaService extends BaseService
         });
 
         $matchedIds = array_keys($listByFilenames);
-        $mediaItemsExists = MediaItem::whereIn('file_name', $matchedIds)->pluck('file_name')->toArray();
+        $mediaItemsExists = MediaItem::whereIn('file_name', $matchedIds)
+            ->pluck('file_name')
+            ->toArray();
         $diff = array_diff($matchedIds, $mediaItemsExists);
         $infoList['files_matched_by_name'] = count($diff);
 
@@ -365,6 +497,10 @@ class MediaService extends BaseService
      */
     public function findUserImageByOrigin(int $userId, string $externUrl): ?MediaItem
     {
-        return MediaItem::with([])->images()->where('extern_url', $externUrl)->where('user_id', $userId)->first();
+        return MediaItem::with([])
+            ->images()
+            ->where('extern_url', $externUrl)
+            ->where('user_id', $userId)
+            ->first();
     }
 }

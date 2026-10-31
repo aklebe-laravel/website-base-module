@@ -66,6 +66,18 @@ Http/Livewire/DataTable/xxx.php
 
 `php artisan form:make` (Form module) or `php artisan deploy-env:former MyModule --classes=xxx` (DeployEnv) creates them.
 
+## Media images
+
+`MediaService::createMediaFile()` creates the files of an image media item (`media_type` `IMAGE`) from a source file:
+the original (`storage/app/public/media`) and the thumbs `thumbs_medium` and `thumbs_small`.
+Sizes and JPG quality come from the core config (`catalog.product.image*`, default 1000, 200 and 50 px).
+
+- Images are never upscaled. The original is fitted into the box with background `f8f8f8`,
+  a smaller image keeps its size (the box shrinks), thumbs are scaled down only.
+- Animated GIFs stay animated GIFs (scaled down only, without background), everything else becomes JPG.
+- Animated GIFs bigger than `MediaService::MAX_ANIMATED_GIF_PIXELS` (frames × width × height) are saved as JPG
+  of the first frame, because GD keeps all frames in memory.
+
 ## Notifications
 
 ### Channel
