@@ -52,7 +52,7 @@ class MediaService extends BaseService
     ];
 
     /**
-     * Animated GIFs above this size (frames * width * height) are saved as still JPG (first frame),
+     * Animated GIFs above this size (frames * width * height) are saved as still WebP (first frame),
      * because GD keeps all frames in memory while processing (about 4 bytes per pixel).
      */
     const int MAX_ANIMATED_GIF_PIXELS = 50_000_000;
@@ -60,10 +60,10 @@ class MediaService extends BaseService
     /**
      * Creates the media files (original and thumbs) of a media item from a source file.
      *
-     * Images are never upscaled:
-     * - original: fitted into the configured box with background f8f8f8 (the box shrinks if the image is smaller)
-     * - thumbs: scaled down only
-     * Animated GIFs stay animated GIFs (scaled down only, no background), everything else becomes JPG.
+     * All sizes (original and thumbs) are scaled down only, keeping the aspect ratio: never upscaled and
+     * without a background, so the frontend decides how to frame an image (like object-contain with a theme color).
+     * Animated GIFs stay animated GIFs (the GD driver can't write animated WebP), everything else becomes WebP
+     * (keeps transparency).
      *
      * @param  MediaItem  $mediaModel
      * @param  string     $originalMediaFile
@@ -85,12 +85,10 @@ class MediaService extends BaseService
                     $stillImageFile = $sourceFile = $this->createStillImageFromGif($originalMediaFile);
                     $animated = false;
                 }
-                $format = $animated ? 'gif' : 'jpg';
+                $format = $animated ? 'gif' : 'webp';
 
                 try {
                     $img = Image::fromPath($sourceFile);
-                    $imageWidth = $img->width();
-                    $imageHeight = $img->height();
                     $loopIndex = 0;
 
                     foreach (self::availableThumbs as $thumbName => $data) {
@@ -105,14 +103,8 @@ class MediaService extends BaseService
                         $height = (int) $config->getValue($configKeyHeight, $configKeyHeightDefault);
                         $quality = (int) $config->getValue($configKeyQuality, $configKeyQualityDefault);
 
-                        if ($loopIndex === 0 && !$animated) {
-                            // fit into the box and fill the rest with f8f8f8 (images are immutable, use the result)
-                            [$boxWidth, $boxHeight] = $this->getBoxWithoutUpscaling($imageWidth, $imageHeight, $width, $height);
-                            $processedImage = $img->contain(width: $boxWidth, height: $boxHeight, background: 'f8f8f8');
-                        } else {
-                            // keeps the aspect ratio, never upscales
-                            $processedImage = $img->scale(width: $width, height: $height);
-                        }
+                        // keeps the aspect ratio, never upscales (images are immutable, use the result)
+                        $processedImage = $img->scale(width: $width, height: $height);
 
                         $this->saveImageToMedia($processedImage, $mediaModel, $originalMediaFile, $quality, $thumbName, ($loopIndex === 0), $format);
                         $loopIndex++;
@@ -128,33 +120,6 @@ class MediaService extends BaseService
                 $this->saveImport($mediaModel, $originalMediaFile);
                 break;
         }
-    }
-
-    /**
-     * Size of the box for contain() without upscaling.
-     * If the image is smaller than the box, the box shrinks by the same factor (keeping its aspect ratio),
-     * so the image keeps its size and only gets the background around it.
-     *
-     * @param  int  $imageWidth
-     * @param  int  $imageHeight
-     * @param  int  $boxWidth
-     * @param  int  $boxHeight
-     *
-     * @return array{0: int, 1: int}
-     */
-    public function getBoxWithoutUpscaling(int $imageWidth, int $imageHeight, int $boxWidth, int $boxHeight): array
-    {
-        if ($imageWidth <= 0 || $imageHeight <= 0) {
-            return [$boxWidth, $boxHeight];
-        }
-
-        // factor contain() would scale the image with
-        $factor = min($boxWidth / $imageWidth, $boxHeight / $imageHeight);
-        if ($factor <= 1) {
-            return [$boxWidth, $boxHeight];
-        }
-
-        return [max(1, (int) round($boxWidth / $factor)), max(1, (int) round($boxHeight / $factor))];
     }
 
     /**
@@ -231,11 +196,11 @@ class MediaService extends BaseService
      * @param  int                      $quality
      * @param  string                   $thumbPath
      * @param  bool                     $generate
-     * @param  string                   $format  'jpg' or 'gif' (keeps animations, $quality is not used)
+     * @param  string                   $format  'webp', 'jpg' or 'gif' (keeps animations, $quality is not used)
      *
      * @return bool
      */
-    public function saveImageToMedia(\Illuminate\Image\Image $img, MediaItem $mediaModel, string $originalMediaFile, int $quality = 90, string $thumbPath = '', bool $generate = false, string $format = 'jpg'): bool
+    public function saveImageToMedia(\Illuminate\Image\Image $img, MediaItem $mediaModel, string $originalMediaFile, int $quality = 90, string $thumbPath = '', bool $generate = false, string $format = 'webp'): bool
     {
         $relativePath = $mediaModel->relative_path ?? '';
         $fileNamePrefix = sprintf(MediaItem::fileNamePrefixFormat, $mediaModel->id);
@@ -261,12 +226,16 @@ class MediaService extends BaseService
         $path = app('system_base_file')->getValidPath($path.'/'.$fileName);
 
         // the image has no save(), so write the encoded bytes
-        $imageBytes = ($format === 'gif')
-            ? $img->toGif()
-                ->toBytes()
-            : $img->toJpeg()
+        $imageBytes = match ($format) {
+            'gif' => $img->toGif()
+                ->toBytes(),
+            'jpg', 'jpeg' => $img->toJpeg()
                 ->quality($quality)
-                ->toBytes();
+                ->toBytes(),
+            default => $img->toWebp()
+                ->quality($quality)
+                ->toBytes(),
+        };
 
         if (file_put_contents($path, $imageBytes) !== false) {
 

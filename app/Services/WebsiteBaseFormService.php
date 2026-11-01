@@ -37,7 +37,8 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(Store::orderBy('code', 'ASC')->get(),
+            return $systemService->toHtmlSelectOptions(Store::orderBy('code', 'ASC')
+                ->get(),
                 fn($x) => sprintf("%s (%s)", $x->code, $x->getKey()),
                 'id',
                 $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
@@ -73,7 +74,12 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(Country::orderBy('nice_name', 'ASC')->selectRaw('*, LOWER(iso) as iso')->get(), ['nice_name', 'iso'], 'iso', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(Country::orderBy('nice_name', 'ASC')
+                ->selectRaw('*, LOWER(iso) as iso')
+                ->get(),
+                ['nice_name', 'iso'],
+                'iso',
+                $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 
@@ -108,7 +114,11 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(Currency::orderBy('name', 'ASC')->get(), fn($v) => sprintf("%s (%s)", $v->name, $v->code), 'code', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(Currency::orderBy('name', 'ASC')
+                ->get(),
+                fn($v) => sprintf("%s (%s)", $v->name, $v->code),
+                'code',
+                $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 
@@ -219,7 +229,10 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(app(AclResource::class)->with([])->orderBy('name')->get(),
+            return $systemService->toHtmlSelectOptions(app(AclResource::class)
+                ->with([])
+                ->orderBy('name')
+                ->get(),
                 'code',
                 $keyProperty,
                 $multiSelect ? [] : $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
@@ -257,7 +270,13 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(app(AclGroup::class)->with([])->orderBy('name')->get(), 'name', 'id', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(app(AclGroup::class)
+                ->with([])
+                ->orderBy('name')
+                ->get(),
+                'name',
+                'id',
+                $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 
@@ -295,7 +314,10 @@ class WebsiteBaseFormService extends BaseService
             $list = [];
 
             if ($userId) {
-                $collection = Address::with([])->where('user_id', $userId)->orderBy('lastname', 'ASC')->get();
+                $collection = Address::with([])
+                    ->where('user_id', $userId)
+                    ->orderBy('lastname', 'ASC')
+                    ->get();
 
                 foreach ($collection as $item) {
                     $list[] = [
@@ -344,7 +366,12 @@ class WebsiteBaseFormService extends BaseService
             /** @var SystemService $systemService */
             $systemService = app('system_base');
 
-            return $systemService->toHtmlSelectOptions(User::withAclResources([AclResource::RES_NON_HUMAN])->orderBy('name')->get(), ['id', 'name'], 'id', $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
+            return $systemService->toHtmlSelectOptions(User::withAclResources([AclResource::RES_NON_HUMAN])
+                ->orderBy('name')
+                ->get(),
+                ['id', 'name'],
+                'id',
+                $systemService->selectOptionsSimple[$systemService::selectValueNoChoice]);
         });
     }
 
@@ -414,14 +441,22 @@ class WebsiteBaseFormService extends BaseService
 
     /**
      * @param  string|null  $keyProperty
+     * @param  string       $scope  MediaItem scope like 'productImages' (default) or 'images' (all images)
      *
      * @return array
      */
-    public static function getFormElementSelectMediaItems(?string $keyProperty = 'id'): array
+    public static function getFormElementSelectMediaItems(?string $keyProperty = 'id', string $scope = 'productImages'): array
     {
-        return app(CacheService::class)->rememberFrontend('form_element.select_media_images.options', function () use ($keyProperty) {
+        // the default scope keeps the former cache key
+        $cacheKey = 'form_element.select_media_images.options'.($scope === 'productImages' ? '' : '_'.$scope);
 
-            return MediaItem::with([])->productImages()->orderBy('id', 'ASC')->get()->toArray();
+        return app(CacheService::class)->rememberFrontend($cacheKey, function () use ($scope) {
+
+            return MediaItem::with([])
+                ->{$scope}()
+                ->orderBy('id', 'ASC')
+                ->get()
+                ->toArray();
         });
     }
 
@@ -450,14 +485,15 @@ class WebsiteBaseFormService extends BaseService
     /**
      * @param  array        $mergeData
      * @param  string|null  $keyProperty
+     * @param  string       $scope  MediaItem scope, see getFormElementSelectMediaItems()
      *
      * @return array
      */
-    public static function getFormElementImagePickerMediaItems(array $mergeData = [], ?string $keyProperty = 'id'): array
+    public static function getFormElementImagePickerMediaItems(array $mergeData = [], ?string $keyProperty = 'id', string $scope = 'productImages'): array
     {
         return app('system_base')->arrayMergeRecursiveDistinct([
             'html_element' => 'website-base::image_picker',
-            'options'      => static::getFormElementSelectMediaItems($keyProperty),
+            'options'      => static::getFormElementSelectMediaItems($keyProperty, $scope),
             'label'        => __('Image'),
             'description'  => __('Image represents this item'),
             //'description'  => __(''),

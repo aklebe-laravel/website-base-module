@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Modules\WebsiteBase\app\Providers;
 
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Config;
 use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Providers\Base\ModuleBaseServiceProvider;
 use Modules\SystemBase\app\Services\ModuleService;
@@ -76,18 +75,8 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
 
         $this->app->bind('media', MediaItem::class);
 
-        // ---------------------------------------------------
-        // User Bind:
-        // Bind to the concrete base class
-        // ONLY BIND AppUser! Do not every derived class!
-        // Just use app(\App\Models\User) everywhere, nothing else!
-        // ---------------------------------------------------
+        // user model of this module, see SystemBaseServiceProvider::register()
         $this->app->bind(AppUser::class, ModuleUser::class);
-        // Shorthand
-        $this->app->bind('user', ModuleUser::class);
-
-        // Bind to the core framework interface for injection
-        //$this->app->bind(Authenticatable::class, ModuleUser::class);
 
         $this->app->register(ScheduleServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
@@ -104,14 +93,6 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
     {
         parent::boot();
 
-        // 1. Override the auth driver configuration dynamically
-        Config::set('auth.providers.users.database.model', ModuleUser::class);
-
-        // 2. Enforce morph map to prevent data corruption in polymorphic tables
-        Relation::morphMap([
-            'users' => ModuleUser::class,
-        ]);
-
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AttributeCleanups::class,
@@ -121,28 +102,21 @@ class WebsiteBaseServiceProvider extends ModuleBaseServiceProvider
             ]);
         }
 
-        //
+        // morph types use names instead of class names
         Relation::enforceMorphMap([
             'media_item' => MediaItem::class,
         ]);
 
-        Blade::component('website-base::menu-main', Main::class);
-        Blade::component('website-base::popup', Popup::class);
-
-        //// Views mit Namespace laden
-        //$this->loadViewsFrom(
-        //    __DIR__ . '/../resources/views',
-        //    'website-base'
-        //);
-
-        // Blade Components explizit registrieren
-        $this->loadViewComponentsAs('website-base', [
-            'dropdown' => Dropdown::class,
-        ]);
-
-        // Optional: Einzelne Alias-Registrierung als Fallback
-        Blade::component('website-base::dropdown', Dropdown::class);
+        // class based components like <x-website-base::popup/>
+        foreach (
+            [
+                'menu-main' => Main::class,
+                'popup'     => Popup::class,
+                'dropdown'  => Dropdown::class,
+            ] as $alias => $class
+        ) {
+            Blade::component('website-base::'.$alias, $class);
+        }
     }
-
 
 }

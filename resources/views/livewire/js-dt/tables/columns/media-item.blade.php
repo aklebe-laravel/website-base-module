@@ -12,7 +12,7 @@
      **/
     $imageBoxCss = $imageBoxCss ?? '';
     $value = $item->mediaItem->final_thumb_small_url ?? null;
-    $value = $value ?: theme_asset('images/no_image_available.jpg');
+    $value = $value ?: theme_asset('images/no_image_available.webp');
 @endphp
 <div class="text-center image-content w-full">
     <div class="image-box {{ $imageBoxCss }}">

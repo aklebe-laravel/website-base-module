@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Modules\WebsiteBase\app\Http\Livewire;
 
@@ -10,7 +10,7 @@ use Illuminate\View\View;
 
 class ImagePicker extends Component
 {
-    /** @var array<int, array<string, string>> */
+    /** @var array<int, array{id: int, label: string, image: string}> */
     public array $images = [];
 
     // This binds the property directly to wire:model of the parent component
@@ -36,14 +36,19 @@ class ImagePicker extends Component
     }
 
     /**
-     * @param $id
+     * The image entry of $id, null if there is none: no selection, or the selected
+     * media item is not part of $images (deleted, or excluded by the options scope).
      *
-     * @return array
+     * @param  int|null  $id
+     *
+     * @return array|null
      */
-    public function getImage($id) : array
+    public function getImage(?int $id): ?array
     {
-        return array_find($this->images, function ($image) use ($id) {
-            return $image['id'] === $id;
-        });
+        if ($id === null) {
+            return null;
+        }
+
+        return array_find($this->images, fn(array $image) => (int) $image['id'] === $id);
     }
 }

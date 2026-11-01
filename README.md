@@ -70,12 +70,14 @@ Http/Livewire/DataTable/xxx.php
 
 `MediaService::createMediaFile()` creates the files of an image media item (`media_type` `IMAGE`) from a source file:
 the original (`storage/app/public/media`) and the thumbs `thumbs_medium` and `thumbs_small`.
-Sizes and JPG quality come from the core config (`catalog.product.image*`, default 1000, 200 and 50 px).
+Sizes and quality come from the core config (`catalog.product.image*`, default 1000, 200 and 50 px).
 
-- Images are never upscaled. The original is fitted into the box with background `f8f8f8`,
-  a smaller image keeps its size (the box shrinks), thumbs are scaled down only.
-- Animated GIFs stay animated GIFs (scaled down only, without background), everything else becomes JPG.
-- Animated GIFs bigger than `MediaService::MAX_ANIMATED_GIF_PIXELS` (frames × width × height) are saved as JPG
+- All sizes are scaled down only, keeping the aspect ratio: never upscaled and without a background.
+  Framing is done by the frontend, like a square with the theme color in light and dark mode:
+  `<img class="aspect-square w-full object-contain bg-surface-100" src="...">`
+- Images are saved as WebP (keeps transparency). Animated GIFs stay animated GIFs, because the GD driver
+  can't write animated WebP.
+- Animated GIFs bigger than `MediaService::MAX_ANIMATED_GIF_PIXELS` (frames × width × height) are saved as WebP
   of the first frame, because GD keeps all frames in memory.
 
 ## Notifications

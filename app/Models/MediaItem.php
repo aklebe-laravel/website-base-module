@@ -49,7 +49,7 @@ class MediaItem extends Model implements Attachable
      */
     const array MEDIA_TYPES = [
         self::MEDIA_TYPE_IMAGE   => [
-            'extensions'  => ['gif', 'jpg', 'jpeg', 'png'],
+            'extensions'  => ['gif', 'jpg', 'jpeg', 'png', 'webp'],
             'description' => 'Images',
             'media_path'  => 'app/public/media',
             'objects'     => [

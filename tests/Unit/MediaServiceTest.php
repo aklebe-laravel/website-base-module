@@ -7,7 +7,7 @@ use Modules\SystemBase\tests\Unit\Isolated\IsolatedTestCase;
 use Modules\WebsiteBase\app\Services\MediaService;
 
 /**
- * MediaService helpers which work without the application (GIF detection, box size without upscaling).
+ * MediaService helpers which work without the application (GIF detection).
  */
 class MediaServiceTest extends IsolatedTestCase
 {
@@ -55,19 +55,5 @@ class MediaServiceTest extends IsolatedTestCase
         $this->assertFalse($this->service->isAnimatedGif($noGif));
 
         $this->assertTrue($this->service->canProcessAnimatedGif($animated));
-    }
-
-    public function test_box_without_upscaling(): void
-    {
-        // bigger image: box unchanged (contain() scales down)
-        $this->assertSame([1000, 1000], $this->service->getBoxWithoutUpscaling(2000, 1000, 1000, 1000));
-        $this->assertSame([1000, 500], $this->service->getBoxWithoutUpscaling(300, 600, 1000, 500));
-        // same size
-        $this->assertSame([1000, 1000], $this->service->getBoxWithoutUpscaling(1000, 1000, 1000, 1000));
-        // smaller image: the box shrinks, the image keeps its size
-        $this->assertSame([480, 480], $this->service->getBoxWithoutUpscaling(480, 270, 1000, 1000));
-        $this->assertSame([100, 50], $this->service->getBoxWithoutUpscaling(100, 20, 200, 100));
-        // invalid image size: box unchanged
-        $this->assertSame([1000, 1000], $this->service->getBoxWithoutUpscaling(0, 0, 1000, 1000));
     }
 }

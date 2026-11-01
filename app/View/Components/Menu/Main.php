@@ -11,15 +11,12 @@ use Illuminate\View\Component;
 class Main extends Component
 {
     public array $navTree;
-    public string $iconAssetPath;
 
-    /**
-     *
-     */
     public function __construct()
     {
-        $this->iconAssetPath = theme_asset('images/no_image_available.jpg');
-        $this->navTree = app('website_base_settings')->getNavigation()->tree();
+        $this->navTree = app('website_base_settings')
+            ->getNavigation()
+            ->tree();
     }
 
     /**
@@ -35,17 +32,19 @@ class Main extends Component
      */
     public static function hasActiveDescendant(object|array $item): bool
     {
-        $children = collect(((object)$item)->children ?? []);
+        $children = collect(((object) $item)->children ?? []);
 
         return $children->some(function ($child) {
-            $childObj = (object)$child;
+            $childObj = (object) $child;
+
             return ($childObj->active ?? false) || self::hasActiveDescendant($childObj);
         });
     }
 
     public static function isItemActive(object|array $item): bool
     {
-        $itemObj = (object)$item;
+        $itemObj = (object) $item;
+
         // Check item itself OR any child
         return ($itemObj->active ?? false) || self::hasActiveDescendant($itemObj);
     }
