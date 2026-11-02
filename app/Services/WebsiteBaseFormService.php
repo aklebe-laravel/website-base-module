@@ -441,19 +441,15 @@ class WebsiteBaseFormService extends BaseService
 
     /**
      * @param  string|null  $keyProperty
-     * @param  string       $scope  MediaItem scope like 'productImages' (default) or 'images' (all images)
      *
      * @return array
      */
-    public static function getFormElementSelectMediaItems(?string $keyProperty = 'id', string $scope = 'productImages'): array
+    public static function getFormElementSelectMediaItems(?string $keyProperty = 'id'): array
     {
-        // the default scope keeps the former cache key
-        $cacheKey = 'form_element.select_media_images.options'.($scope === 'productImages' ? '' : '_'.$scope);
-
-        return app(CacheService::class)->rememberFrontend($cacheKey, function () use ($scope) {
+        return app(CacheService::class)->rememberFrontend('form_element.select_media_images.options', function () {
 
             return MediaItem::with([])
-                ->{$scope}()
+                ->productImages()
                 ->orderBy('id', 'ASC')
                 ->get()
                 ->toArray();
@@ -483,17 +479,16 @@ class WebsiteBaseFormService extends BaseService
     }
 
     /**
-     * @param  array        $mergeData
-     * @param  string|null  $keyProperty
-     * @param  string       $scope  MediaItem scope, see getFormElementSelectMediaItems()
+     * Image picker: the component loads the images itself (public ones and the own ones of the current user).
+     *
+     * @param  array  $mergeData
      *
      * @return array
      */
-    public static function getFormElementImagePickerMediaItems(array $mergeData = [], ?string $keyProperty = 'id', string $scope = 'productImages'): array
+    public static function getFormElementImagePickerMediaItems(array $mergeData = []): array
     {
         return app('system_base')->arrayMergeRecursiveDistinct([
             'html_element' => 'website-base::image_picker',
-            'options'      => static::getFormElementSelectMediaItems($keyProperty, $scope),
             'label'        => __('Image'),
             'description'  => __('Image represents this item'),
             //'description'  => __(''),

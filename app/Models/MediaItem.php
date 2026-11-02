@@ -248,6 +248,26 @@ class MediaItem extends Model implements Attachable
     }
 
     /**
+     * Images a user may pick: all public images plus the own ones (public or not).
+     * Without $userId (guest) only public images.
+     *
+     * @param  Builder|self     $query
+     * @param  int|string|null  $userId
+     *
+     * @return Builder|self
+     */
+    public function scopeVisibleImagesFor(Builder|self $query, int|string|null $userId): Builder|self
+    {
+        return $query->images()
+            ->where(function (Builder $q) use ($userId) {
+                $q->where('is_public', true);
+                if ($userId) {
+                    $q->orWhere('user_id', $userId);
+                }
+            });
+    }
+
+    /**
      * scope scopeAvatars()
      *
      * @param  Builder|self  $query
