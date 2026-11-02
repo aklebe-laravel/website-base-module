@@ -130,7 +130,8 @@ trait TraitAttributeAssignment
     {
         $cacheParams = $this->getCacheParametersExtraAttributeEntity();
 
-        return app(CacheService::class)->forget($cacheParams['key']);
+        // same tags as in refreshExtraAttributeProperties(), otherwise a tagged store (redis) keeps the old values
+        return app(CacheService::class)->forget($cacheParams['key'], [WebsiteService::cacheTagExtraAttributes]);
     }
 
     /**
@@ -207,6 +208,7 @@ trait TraitAttributeAssignment
                 break;
 
             case ModelAttributeAssignment::ATTRIBUTE_TYPE_ARRAY:
+            case ModelAttributeAssignment::ATTRIBUTE_TYPE_JSON: // same like array, see ATTRIBUTE_TYPE_MAP
                 if ($value !== null && !is_array($value)) {
                     $value = json_decode($value, true);
                 }
