@@ -118,6 +118,16 @@ return [
                 ],
             ],
         ],
+        '0018' => [
+            [
+                'cmd'     => 'models',
+                'sources' => [
+                    // user setting 'timezone' (time zone of the times shown to the user)
+                    'model-attributes.php',
+                    'model-attribute-assignments.php',
+                ],
+            ],
+        ],
     ],
 
 ];

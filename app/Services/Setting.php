@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Modules\WebsiteBase\app\Services;
 
+use DateTimeInterface;
+use DateTimeZone;
 use Exception;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Modules\Acl\app\Services\UserService;
 use Modules\SystemBase\app\Services\CacheService;
@@ -18,6 +21,11 @@ use Throwable;
 
 class Setting
 {
+    /**
+     * Extra attribute of the user: time zone for the times shown to this user (empty = installation).
+     */
+    public const string USER_ATTRIBUTE_TIMEZONE = 'timezone';
+
     /**
      * @var Store|null
      */
@@ -275,4 +283,79 @@ class Setting
         $this->setNavigation($navigation);
     }
 
+
+    // ------------------------------------------------------------------
+    // Time zones
+    //
+    // Internally everything is UTC (app.timezone, database, calculations).
+    // Only what people see or type in is local:
+    //   installationTimezone(): shared things like the time windows of VM groups (config 'website-base.timezone')
+    //   displayTimezone():      times shown to the current user (user setting, otherwise the installation)
+    // ------------------------------------------------------------------
+
+    /**
+     * Time zone of this installation (env APP_DISPLAY_TIMEZONE), e.g. 'Europe/Berlin'. Default: app.timezone (UTC).
+     * For everything that is the same for all users, like schedules entered as local times.
+     *
+     * @return string
+     */
+    public function installationTimezone(): string
+    {
+        $timezone = (string) config('website-base.timezone', '');
+
+        return self::isValidTimezone($timezone) ? $timezone : (string) config('app.timezone', 'UTC');
+    }
+
+    /**
+     * Time zone for the times shown to the current user: user setting 'timezone', otherwise the installation.
+     * Without a user (queue, scheduler) always the installation.
+     *
+     * @return string
+     */
+    public function displayTimezone(): string
+    {
+        $user = $this->currentUser();
+        $timezone = $user ? (string) $user->getExtraAttribute(self::USER_ATTRIBUTE_TIMEZONE, '') : '';
+
+        return self::isValidTimezone($timezone) ? $timezone : $this->installationTimezone();
+    }
+
+    /**
+     * A point in time in the display time zone of the current user, ready to format ('H:i', isoFormat(), ...).
+     *
+     * @param  int|string|DateTimeInterface  $time  UNIX timestamp, date string (UTC if without zone) or date object
+     *
+     * @return Carbon
+     */
+    public function toDisplayTime(int|string|DateTimeInterface $time): Carbon
+    {
+        $carbon = is_int($time) ? Carbon::createFromTimestamp($time) : Carbon::parse($time);
+
+        return $carbon->setTimezone($this->displayTimezone());
+    }
+
+    /**
+     * @param  string  $timezone
+     *
+     * @return bool
+     */
+    public static function isValidTimezone(string $timezone): bool
+    {
+        return $timezone !== '' && in_array($timezone, DateTimeZone::listIdentifiers(), true);
+    }
+
+    /**
+     * Options for a select: identifier => label ('Europe/Berlin' => 'Europe/Berlin (UTC+01:00)').
+     *
+     * @return array<string, string>
+     */
+    public static function timezoneOptions(): array
+    {
+        $options = [];
+        foreach (DateTimeZone::listIdentifiers() as $identifier) {
+            $options[$identifier] = sprintf('%s (UTC%s)', $identifier, (new \DateTime('now', new DateTimeZone($identifier)))->format('P'));
+        }
+
+        return $options;
+    }
 }
