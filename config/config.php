@@ -16,6 +16,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Progressive web app (PWA)
+    |--------------------------------------------------------------------------
+    |
+    | Makes the website installable (Android, iOS, desktop) and shows an offline page when the server can't be
+    | reached. See README "Progressive web app". Empty colors fall back to the theme (theme.json "tokens":
+    | "pwa.theme_color", "pwa.background_color") and then to PwaService::DEFAULT_COLOR.
+    |
+    */
+    'pwa'                   => [
+        // Default: on in production only. A service worker that stays registered in dev is confusing.
+        'enabled'          => (bool) env('MODULE_WEBSITE_BASE_PWA_ENABLED', env('APP_ENV') === 'production'),
+        // empty = app.name
+        'name'             => env('MODULE_WEBSITE_BASE_PWA_NAME', ''),
+        // empty = name
+        'short_name'       => env('MODULE_WEBSITE_BASE_PWA_SHORT_NAME', ''),
+        // empty = theme token, then PwaService::DEFAULT_COLOR
+        'theme_color'      => env('MODULE_WEBSITE_BASE_PWA_THEME_COLOR', ''),
+        'background_color' => env('MODULE_WEBSITE_BASE_PWA_BACKGROUND_COLOR', ''),
+        // Seconds a page load may take until the offline page is shown (VPN off: connects can hang a long time)
+        'navigate_timeout' => (int) env('MODULE_WEBSITE_BASE_PWA_NAVIGATE_TIMEOUT', 15),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Cache settings
     |--------------------------------------------------------------------------
     |

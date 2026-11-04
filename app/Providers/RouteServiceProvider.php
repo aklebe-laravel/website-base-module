@@ -36,7 +36,22 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
 
+        $this->mapPwaRoutes();
+
         $this->mapWebRoutes();
+    }
+
+    /**
+     * Define the PWA routes (manifest, service worker, offline page).
+     *
+     * Without the "web" group on purpose: browsers request these files often (the service worker on every
+     * update check), they need no session, cookies or CSRF, and must work for guests.
+     *
+     * @return void
+     */
+    protected function mapPwaRoutes(): void
+    {
+        Route::namespace($this->moduleNamespace)->group(ModuleService::getPath('pwa.php', 'WebsiteBase', 'routes'));
     }
 
     /**

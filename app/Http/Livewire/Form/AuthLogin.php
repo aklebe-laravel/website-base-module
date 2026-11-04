@@ -157,7 +157,7 @@ class AuthLogin extends AuthBase
             RateLimiter::hit($this->throttleKey());
             $this->addErrorMessage(__('auth.failed'));
             Log::error(sprintf("User Login failed. Attempted to authenticate '%s'.", $username),
-                [__METHOD__, $credentials]);
+                [__METHOD__]);
 
             return false;
         }
